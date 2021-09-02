@@ -43,6 +43,7 @@ class ApisManager:
     def __init__(self) -> None:
         self.apis: list[Api] = []
         self.logzio_shipper = None
+        self.time_interval = 0
         self.threads = []
         self.event = threading.Event()
 
@@ -72,6 +73,10 @@ class ApisManager:
             return False
 
         self.logzio_shipper = LogzioShipper(logzio_url, logzio_token)
+        self.time_interval = self.__get_time_interval(config_data)
+
+        if self.time_interval == 0:
+            return False
 
         if not self.__add_auth_apis(config_data):
             return False
@@ -90,6 +95,20 @@ class ApisManager:
                 "Your configuration is not valid: logzio must have url and token. Please check your configuration.")
 
         return logzio_url, logzio_token
+
+    def __get_time_interval(self, config_data: dict) -> int:
+        time_interval = 0
+
+        try:
+            time_interval = config_data['settings']['time_interval'] * 60
+        except KeyError:
+            logger.error(
+                "Your configuration is not valid: settings must have time_interval. Please check your configuration.")
+        except TypeError:
+            logger.error("Your configuration is not valid: time_interval in settings must be whole positive integer. "
+                         "Please check your configuration.")
+
+        return time_interval
 
     def __add_auth_apis(self, config_data: dict) -> bool:
         if ApisManager.AUTH_APIS_CONFIG_KEY in config_data:
@@ -214,7 +233,7 @@ class ApisManager:
             thread.start()
             thread.join()
 
-            if self.event.wait(timeout=30):
+            if self.event.wait(timeout=self.time_interval):
                 break
 
     def __send_data_to_logzio(self, api: Api):
@@ -250,7 +269,7 @@ class ApisManager:
         if is_data_exist and is_data_sent_successfully:
             api.update_start_date_filter()
 
-        logger.info("Task is over. A new Task will run in {} minutes.".format(30 / 60))
+        logger.info("Task is over. A new Task will run in {} minutes.".format(self.time_interval / 60))
 
     def __exit_gracefully(self) -> None:
         logger.info("Signal caught...")
