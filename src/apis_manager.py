@@ -262,6 +262,10 @@ class ApisManager:
             if e.response.status_code == 401:
                 os.kill(os.getpid(), signal.SIGTERM)
                 return
+        except Api.ApiError:
+            logger.error("Failed to send data to Logz.io...")
+            os.kill(os.getpid(), signal.SIGTERM)
+            return
         except Exception:
             logger.error("Failed to send data to Logz.io...")
             is_data_sent_successfully = False

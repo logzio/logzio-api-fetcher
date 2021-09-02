@@ -2,8 +2,9 @@ import logging
 import requests
 import json
 
-from typing import Generator, Optional
+from typing import Generator
 from datetime import datetime, timedelta
+from .api import Api
 from .auth_api import AuthApi
 
 
@@ -80,6 +81,10 @@ class CiscoSecureX(AuthApi):
             response.raise_for_status()
         except requests.HTTPError as e:
             logger.error("Something went wrong while trying to get the events. response: {}".format(e))
+
+            if e.response.status_code == 400 or e.response.status_code == 401:
+                raise Api.ApiError()
+
             raise
         except Exception as e:
             logger.error("Something went wrong. response: {}".format(e))

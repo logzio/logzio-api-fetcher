@@ -4,6 +4,9 @@ from typing import Generator
 
 class Api(ABC):
 
+    class ApiError(Exception):
+        pass
+
     @abstractmethod
     def fetch_data(self) -> Generator:
         pass
