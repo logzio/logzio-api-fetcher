@@ -1,0 +1,31 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: TOKEN
+
+auth_apis:
+  - type: cisco_secure_x
+    id: ID
+    key: KEY
+    filters:
+      - key: start_date
+        value: 2021-08-01T00%3A00%3A00%2B00%3A00
+      - key: event_type%5B%5D
+        value: 554696714
+
+oauth_apis:
+  - type: azure_graph
+    id: ID
+    key: KEY
+    filters:
+      - FILTER_1
+      - FILTER_2
+  - type: general
+    token_url:
+    data_url:
+    data_json_path:
+    next_url_json_path:
+    id: ID
+    key: KEY
+    filters:
+      - FILTER_1
+      - FILTER_2

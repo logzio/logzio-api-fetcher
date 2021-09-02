@@ -9,9 +9,9 @@ import requests
 
 from typing import Optional
 from requests.sessions import InvalidSchema
-from api import Api
-from cisco_secure_x import CiscoSecureX
-from logzio_shipper import LogzioShipper
+from .api import Api
+from .cisco_secure_x import CiscoSecureX
+from .logzio_shipper import LogzioShipper
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class ApiHandler:
     START_DATE_REGEX = '[12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]'
 
     TIME_INTERVAL = 10 * 60                                  # 10 min
-    LAST_START_DATE_FILE_PATH = 'last_start_date.txt'
+    LAST_START_DATE_FILE_PATH = 'core/last_start_date.txt'
 
     def __init__(self) -> None:
         if not self.__are_environment_variables_valid():
@@ -42,14 +42,11 @@ class ApiHandler:
         self.api = self.__get_api()
         self.logzio_shipper = LogzioShipper(os.environ[ApiHandler.LOGZIO_URL_VAR_NAME],
                                             os.environ[ApiHandler.LOGZIO_TOKEN_VAR_NAME])
-        self.scheduler = sched.scheduler(time.time, time.sleep)
         self.time_interval = self.__get_time_interval()
-        self.scheduler_task: Optional[threading.Thread] = None
+        self.event = threading.Event()
 
     def run(self) -> None:
-        self.scheduler.enter(0, 0, self.__run_scheduler_task)
-        self.scheduler.run()
-
+        threading.Thread(target=self.__run_scheduled_tasks).start()
         signal.sigwait([signal.SIGINT, signal.SIGTERM])
         self.__exit_gracefully()
 
@@ -177,15 +174,25 @@ class ApiHandler:
         if are_events_exist and are_events_sent_successfully:
             self.api.update_start_date()
 
-        self.scheduler.enter(self.time_interval, 0, self.__run_scheduler_task)
-
         logger.info("Task is over. A new Task will run in {} minutes.".format(self.time_interval / 60))
+
+    def __run_scheduled_tasks(self):
+        while True:
+            thread = threading.Thread(target=self.__send_events_to_logzio)
+
+            thread.start()
+            thread.join()
+
+            if self.event.wait(timeout=self.time_interval):
+                break
+
+    def __set_signal_flag(self) -> None:
+        self.signal_flag = True
 
     def __exit_gracefully(self) -> None:
         logger.info("Signal caught...")
 
-        self.scheduler_task.join()
-        self.scheduler.cancel(self.scheduler.queue[0])
+        self.event.set()
 
         with open(ApiHandler.LAST_START_DATE_FILE_PATH, 'w') as file:
             file.write(self.api.get_last_start_date())

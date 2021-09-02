@@ -2,47 +2,42 @@ import logging
 import requests
 import json
 
-from typing import Generator
-from api import Api
+from typing import Generator, Optional
 from datetime import datetime, timedelta
+from .auth_api import AuthApi
 
 
 logger = logging.getLogger(__name__)
 
 
-class CiscoSecureX(Api):
+class CiscoSecureX(AuthApi):
 
-    GET_EVENTS_URL = 'https://api.amp.cisco.com/v1/events'
+    GET_EVENTS_URL = 'https://api.amp.cisco.com/v1/events?'
     MAX_EVENTS_BULK = 2500
 
-    def __init__(self, api_id: str, api_key: str, start_date: str) -> None:
-        super().__init__(api_id, api_key, start_date)
+    def __init__(self, api_id: str, api_key: str, api_filters: list[dict]) -> None:
+        super().__init__(api_id, api_key, api_filters)
 
-        if start_date is None:
-            return
-
-        self.__format_start_date(self.start_date)
-
-    def get_events(self) -> Generator:
-        events = []
-        total_events = 0
+    def fetch_data(self) -> Generator:
+        total_events = []
+        total_events_num = 0
         api_url = self.__get_api_url()
 
         while True:
             try:
-                data = self.__get_data_from_api(api_url)
+                next_url, events, events_num = self.__get_data_from_api(api_url)
             except Exception:
                 raise
 
-            events.extend(data['events'])
-            total_events += data['events_num']
+            total_events.extend(events)
+            total_events_num += events_num
 
-            if data['next_url'] is None or total_events >= CiscoSecureX.MAX_EVENTS_BULK:
+            if next_url is None or total_events_num >= CiscoSecureX.MAX_EVENTS_BULK:
                 break
 
-            api_url = data['next_url']
+            api_url = next_url
 
-        if total_events == 0:
+        if total_events_num == 0:
             logger.info("No new events available.")
             return []
 
@@ -51,41 +46,35 @@ class CiscoSecureX(Api):
         for event in reversed(events):
             yield json.dumps(event)
 
-        self.last_start_date = events[0]['date'].split('+')[0]
+        self.__set_last_start_date(events[0]['date'])
 
-    def update_start_date(self) -> None:
-        new_start_date = str(
-            datetime.strptime(self.last_start_date, '%Y-%m-%dT%H:%M:%S') + timedelta(seconds=1))
+    def update_start_date_filter(self) -> None:
+        for api_filter in self.api_filters:
+            if api_filter['key'] != 'start_date':
+                continue
 
-        self.__format_start_date(new_start_date)
+            api_filter['key'] = self.last_start_date
+            return
+
+        self.api_filters.append({'key': 'start_date', 'value': self.last_start_date})
 
     def get_last_start_date(self) -> str:
-        last_start_date = self.start_date.split('%2B')[0]
-        last_start_date = last_start_date.replace('T', ' ')
-        last_start_date = last_start_date.replace('%3A', ':')
-
-        return last_start_date
-
-    def __format_start_date(self, start_date: str) -> None:
-        formatted_start_date = start_date.replace(' ', 'T')
-        formatted_start_date = formatted_start_date.replace(':', '%3A')
-        formatted_start_date += '%2B00%3A00'
-
-        self.start_date = formatted_start_date
+        return self.last_start_date
 
     def __get_api_url(self) -> str:
-        if self.start_date is None:
-            return CiscoSecureX.GET_EVENTS_URL
+        api_url = CiscoSecureX.GET_EVENTS_URL
+        api_filters_num = len(self.api_filters)
 
-        return "{0}?start_date={1}".format(CiscoSecureX.GET_EVENTS_URL, self.start_date)
+        for api_filter in self.api_filters:
+            api_url += api_filter['key'] + '=' + str(api_filter['value'])
+            api_filters_num -= 1
 
-    def __get_data_from_api(self, url: str) -> dict[str, list[str], int]:
-        data = {
-            "next_url": None,
-            "events": [],
-            "events_num": 0
-        }
+            if api_filters_num > 0:
+                api_url += '&'
 
+        return api_url
+
+    def __get_data_from_api(self, url: str) -> tuple[str, list, int]:
         try:
             response = requests.get(url=url, auth=(self.api_id, self.api_key))
             response.raise_for_status()
@@ -98,10 +87,39 @@ class CiscoSecureX(Api):
 
         json_data = json.loads(response.content)
 
-        data['next_url'] = json_data['metadata']['links'].get('next')
-        data['events'] = json_data['data']
-        data['events_num'] = json_data['metadata']['results']['current_item_count']
+        next_url = json_data['metadata']['links'].get('next')
+        events = json_data['data']
+        events_num = json_data['metadata']['results']['current_item_count']
 
-        logger.info("Successfully got {} events from api.".format(data['events_num']))
+        logger.info("Successfully got {} events from api.".format(events_num))
 
-        return data
+        return next_url, events, events_num
+
+    def __set_last_start_date(self, last_start_date) -> None:
+        new_start_date = str(
+            datetime.strptime(last_start_date, '%Y-%m-%dT%H:%M:%S%z') + timedelta(seconds=1))
+        new_start_date = new_start_date.replace(' ', 'T')
+        new_start_date = new_start_date.replace(':', '%3A')
+
+        if '+' in new_start_date:
+            new_start_date = new_start_date.replace('+', '%2B')
+
+        self.last_start_date = new_start_date
+
+    def update_start_date(self) -> None:
+        new_start_date = str(
+            datetime.strptime(self.last_start_date, '%Y-%m-%dT%H:%M:%S%z') + timedelta(seconds=1))
+        new_start_date = new_start_date.replace(' ', 'T')
+
+        self.__format_start_date(new_start_date)
+
+    def get_last_start_date(self) -> Optional[str]:
+        if self.start_date is None:
+            return None
+
+        last_start_date = self.start_date.replace('%3A', ':')
+
+        if '%2B' in last_start_date:
+            last_start_date = last_start_date.replace('%2B', '+')
+
+        return last_start_date

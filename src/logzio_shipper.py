@@ -44,7 +44,8 @@ class LogzioShipper:
         except Exception:
             raise
 
-        self.__reset_after_send(log, log_size)
+        self.logs.append(log)
+        self.bulk_size = log_size
 
     def send_to_logzio(self) -> None:
         if not self.logs:
@@ -61,6 +62,7 @@ class LogzioShipper:
                                                                timeout=LogzioShipper.CONNECTION_TIMEOUT_SECONDS)
             response.raise_for_status()
             logger.info("Successfully sent bulk of {} bytes to Logz.io.".format(self.bulk_size))
+            self.__reset_logs()
         except requests.ConnectionError as e:
             logger.error(
                 "Can't establish connection to {0} url. Please make sure your url is a Logz.io valid url. Max retries of {1} has reached. response: {2}".format(
@@ -130,7 +132,6 @@ class LogzioShipper:
 
         return session
 
-    def __reset_after_send(self, log: Any, log_size: int) -> None:
+    def __reset_logs(self):
         self.logs.clear()
-        self.logs.append(log)
-        self.bulk_size = log_size
+        self.bulk_size = 0

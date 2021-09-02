@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Generator
+from typing import Generator, Optional
 
 
 class Api(ABC):
 
-    def __init__(self, api_id: str, api_key: str, start_date: str) -> None:
+    def __init__(self, api_id: str, api_key: str, start_date: Optional[str]) -> None:
         self.api_id = api_id
         self.api_key = api_key
         self.start_date = start_date
