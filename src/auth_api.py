@@ -1,8 +1,9 @@
 from typing import Generator
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from .api import Api
 
 
-class AuthApi(ABC):
+class AuthApi(Api):
 
     def __init__(self, api_id: str, api_key: str, api_filters: list[dict], url: str = None,
                  next_url_json_path: str = None, data_json_path: str = None):

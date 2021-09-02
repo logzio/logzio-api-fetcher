@@ -41,7 +41,7 @@ class CiscoSecureX(AuthApi):
             logger.info("No new events available.")
             return []
 
-        logger.info("Successfully got {} total events from api.".format(total_events))
+        logger.info("Successfully got {} total events from api.".format(total_events_num))
 
         for event in reversed(events):
             yield json.dumps(event)
@@ -105,21 +105,3 @@ class CiscoSecureX(AuthApi):
             new_start_date = new_start_date.replace('+', '%2B')
 
         self.last_start_date = new_start_date
-
-    def update_start_date(self) -> None:
-        new_start_date = str(
-            datetime.strptime(self.last_start_date, '%Y-%m-%dT%H:%M:%S%z') + timedelta(seconds=1))
-        new_start_date = new_start_date.replace(' ', 'T')
-
-        self.__format_start_date(new_start_date)
-
-    def get_last_start_date(self) -> Optional[str]:
-        if self.start_date is None:
-            return None
-
-        last_start_date = self.start_date.replace('%3A', ':')
-
-        if '%2B' in last_start_date:
-            last_start_date = last_start_date.replace('%2B', '+')
-
-        return last_start_date

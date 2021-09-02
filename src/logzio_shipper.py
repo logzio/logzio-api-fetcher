@@ -132,6 +132,6 @@ class LogzioShipper:
 
         return session
 
-    def __reset_logs(self):
+    def __reset_logs(self) -> None:
         self.logs.clear()
         self.bulk_size = 0

@@ -1,7 +1,14 @@
 import logging
+import os
+import signal
+import sys
+import threading
+import requests
 import yaml
 
 from typing import Optional
+from requests.sessions import InvalidSchema
+from .api import Api
 from .auth_api import AuthApi
 from .oauth_api import OAuthApi
 from .cisco_secure_x import CiscoSecureX
@@ -34,20 +41,26 @@ class ApisManager:
     API_AZURE_GRAPH_TYPE = 'azure_graph'
 
     def __init__(self) -> None:
-        self.auth_apis: list[AuthApi] = []
-        self.oauth_apis: list[OAuthApi] = []
+        self.apis: list[Api] = []
         self.logzio_shipper = None
+        self.threads = []
+        self.event = threading.Event()
 
         if not self.__read_data_from_config():
-            exit(1)
+            sys.exit(1)
 
     def run(self) -> None:
-        if len(self.auth_apis) == 0 and len(self.oauth_apis) == 0:
+        if len(self.apis) == 0:
             return
 
-        for auth_api in self.auth_apis:
-            for data in auth_api.fetch_data():
-                print(data)
+        for api in self.apis:
+            self.threads.append(threading.Thread(target=self.__run_scheduled_tasks, args=(api,)))
+
+        for thread in self.threads:
+            thread.start()
+
+        signal.sigwait([signal.SIGINT, signal.SIGTERM])
+        self.__exit_gracefully()
 
     def __read_data_from_config(self) -> bool:
         with open(ApisManager.CONFIG_FILE, 'r') as config_file:
@@ -86,7 +99,7 @@ class ApisManager:
                 if auth_api is None:
                     return False
 
-                self.auth_apis.append(auth_api)
+                self.apis.append(auth_api)
 
         return True
 
@@ -193,3 +206,56 @@ class ApisManager:
                 "next_url_json_path and data_json_path. Please check your configuration.")
 
         return api_token_url, api_data_url, next_url_json_path, data_json_path
+
+    def __run_scheduled_tasks(self, api: Api):
+        while True:
+            thread = threading.Thread(target=self.__send_data_to_logzio, args=(api,))
+
+            thread.start()
+            thread.join()
+
+            if self.event.wait(timeout=30):
+                break
+
+    def __send_data_to_logzio(self, api: Api):
+        logger.info("Task is running...")
+
+        is_data_exist = False
+        is_data_sent_successfully = True
+
+        try:
+            for data in api.fetch_data():
+                is_data_exist = True
+                self.logzio_shipper.add_log_to_send(data)
+
+            self.logzio_shipper.send_to_logzio()
+        except requests.exceptions.InvalidURL:
+            logger.error("Failed to send data to Logz.io...")
+            os.kill(os.getpid(), signal.SIGTERM)
+            return
+        except InvalidSchema:
+            logger.error("Failed to send data to Logz.io...")
+            os.kill(os.getpid(), signal.SIGTERM)
+            return
+        except requests.HTTPError as e:
+            logger.error("Failed to send data to Logz.io...")
+
+            if e.response.status_code == 401:
+                os.kill(os.getpid(), signal.SIGTERM)
+                return
+        except Exception:
+            logger.error("Failed to send data to Logz.io...")
+            is_data_sent_successfully = False
+
+        if is_data_exist and is_data_sent_successfully:
+            api.update_start_date_filter()
+
+        logger.info("Task is over. A new Task will run in {} minutes.".format(30 / 60))
+
+    def __exit_gracefully(self) -> None:
+        logger.info("Signal caught...")
+
+        self.event.set()
+
+        for thread in self.threads:
+            thread.join()

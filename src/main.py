@@ -1,10 +1,10 @@
 from logging.config import fileConfig
-from api_handler import ApiHandler
+from src.apis_manager import ApisManager
 
 
 def main():
     fileConfig('logging_config.ini', disable_existing_loggers=False)
-    ApiHandler().run()
+    ApisManager().run()
 
 
 if __name__ == '__main__':

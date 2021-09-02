@@ -1,7 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from .api import Api
 
 
-class OAuthApi(ABC):
+class OAuthApi(Api):
 
     def __init__(self, api_id: str, api_key: str, api_filter: list[str], token_url: str = None,
                  data_url: str = None, next_url_json_path: str = None, data_json_path: str = None):
