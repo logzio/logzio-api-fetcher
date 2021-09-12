@@ -18,3 +18,7 @@ class Api(ABC):
     @abstractmethod
     def get_last_start_date(self) -> str:
         pass
+
+    @abstractmethod
+    def get_api_name(self) -> str:
+        pass

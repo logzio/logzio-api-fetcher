@@ -11,3 +11,7 @@ class ApiFilter:
     @property
     def value(self) -> str:
         return self._value
+
+    @value.setter
+    def value(self, value: str) -> None:
+        self._value = value
