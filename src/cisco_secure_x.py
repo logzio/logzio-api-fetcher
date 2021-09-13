@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class CiscoSecureX(AuthApi):
 
-    GET_EVENTS_URL = 'https://api.amp.cisco.com/v1/events?'
+    GET_EVENTS_URL = 'https://api.amp.cisco.com/v1/events'
     START_DATE_NAME = 'start_date'
 
     def __init__(self, api_name: str, api_credentials: ApiCredentials, api_filters: list[ApiFilter]) -> None:

@@ -95,6 +95,9 @@ class AuthApi(Api):
         api_url = self._url
         api_filters_num = len(self._filters)
 
+        if api_filters_num > 0:
+            api_url += '?'
+
         for api_filter in self._filters:
             api_url += api_filter.key + '=' + str(api_filter.value)
             api_filters_num -= 1
