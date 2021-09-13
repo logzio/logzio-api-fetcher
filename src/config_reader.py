@@ -29,7 +29,7 @@ class ConfigReader:
     API_CREDENTIALS_CONFIG_KEY = 'credentials'
     API_CREDENTIALS_ID_CONFIG_KEY = 'id'
     API_CREDENTIALS_KEY_CONFIG_KEY = 'key'
-    API_START_DATE_NAME_CONFIG_KEY = 'name'
+    API_START_DATE_NAME_CONFIG_KEY = 'start_date_name'
     API_FILTERS_CONFIG_KEY = 'filters'
     API_FILTER_KEY_CONFIG_KEY = 'key'
     API_FILTER_VALUE_CONFIG_KEY = 'value'

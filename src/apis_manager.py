@@ -5,8 +5,10 @@ import sys
 import threading
 import requests
 
+from typing import Optional
 from requests.sessions import InvalidSchema
 from .config_reader import ConfigReader
+from .data.logzio_config_data import LogzioConfigData
 from .data.auth_api_config_data import AuthApiConfigData
 from .data.oauth_api_config_data import OAuthApiConfigData
 from .api import Api
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ApisManager:
 
     CONFIG_FILE = 'config.yaml'
-    LAST_START_DATES_FILE = 'last_start_date.txt'
+    LAST_START_DATES_FILE = 'last_start_dates.txt'
 
     API_GENERAL_TYPE = 'general'
     API_CISCO_SECURE_X_TYPE = 'cisco_secure_x'
@@ -30,7 +32,7 @@ class ApisManager:
 
     def __init__(self) -> None:
         self.apis: list[Api] = []
-        self.logzio_shipper = None
+        self.logzio_credentials: Optional[LogzioConfigData] = None
         self.settings = None
         self.threads = []
         self.event = threading.Event()
@@ -60,7 +62,7 @@ class ApisManager:
         if logzio_config_data is None:
             return False
 
-        self.logzio_shipper = LogzioShipper(logzio_config_data.url, logzio_config_data.token)
+        self.logzio_credentials = logzio_config_data
 
         settings_config_data = config_reader.get_settings_config_data()
 
@@ -113,8 +115,10 @@ class ApisManager:
         return False
 
     def __run_scheduled_tasks(self, api: Api):
+        logzio_shipper = LogzioShipper(self.logzio_credentials.url, self.logzio_credentials.token)
+
         while True:
-            thread = threading.Thread(target=self.__send_data_to_logzio, args=(api,))
+            thread = threading.Thread(target=self.__send_data_to_logzio, args=(api, logzio_shipper,))
 
             thread.start()
             thread.join()
@@ -122,7 +126,7 @@ class ApisManager:
             if self.event.wait(timeout=self.settings.time_interval):
                 break
 
-    def __send_data_to_logzio(self, api: Api):
+    def __send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper):
         logger.info("Task is running for api {}...".format(api.get_api_name()))
 
         is_data_exist = False
@@ -131,9 +135,9 @@ class ApisManager:
         try:
             for data in api.fetch_data():
                 is_data_exist = True
-                self.logzio_shipper.add_log_to_send(data)
+                logzio_shipper.add_log_to_send(data)
 
-            self.logzio_shipper.send_to_logzio()
+            logzio_shipper.send_to_logzio()
         except requests.exceptions.InvalidURL:
             logger.error("Failed to send data to Logz.io...")
             os.kill(os.getpid(), signal.SIGTERM)
@@ -171,10 +175,12 @@ class ApisManager:
             file_lines = file.readlines()
             line_num = self._get_api_line_num_in_file(api_name, file_lines)
 
-            if line_num == -1:
+            if not file_lines:
                 file_lines.append("{0}: {1}".format(api_name, last_start_date))
+            elif line_num == -1:
+                file_lines.append("\n{0}: {1}".format(api_name, last_start_date))
             else:
-                file_lines[line_num] = "{0}: {1}".format(api_name, last_start_date)
+                file_lines[line_num] = "\n{0}: {1}".format(api_name, last_start_date)
 
             file.seek(0)
             file.writelines(file_lines)
@@ -182,15 +188,15 @@ class ApisManager:
         self.lock.release()
 
     def _get_api_line_num_in_file(self, api_name: str, file_lines: list[str]) -> int:
-        line_num = -1
+        line_num = 0
 
         for line in file_lines:
+            if line.startswith(api_name):
+                return line_num
+
             line_num += 1
 
-            if line.startswith(api_name):
-                break
-
-        return line_num
+        return -1
 
     def __exit_gracefully(self) -> None:
         logger.info("Signal caught...")
