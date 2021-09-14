@@ -90,6 +90,9 @@ class AuthApi(Api):
         api_url = self._url.api_url
         api_filters_num = len(self._base_config.filters)
 
+        if api_filters_num > 0:
+            api_url += '?'
+
         for api_filter in self._base_config.filters:
             api_url += api_filter.key + '=' + str(api_filter.value)
             api_filters_num -= 1
@@ -123,7 +126,8 @@ class AuthApi(Api):
 
     def _get_response_from_api(self, url: str):
         try:
-            response = requests.get(url=url, auth=(self._base_config.credentials.id, self._base_config.credentials.key),headers=self._url.url_headers)
+            response = requests.get(url=url, auth=(self._base_config.credentials.id, self._base_config.credentials.key),
+                                    headers=self._url.url_headers)
             response.raise_for_status()
         except requests.HTTPError as e:
             logger.error(
