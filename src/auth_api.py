@@ -4,28 +4,23 @@ import requests
 import json
 
 from typing import Generator, Optional
-from abc import abstractmethod
 from datetime import datetime, timedelta
 from jsonpath_ng import parse
 from dateutil import parser
 from .api import Api
-from .data.api_credentials import ApiCredentials
 from .data.api_filter import ApiFilter
 from .data.api_json_paths import ApiJsonPaths
-
+from .data.api_url import ApiUrl
+from .data.config_base_data import ConfigBaseData
 
 logger = logging.getLogger(__name__)
 
 
 class AuthApi(Api):
 
-    def __init__(self, api_name: str, api_credentials: ApiCredentials, api_filters: list[ApiFilter],
-                 api_url: str = None, api_start_date_name: str = None, api_json_paths: ApiJsonPaths = None):
-        self._name = api_name
-        self._credentials = api_credentials
-        self._start_date_name = api_start_date_name
-        self._filters = api_filters
+    def __init__(self, base_config: ConfigBaseData, api_url: ApiUrl, api_json_paths: ApiJsonPaths = None):
         self._url = api_url
+        self._base_config = base_config
         self._json_paths = api_json_paths
         self._current_data_last_date: Optional[str] = None
 
@@ -33,10 +28,10 @@ class AuthApi(Api):
         total_events, total_events_num = self._get_total_data_from_api()
 
         if not total_events:
-            logger.info("No new events available for api {}.".format(self._name))
+            logger.info("No new events available for api {}.".format(self._base_config.name))
             return total_events
 
-        logger.info("Successfully got {0} total events from api {1}.".format(total_events_num, self._name))
+        logger.info("Successfully got {0} total events from api {1}.".format(total_events_num, self._base_config))
 
         for event in total_events:
             yield json.dumps(event)
@@ -49,18 +44,18 @@ class AuthApi(Api):
     def update_start_date_filter(self) -> None:
         new_start_date = self._get_new_start_date()
 
-        for api_filter in self._filters:
-            if api_filter.key != self._start_date_name:
+        for api_filter in self._base_config.filters:
+            if api_filter.key != self._base_config.start_date_name:
                 continue
 
             api_filter.value = new_start_date
             return
 
-        self._filters.append(ApiFilter(self._start_date_name, new_start_date))
+        self._base_config.filters.append(ApiFilter(self._base_config.start_date_name, new_start_date))
 
     def get_last_start_date(self) -> Optional[str]:
-        for api_filter in self._filters:
-            if api_filter.key != self._start_date_name:
+        for api_filter in self._base_config.filters:
+            if api_filter.key != self._base_config.start_date_name:
                 continue
 
             return api_filter.value
@@ -68,7 +63,7 @@ class AuthApi(Api):
         return None
 
     def get_api_name(self):
-        return self._name
+        return self._base_config.name
 
     def _get_total_data_from_api(self) -> tuple[list, int]:
         total_events = []
@@ -84,7 +79,7 @@ class AuthApi(Api):
             total_events.extend(events)
             total_events_num += events_num
 
-            if next_url is None or total_events_num >= 2500:
+            if next_url is None or total_events_num >= self._base_config.max_bulk_size:
                 break
 
             api_url = next_url
@@ -92,10 +87,10 @@ class AuthApi(Api):
         return total_events, total_events_num
 
     def _build_api_url(self) -> str:
-        api_url = self._url
-        api_filters_num = len(self._filters)
+        api_url = self._url.api_url
+        api_filters_num = len(self._base_config.filters)
 
-        for api_filter in self._filters:
+        for api_filter in self._base_config.filters:
             api_url += api_filter.key + '=' + str(api_filter.value)
             api_filters_num -= 1
 
@@ -116,29 +111,31 @@ class AuthApi(Api):
 
         if events is None:
             logger.error(
-                "The json path for api {}'s data is wrong. Please change your configuration.".format(self._name))
+                "The json path for api {}'s data is wrong. Please change your configuration.".format(
+                    self._base_config.name))
             raise Api.ApiError
 
         events_num = len(events)
 
-        logger.info("Successfully got {0} events from api {1}.".format(events_num, self._name))
+        logger.info("Successfully got {0} events from api {1}.".format(events_num, self._base_config.name))
 
         return next_url, events, events_num
 
     def _get_response_from_api(self, url: str):
         try:
-            response = requests.get(url=url, auth=(self._credentials.id, self._credentials.key))
+            response = requests.get(url=url, auth=(self._base_config.credentials.id, self._base_config.credentials.key),headers=self._url.url_headers)
             response.raise_for_status()
         except requests.HTTPError as e:
             logger.error(
-                "Something went wrong while trying to get the events from api {0}. response: {1}".format(self._name, e))
+                "Something went wrong while trying to get the events from api {0}. response: {1}".format(
+                    self._base_config.name, e))
 
             if e.response.status_code == 400 or e.response.status_code == 401:
                 raise Api.ApiError()
 
             raise
         except Exception as e:
-            logger.error("Something went wrong with api {0}. response: {1}".format(self._name, e))
+            logger.error("Something went wrong with api {0}. response: {1}".format(self._base_config.name, e))
             raise
 
         return response
@@ -152,7 +149,7 @@ class AuthApi(Api):
             if event_date is None:
                 logger.error(
                     "The json path for api {}'s data date is wrong. Please change your configuration.".format(
-                        self._name))
+                        self._base_config.name))
                 raise Api.ApiError
 
             event_date_datetime = parser.parse(event_date)

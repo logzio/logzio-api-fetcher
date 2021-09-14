@@ -5,9 +5,12 @@ import sys
 import threading
 import requests
 
-from typing import Optional
+from typing import Optional, Union
 from requests.sessions import InvalidSchema
+
+from .azure_graph import AzureGraph
 from .config_reader import ConfigReader
+from .data.azure_graph_config_data import AzureGraphConfigData
 from .data.logzio_config_data import LogzioConfigData
 from .data.auth_api_config_data import AuthApiConfigData
 from .data.oauth_api_config_data import OAuthApiConfigData
@@ -16,15 +19,12 @@ from .cisco_secure_x import CiscoSecureX
 from .general_auth_api import GeneralAuthApi
 from .logzio_shipper import LogzioShipper
 
-
 logger = logging.getLogger(__name__)
 
 
 class ApisManager:
-
     CONFIG_FILE = 'config.yaml'
     LAST_START_DATES_FILE = 'last_start_dates.txt'
-
     API_GENERAL_TYPE = 'general'
     API_CISCO_SECURE_X_TYPE = 'cisco_secure_x'
     API_AZURE_GRAPH_TYPE = 'azure_graph'
@@ -88,30 +88,32 @@ class ApisManager:
         return True
 
     def _add_auth_api(self, auth_api_config_data: AuthApiConfigData) -> bool:
-        if auth_api_config_data.type == ApisManager.API_GENERAL_TYPE:
-            self.apis.append(GeneralAuthApi(auth_api_config_data.name, auth_api_config_data.credentials,
-                                            auth_api_config_data.filters, auth_api_config_data.url,
-                                            auth_api_config_data.start_date_name, auth_api_config_data.json_paths))
+        if auth_api_config_data.base_config.type == ApisManager.API_GENERAL_TYPE:
+            self.apis.append(
+                GeneralAuthApi(auth_api_config_data.base_config, auth_api_config_data.api_url,
+                               auth_api_config_data.json_paths))
             return True
 
-        if auth_api_config_data.type == ApisManager.API_CISCO_SECURE_X_TYPE:
-            self.apis.append(CiscoSecureX(auth_api_config_data.name, auth_api_config_data.credentials,
-                                          auth_api_config_data.filters))
+        if auth_api_config_data.base_config.type == ApisManager.API_CISCO_SECURE_X_TYPE:
+            self.apis.append(
+                CiscoSecureX(auth_api_config_data.base_config))
             return True
 
-        logger.error("the auth api {0} has an unsupported type - {1}".format(auth_api_config_data.name,
-                                                                             auth_api_config_data.type))
+        logger.error("the auth api {0} has an unsupported type - {1}".format(auth_api_config_data.base_config.name,
+                                                                             auth_api_config_data.base_config.type))
         return False
 
-    def _add_oauth_api(self, oauth_api_config_data: OAuthApiConfigData):
-        if oauth_api_config_data.type == ApisManager.API_GENERAL_TYPE:
+    def _add_oauth_api(self, oauth_api_config_data: Union[
+        None, OAuthApiConfigData, AzureGraphConfigData]):
+        if oauth_api_config_data.config_base_data.type == ApisManager.API_GENERAL_TYPE:
             pass
 
-        if oauth_api_config_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
-            pass
+        if oauth_api_config_data.config_base_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
+            self.apis.append(AzureGraph(oauth_api_config_data))
 
-        logger.error("One of the oauth api {0} has an unsupported type - {1}".format(oauth_api_config_data.name,
-                                                                                     oauth_api_config_data.type))
+        logger.error(
+            "One of the oauth api {0} has an unsupported type - {1}".format(oauth_api_config_data.config_base_data.name,
+                                                                            oauth_api_config_data.config_base_data.type))
         return False
 
     def __run_scheduled_tasks(self, api: Api):
