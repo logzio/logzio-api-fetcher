@@ -10,7 +10,7 @@ class ConfigBaseData:
         self._credentials = api_credentials
         self._start_date_name = api_start_date_name
         self._filters = api_filters
-        self._max_bulk_size=max_bulk_size
+        self._max_bulk_size = max_bulk_size
 
     @property
     def type(self) -> str:
@@ -39,3 +39,7 @@ class ConfigBaseData:
     @property
     def max_bulk_size(self) -> int:
         return self._max_bulk_size
+
+    @max_bulk_size.setter
+    def max_bulk_size(self, value):
+        self._max_bulk_size = value

@@ -5,12 +5,11 @@ import sys
 import threading
 import requests
 
-from typing import Optional, Union
+from typing import Optional
 from requests.sessions import InvalidSchema
 
 from .azure_graph import AzureGraph
 from .config_reader import ConfigReader
-from .data.azure_graph_config_data import AzureGraphConfigData
 from .data.logzio_config_data import LogzioConfigData
 from .data.auth_api_config_data import AuthApiConfigData
 from .data.oauth_api_config_data import OAuthApiConfigData
@@ -75,19 +74,20 @@ class ApisManager:
             if auth_api_config_data is None:
                 return False
 
-            if not self._add_auth_api(auth_api_config_data):
+            if not self._add_auth_api(auth_api_config_data, settings_config_data.max_bulk_size):
                 return False
 
         for oauth_api_config_data in config_reader.get_oauth_apis_config_data():
             if oauth_api_config_data is None:
                 return False
 
-            if not self._add_oauth_api(oauth_api_config_data):
+            if not self._add_oauth_api(oauth_api_config_data, settings_config_data.max_bulk_size):
                 return False
 
         return True
 
-    def _add_auth_api(self, auth_api_config_data: AuthApiConfigData) -> bool:
+    def _add_auth_api(self, auth_api_config_data: AuthApiConfigData, max_bulk_size: int) -> bool:
+        auth_api_config_data.base_config.max_bulk_size = max_bulk_size
         if auth_api_config_data.base_config.type == ApisManager.API_GENERAL_TYPE:
             self.apis.append(
                 GeneralAuthApi(auth_api_config_data.base_config, auth_api_config_data.api_url,
@@ -103,18 +103,19 @@ class ApisManager:
                                                                              auth_api_config_data.base_config.type))
         return False
 
-    def _add_oauth_api(self, oauth_api_config_data: Union[
-        None, OAuthApiConfigData, AzureGraphConfigData]):
+    def _add_oauth_api(self, oauth_api_config_data: OAuthApiConfigData, max_bulk_size: int):
+        oauth_api_config_data.config_base_data.max_bulk_size = max_bulk_size
         if oauth_api_config_data.config_base_data.type == ApisManager.API_GENERAL_TYPE:
             pass
-
-        if oauth_api_config_data.config_base_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
+        elif oauth_api_config_data.config_base_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
             self.apis.append(AzureGraph(oauth_api_config_data))
-
-        logger.error(
-            "One of the oauth api {0} has an unsupported type - {1}".format(oauth_api_config_data.config_base_data.name,
-                                                                            oauth_api_config_data.config_base_data.type))
-        return False
+        else:
+            logger.error(
+                "One of the oauth api {0} has an unsupported type - {1}".format(
+                    oauth_api_config_data.config_base_data.name,
+                    oauth_api_config_data.config_base_data.type))
+            return False
+        return True
 
     def __run_scheduled_tasks(self, api: Api):
         logzio_shipper = LogzioShipper(self.logzio_credentials.url, self.logzio_credentials.token)

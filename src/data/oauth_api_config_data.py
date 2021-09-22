@@ -1,4 +1,3 @@
-
 from .config_base_data import ConfigBaseData
 from .oauth_api_urls import OAuthApiUrls
 from .api_json_paths import ApiJsonPaths
@@ -20,6 +19,10 @@ class OAuthApiConfigData:
     @property
     def json_paths(self) -> ApiJsonPaths:
         return self._json_paths
+
+    @json_paths.setter
+    def json_paths(self, value):
+        self._json_paths = value
 
     @property
     def config_base_data(self):

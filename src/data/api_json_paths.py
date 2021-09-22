@@ -16,3 +16,11 @@ class ApiJsonPaths:
     @property
     def data_date(self) -> str:
         return self._data_date
+
+    @next_url.setter
+    def next_url(self, next_url) -> str:
+        self._next_url = next_url
+
+    @data.setter
+    def data(self, data_link) -> str:
+        self._data = data_link

@@ -4,8 +4,6 @@ import yaml
 from typing import Optional, Generator, Union
 
 from .data.api_url import ApiUrl
-from .data.azure_ad_client_data import AzureADClientData
-from .data.azure_graph_config_data import AzureGraphConfigData
 from .data.config_base_data import ConfigBaseData
 from .data.logzio_config_data import LogzioConfigData
 from .data.settings_config_data import SettingsConfigData
@@ -33,7 +31,7 @@ class ConfigReader:
     API_CREDENTIALS_ID_CONFIG_KEY = 'id'
     API_CREDENTIALS_KEY_CONFIG_KEY = 'key'
     API_START_DATE_NAME_CONFIG_KEY = 'start_date_name'
-    API_FILTERS_CONFIG_KEY = 'filters'
+    API_FILTERS_CONFIG_KEY = 'additional_filters'
     API_FILTER_KEY_CONFIG_KEY = 'key'
     API_FILTER_VALUE_CONFIG_KEY = 'value'
     GENERAL_API_URL_CONFIG_KEY = 'url'
@@ -43,8 +41,9 @@ class ConfigReader:
     GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY = 'next_url'
     GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY = 'data'
     GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY = 'data_date'
+    GENERAL_API_URL_BODY_CONFIG_KEY = 'body'
     GENERAL_API_URL_HEADERS_CONFIG_KEY = 'headers'
-    GENERAL_API_MAX_BULK_SIZE_CONFIG_KEY = 'max_bulk_size'
+    settings_MAX_BULK_SIZE_CONFIG_KEY = 'max_bulk_size'
 
     def __init__(self, config_file: str, api_general_type: str):
         with open(config_file, 'r') as config:
@@ -66,7 +65,6 @@ class ConfigReader:
     def get_settings_config_data(self) -> Optional[SettingsConfigData]:
         try:
             settings = self.config_data[ConfigReader.SETTINGS_CONFIG_KEY]
-
             time_interval = settings[ConfigReader.SETTINGS_TIME_INTERVAL_CONFIG_KEY] * 60
         except KeyError:
             logger.error(
@@ -77,7 +75,7 @@ class ConfigReader:
                          "Please check your configuration.")
             return None
 
-        return SettingsConfigData(time_interval)
+        return SettingsConfigData(time_interval, settings.get(ConfigReader.settings_MAX_BULK_SIZE_CONFIG_KEY))
 
     def get_auth_apis_config_data(self) -> Generator:
         if ConfigReader.AUTH_APIS_CONFIG_KEY in self.config_data:
@@ -94,7 +92,7 @@ class ConfigReader:
         api_name = self._get_api_name(config_auth_api_data)
         api_credentials = self._get_api_credentials(config_auth_api_data)
         api_filters = self._get_api_filters(config_auth_api_data)
-        max_bulk_size = config_auth_api_data.get(self.GENERAL_API_MAX_BULK_SIZE_CONFIG_KEY)
+        max_bulk_size = config_auth_api_data.get(self.settings_MAX_BULK_SIZE_CONFIG_KEY)
         if api_type is None or api_name is None or api_credentials is None or api_filters is None:
             return None
 
@@ -114,7 +112,7 @@ class ConfigReader:
         return AuthApiConfigData(base_config)
 
     def _get_oauth_api_config_data(self, config_oauth_api_data: dict) -> Union[
-        None, OAuthApiConfigData, AzureGraphConfigData]:
+        None, OAuthApiConfigData]:
         api_type = self._get_api_type(config_oauth_api_data)
         api_name = self._get_api_name(config_oauth_api_data)
         api_credentials = self._get_api_credentials(config_oauth_api_data)
@@ -125,21 +123,15 @@ class ConfigReader:
 
         api_urls = self._get_oauth_urls(config_oauth_api_data)
         api_start_date_name = self._get_api_start_date_name(config_oauth_api_data)
-        api_json_paths = ApiJsonPaths("@odata.nextLink", "value", config_oauth_api_data.get(
-            ConfigReader.GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY))
+        api_json_paths = self._get_api_json_paths(config_oauth_api_data)
+
         if api_urls is None or api_start_date_name is None or api_json_paths is None:
             return None
         base_config = ConfigBaseData(api_type, api_name, api_credentials, api_filters, api_start_date_name)
         oauth_config = OAuthApiConfigData(base_config
                                           , api_urls,
                                           api_json_paths)
-        from src.apis_manager import ApisManager
-        if api_type == self.api_general_type:
-            return oauth_config
-        elif api_type == ApisManager.API_AZURE_GRAPH_TYPE:
-            return self._get_azure_graph_config_data(oauth_config, config_oauth_api_data)
-
-        return OAuthApiConfigData(base_config)
+        return oauth_config
 
     def _get_api_type(self, config_api_data: dict) -> Optional[str]:
         try:
@@ -189,16 +181,16 @@ class ConfigReader:
     def _get_api_filters(self, config_api_data: dict) -> Optional[list[ApiFilter]]:
         api_filters = []
         if ConfigReader.API_FILTERS_CONFIG_KEY in config_api_data:
-            for api_filter in config_api_data[ConfigReader.API_FILTERS_CONFIG_KEY]:
-                try:
-                    api_filter_key = api_filter[ConfigReader.API_FILTER_KEY_CONFIG_KEY]
-                    api_filter_value = api_filter[ConfigReader.API_FILTER_VALUE_CONFIG_KEY]
-                except KeyError:
-                    logger.error("Your configuration is not valid: auth_api/oauth_api filter must have key and value. "
-                                 "Please check your configuration.")
-                    return None
+            for filter, value in config_api_data[ConfigReader.API_FILTERS_CONFIG_KEY].items():
+                # try:
+                #     api_filter_key = api_filter[ConfigReader.API_FILTER_KEY_CONFIG_KEY]
+                #     api_filter_value = api_filter[ConfigReader.API_FILTER_VALUE_CONFIG_KEY]
+                # except KeyError:
+                #     logger.error("Your configuration is not valid: auth_api/oauth_api filter must have key and value. "
+                #                  "Please check your configuration.")
+                #     return None
 
-                api_filters.append(ApiFilter(api_filter_key, api_filter_value))
+                api_filters.append(ApiFilter(filter, value))
 
         return api_filters
 
@@ -218,6 +210,10 @@ class ConfigReader:
                 ConfigReader.GENERAL_API_URL_CONFIG_KEY]
             api_token_url = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY][
                 ConfigReader.GENERAL_API_URL_CONFIG_KEY]
+            api_data_body = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_DATA_URL_CONFIG_KEY].get(
+                ConfigReader.GENERAL_API_URL_BODY_CONFIG_KEY)
+            api_token_body = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY].get(
+                ConfigReader.GENERAL_API_URL_BODY_CONFIG_KEY)
             api_data_headers = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_DATA_URL_CONFIG_KEY].get(
                 ConfigReader.GENERAL_API_URL_HEADERS_CONFIG_KEY)
             api_token_headers = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY].get(
@@ -229,20 +225,22 @@ class ConfigReader:
                 "Please check your configuration.")
             return None
 
-        return OAuthApiUrls(ApiUrl(api_data_url, api_data_headers), ApiUrl(api_token_url, api_token_headers))
+        return OAuthApiUrls(ApiUrl(api_data_url, api_data_headers, api_data_body),
+                            ApiUrl(api_token_url, api_token_headers, api_token_body))
 
     def _get_api_json_paths(self, config_api_data: dict) -> Optional[ApiJsonPaths]:
         try:
             api_json_paths = config_api_data[ConfigReader.GENERAL_API_JSON_PATHS_CONFIG_KEY]
         except KeyError:
-            logger.error(
-                "Your configuration is not valid: general type auth_api/oauth_api must have json_paths with next_url, "
-                "data and data_date. Please check your configuration.")
-            return None
+            if config_api_data[self.API_TYPE_CONFIG_KEY] != 'azure_graph':
+                logger.error(
+                    "Your configuration is not valid: general type auth_api/oauth_api must have json_paths with next_url, "
+                    "data and data_date. Please check your configuration.")
+                return None
 
-        return self._get_json_paths(api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY)
-                                    , api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY),
-                                    api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY))
+        return ApiJsonPaths(api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY)
+                            , api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY),
+                            api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY))
 
     def _get_json_paths(self, next_url: str, data_path: str, date_path: str) -> Optional[ApiJsonPaths]:
         if next_url is None or data_path is None or date_path is None:
@@ -251,26 +249,3 @@ class ConfigReader:
                 "Please check your configuration.")
             return None
         return ApiJsonPaths(next_url, data_path, date_path)
-
-    def _get_azure_ad_client(self, config_oauth_api_data: dict) -> Optional[AzureADClientData]:
-        try:
-            tenant_id = config_oauth_api_data[AzureGraphConfigData.TENANT_ID_CONFIG_KEY]
-            scope = config_oauth_api_data.get(AzureGraphConfigData.GRAPH_TOKEN_SCOPE_CONFIG_KEY)
-
-        except KeyError:
-            logger.error(
-                "Your configuration is not valid: azure graph type oauth_api must have tenant_id and scope. "
-                "Please check your configuration.")
-            return None
-
-        subscription_id = config_oauth_api_data.get(AzureGraphConfigData.SUBSCRIPTION_ID_CONFIG_KEY)
-        user_id = config_oauth_api_data.get(AzureGraphConfigData.USER_ID_CONFIG_KEY)
-        return AzureADClientData(tenant_id, scope,
-                                 subscription_id, user_id)
-
-    def _get_azure_graph_config_data(self, oauth_config: OAuthApiConfigData,
-                                     config_oauth_api_data: dict) -> Optional[AzureGraphConfigData]:
-        azure_ad_client = self._get_azure_ad_client(config_oauth_api_data)
-        if azure_ad_client is None:
-            return None
-        return AzureGraphConfigData(oauth_config, azure_ad_client)
