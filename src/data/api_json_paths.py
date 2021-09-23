@@ -18,9 +18,9 @@ class ApiJsonPaths:
         return self._data_date
 
     @next_url.setter
-    def next_url(self, next_url) -> str:
+    def next_url(self, next_url) -> None:
         self._next_url = next_url
 
     @data.setter
-    def data(self, data_link) -> str:
+    def data(self, data_link) -> None:
         self._data = data_link

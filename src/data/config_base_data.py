@@ -3,8 +3,8 @@ from src.data.api_filter import ApiFilter
 
 
 class ConfigBaseData:
-    def __init__(self, api_type: str, api_name: str, api_credentials: ApiCredentials, api_filters: list[ApiFilter]
-                 , api_start_date_name: str = None, max_bulk_size: int = 2500):
+    def __init__(self, api_type: str, api_name: str, api_credentials: ApiCredentials, api_filters: list[ApiFilter],
+                 api_start_date_name: str = None, max_bulk_size: int = 2500) -> None:
         self._type = api_type
         self._name = api_name
         self._credentials = api_credentials
@@ -33,7 +33,7 @@ class ConfigBaseData:
         return self._filters
 
     @start_date_name.setter
-    def start_date_name(self, name):
+    def start_date_name(self, name) -> None:
         self._start_date_name = name
 
     @property
@@ -41,5 +41,5 @@ class ConfigBaseData:
         return self._max_bulk_size
 
     @max_bulk_size.setter
-    def max_bulk_size(self, value):
+    def max_bulk_size(self, value) -> None:
         self._max_bulk_size = value

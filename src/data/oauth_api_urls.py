@@ -3,7 +3,7 @@ from src.data.api_url import ApiUrl
 
 class OAuthApiUrls:
 
-    def __init__(self, api_data_url: ApiUrl, api_token_url: ApiUrl):
+    def __init__(self, api_data_url: ApiUrl, api_token_url: ApiUrl) -> None:
         self._data_url = api_data_url
         self._token_url = api_token_url
 

@@ -1,6 +1,6 @@
 class SettingsConfigData:
 
-    def __init__(self, time_interval: int, max_bulk_size: int = 2500):
+    def __init__(self, time_interval: int, max_bulk_size: int = 2500) -> None:
         self._time_interval = time_interval
         self._max_bulk_size = max_bulk_size
 

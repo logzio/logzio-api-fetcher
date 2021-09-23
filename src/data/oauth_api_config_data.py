@@ -21,9 +21,9 @@ class OAuthApiConfigData:
         return self._json_paths
 
     @json_paths.setter
-    def json_paths(self, value):
+    def json_paths(self, value) -> None:
         self._json_paths = value
 
     @property
-    def config_base_data(self):
+    def config_base_data(self) -> None:
         return self._config_base_data

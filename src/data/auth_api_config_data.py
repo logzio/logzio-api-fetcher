@@ -1,4 +1,3 @@
-
 from .api_json_paths import ApiJsonPaths
 from .api_url import ApiUrl
 from .config_base_data import ConfigBaseData
