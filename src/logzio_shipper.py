@@ -1,13 +1,16 @@
 import logging
 import requests
 import gzip
+import json
 
 from requests.adapters import HTTPAdapter, RetryError
 from requests.sessions import InvalidSchema, Session
 from urllib3.util.retry import Retry
+from .data.base_data.api_custom_field import ApiCustomField
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 VERSION = "1.0.0"
 
@@ -26,16 +29,18 @@ class LogzioShipper:
         self._logzio_url = "{0}/?token={1}&type=api_fetcher".format(logzio_url, token)
         self._logs = []
         self._bulk_size = 0
+        self._custom_fields: list[ApiCustomField] = []
 
     def add_log_to_send(self, log: str) -> None:
-        log_size = len(log)
+        enriched_log = self._add_custom_fields_to_log(log)
+        enriched_log_size = len(enriched_log)
 
-        if not self._is_log_valid_to_be_sent(log_size):
+        if not self._is_log_valid_to_be_sent(enriched_log, enriched_log_size):
             return
 
-        if not self._bulk_size + log_size > LogzioShipper.MAX_BULK_SIZE_BYTES:
-            self._logs.append(log)
-            self._bulk_size += log_size
+        if not self._bulk_size + enriched_log_size > LogzioShipper.MAX_BULK_SIZE_BYTES:
+            self._logs.append(enriched_log)
+            self._bulk_size += enriched_log_size
             return
 
         try:
@@ -43,17 +48,17 @@ class LogzioShipper:
         except Exception:
             raise
 
-        self._logs.append(log)
-        self._bulk_size = log_size
+        self._logs.append(enriched_log)
+        self._bulk_size = enriched_log_size
 
     def send_to_logzio(self) -> None:
-        if not self._logs:
+        if self._logs is None:
             return
 
         try:
             headers = {"Content-Type": "application/json",
                        "Content-Encoding": "gzip",
-                       "Logzio-Shipper": "logzio-api-fetcher/v{0}/0/0.".format(VERSION)}
+                       "Logzio-Shipper": "logzio-azure-blob-trigger/v{0}/0/0.".format(VERSION)}
             compressed_data = gzip.compress(str.encode('\n'.join(self._logs)))
             response = self._get_request_retry_session().post(url=self._logzio_url,
                                                               data=compressed_data,
@@ -97,15 +102,26 @@ class LogzioShipper:
             logger.error("Something went wrong. response: {}".format(e))
             raise
 
-    def _is_log_valid_to_be_sent(self, log_size: int) -> bool:
+    def add_custom_field_to_list(self, custom_field: ApiCustomField) -> None:
+        self._custom_fields.append(custom_field)
+
+    def _is_log_valid_to_be_sent(self, log: str, log_size: int) -> bool:
         if log_size > LogzioShipper.MAX_LOG_SIZE_BYTES:
             logger.error(
-                "One of the log's size is greater than the max log size - {} bytes, that can be sent to Logz.io".format(
-                    LogzioShipper.MAX_LOG_SIZE_BYTES))
+                "The following log's size is greater than the max log size - {0} bytes, that can be sent to Logz.io: {1}".format(
+                    LogzioShipper.MAX_LOG_SIZE_BYTES, log))
 
             return False
 
         return True
+
+    def _add_custom_fields_to_log(self, log: str) -> str:
+        json_log = json.loads(log)
+
+        for field in self._custom_fields:
+            json_log[field.key] = field.value
+
+        return json.dumps(json_log)
 
     def _get_request_retry_session(
             self,

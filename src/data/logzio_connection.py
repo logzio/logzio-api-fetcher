@@ -1,4 +1,4 @@
-class LogzioConfigData:
+class LogzioConnection:
 
     def __init__(self, logzio_url: str, logzio_token: str) -> None:
         self._url = logzio_url

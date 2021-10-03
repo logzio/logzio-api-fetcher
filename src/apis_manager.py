@@ -7,129 +7,109 @@ import requests
 
 from typing import Optional
 from requests.sessions import InvalidSchema
-
 from .azure_graph import AzureGraph
 from .config_reader import ConfigReader
-from .data.logzio_config_data import LogzioConfigData
-from .data.auth_api_config_data import AuthApiConfigData
-from .data.oauth_api_config_data import OAuthApiConfigData
+from .data.logzio_connection import LogzioConnection
+from .data.auth_api_data import AuthApiData
+from .data.oauth_api_data import OAuthApiData
 from .api import Api
 from .cisco_secure_x import CiscoSecureX
 from .general_auth_api import GeneralAuthApi
 from .logzio_shipper import LogzioShipper
 
+
 logger = logging.getLogger(__name__)
 
 
 class ApisManager:
+
     CONFIG_FILE = 'config.yaml'
     LAST_START_DATES_FILE = 'last_start_dates.txt'
+
     API_GENERAL_TYPE = 'general'
     API_CISCO_SECURE_X_TYPE = 'cisco_secure_x'
     API_AZURE_GRAPH_TYPE = 'azure_graph'
-    API_TYPES = [API_GENERAL_TYPE, API_CISCO_SECURE_X_TYPE, API_AZURE_GRAPH_TYPE]
+
+    AUTH_API_TYPES = [API_GENERAL_TYPE, API_CISCO_SECURE_X_TYPE]
+    OAUTH_API_TYPES = [API_GENERAL_TYPE, API_AZURE_GRAPH_TYPE]
 
     def __init__(self) -> None:
-        self.apis: list[Api] = []
-        self.logzio_credentials: Optional[LogzioConfigData] = None
-        self.settings = None
-        self.threads = []
-        self.event = threading.Event()
-        self.lock = threading.Lock()
+        self._apis: list[Api] = []
+        self._logzio_connection: Optional[LogzioConnection] = None
+        self._threads = []
+        self._event = threading.Event()
+        self._lock = threading.Lock()
 
         if not self._read_data_from_config():
             sys.exit(1)
 
     def run(self) -> None:
-        if len(self.apis) == 0:
+        if len(self._apis) == 0:
             return
 
-        for api in self.apis:
-            self.threads.append(threading.Thread(target=self.__run_scheduled_tasks, args=(api,)))
+        for api in self._apis:
+            self._threads.append(threading.Thread(target=self._run_api_scheduled_task, args=(api,)))
 
-        for thread in self.threads:
+        for thread in self._threads:
             thread.start()
 
         signal.sigwait([signal.SIGINT, signal.SIGTERM])
         self.__exit_gracefully()
 
     def _read_data_from_config(self) -> bool:
-        config_reader = ConfigReader(ApisManager.CONFIG_FILE, ApisManager.API_GENERAL_TYPE)
+        config_reader = ConfigReader(ApisManager.CONFIG_FILE, ApisManager.API_GENERAL_TYPE, ApisManager.AUTH_API_TYPES,
+                                     ApisManager.OAUTH_API_TYPES)
 
-        logzio_config_data = config_reader.get_logzio_config_data()
+        logzio_connection = config_reader.get_logzio_connection()
 
-        if logzio_config_data is None:
+        if logzio_connection is None:
             return False
 
-        self.logzio_credentials = logzio_config_data
+        self._logzio_connection = logzio_connection
 
-        settings_config_data = config_reader.get_settings_config_data()
-
-        if settings_config_data is None:
-            return False
-
-        self.settings = settings_config_data
-
-        for auth_api_config_data in config_reader.get_auth_apis_config_data():
+        for auth_api_config_data in config_reader.get_auth_apis_data():
             if auth_api_config_data is None:
                 return False
 
-            if not self._add_auth_api(auth_api_config_data, settings_config_data.max_bulk_size):
-                return False
+            self._add_auth_api(auth_api_config_data)
 
-        for oauth_api_config_data in config_reader.get_oauth_apis_config_data():
+        for oauth_api_config_data in config_reader.get_oauth_apis_data():
             if oauth_api_config_data is None:
                 return False
 
-            if not self._add_oauth_api(oauth_api_config_data, settings_config_data.max_bulk_size):
-                return False
+            self._add_oauth_api(oauth_api_config_data)
 
         return True
 
-    def _add_auth_api(self, auth_api_config_data: AuthApiConfigData, max_bulk_size: int) -> bool:
-        auth_api_config_data.base_config.max_bulk_size = max_bulk_size
-        if auth_api_config_data.base_config.type == ApisManager.API_GENERAL_TYPE:
-            self.apis.append(
-                GeneralAuthApi(auth_api_config_data.base_config, auth_api_config_data.api_url,
-                               auth_api_config_data.json_paths))
-            return True
-
-        if auth_api_config_data.base_config.type == ApisManager.API_CISCO_SECURE_X_TYPE:
-            self.apis.append(
-                CiscoSecureX(auth_api_config_data.base_config))
-            return True
-
-        logger.error("the auth api {0} has an unsupported type - {1}".format(auth_api_config_data.base_config.name,
-                                                                             auth_api_config_data.base_config.type))
-        return False
-
-    def _add_oauth_api(self, oauth_api_config_data: OAuthApiConfigData, max_bulk_size: int):
-        oauth_api_config_data.config_base_data.max_bulk_size = max_bulk_size
-        if oauth_api_config_data.config_base_data.type == ApisManager.API_GENERAL_TYPE:
-            pass
-        elif oauth_api_config_data.config_base_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
-            self.apis.append(AzureGraph(oauth_api_config_data))
+    def _add_auth_api(self, auth_api_data: AuthApiData) -> None:
+        if auth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
+            self._apis.append(GeneralAuthApi(auth_api_data.base_data, auth_api_data.general_type_data))
         else:
-            logger.error(
-                "One of the oauth api {0} has an unsupported type - {1}".format(
-                    oauth_api_config_data.config_base_data.name,
-                    oauth_api_config_data.config_base_data.type))
-            return False
-        return True
+            self._apis.append(CiscoSecureX(auth_api_data.base_data))
 
-    def __run_scheduled_tasks(self, api: Api):
-        logzio_shipper = LogzioShipper(self.logzio_credentials.url, self.logzio_credentials.token)
+    def _add_oauth_api(self, oauth_api_data: OAuthApiData) -> None:
+        if oauth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
+            pass
+        else:
+            pass
+    #TODO: Fix self._apis.append(AzureGraph(oauth_api_data))
+
+    def _run_api_scheduled_task(self, api: Api):
+        logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)
+
+        for api_custom_field in api.get_api_custom_fields():
+            logzio_shipper.add_custom_field_to_list(api_custom_field)
 
         while True:
-            thread = threading.Thread(target=self.__send_data_to_logzio, args=(api, logzio_shipper,))
+            thread = threading.Thread(target=self._send_data_to_logzio, args=(api, logzio_shipper,))
 
             thread.start()
             thread.join()
 
-            if self.event.wait(timeout=self.settings.time_interval):
+            if self._event.wait(timeout=api.get_api_time_interval()):
                 break
 
-    def __send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper):
+    def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper):
         logger.info("Task is running for api {}...".format(api.get_api_name()))
 
         is_data_exist = False
@@ -169,10 +149,10 @@ class ApisManager:
 
         logger.info(
             "Task is over. A new Task for api {0} will run in {1} minutes.".format(api.get_api_name(),
-                                                                                   self.settings.time_interval / 60))
+                                                                                   api.get_api_time_interval() / 60))
 
     def _write_last_start_date_to_file(self, api_name: str, last_start_date: str):
-        self.lock.acquire()
+        self._lock.acquire()
 
         with open(ApisManager.LAST_START_DATES_FILE, 'r+') as file:
             file_lines = file.readlines()
@@ -188,7 +168,7 @@ class ApisManager:
             file.seek(0)
             file.writelines(file_lines)
 
-        self.lock.release()
+        self._lock.release()
 
     def _get_api_line_num_in_file(self, api_name: str, file_lines: list[str]) -> int:
         line_num = 0
@@ -204,7 +184,7 @@ class ApisManager:
     def __exit_gracefully(self) -> None:
         logger.info("Signal caught...")
 
-        self.event.set()
+        self._event.set()
 
-        for thread in self.threads:
+        for thread in self._threads:
             thread.join()

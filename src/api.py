@@ -22,3 +22,11 @@ class Api(ABC):
     @abstractmethod
     def get_api_name(self) -> str:
         pass
+
+    @abstractmethod
+    def get_api_time_interval(self) -> int:
+        pass
+
+    @abstractmethod
+    def get_api_custom_fields(self) -> Generator:
+        pass
