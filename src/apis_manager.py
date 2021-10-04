@@ -149,8 +149,8 @@ class ApisManager:
             self._write_last_start_date_to_file(api.get_api_name(), api.get_last_start_date())
 
         logger.info(
-            "Task is over. A new Task for api {0} will run in {1} minutes.".format(api.get_api_name(),
-                                                                                   api.get_api_time_interval() / 60))
+            "Task is over. A new Task for api {0} will run in {1} minute/s.".format(api.get_api_name(),
+                                                                                    int(api.get_api_time_interval() / 60)))
 
     def _write_last_start_date_to_file(self, api_name: str, last_start_date: str):
         self._lock.acquire()
