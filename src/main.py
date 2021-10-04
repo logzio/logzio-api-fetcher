@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-from .apis_manager import ApisManager
+from src.apis_manager import ApisManager
 
 
 def main():

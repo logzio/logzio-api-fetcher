@@ -3,7 +3,7 @@ import urllib.parse
 import requests
 import json
 
-from typing import Generator, Optional
+from typing import Generator, Optional, Any
 from datetime import datetime, timedelta
 from jsonpath_ng import parse
 from dateutil import parser
@@ -25,22 +25,45 @@ class AuthApi(Api):
         self._current_data_last_date: Optional[str] = None
 
     def fetch_data(self) -> Generator:
-        total_events, total_events_num = self._get_total_data_from_api()
+        total_data_num = 0
+        api_url = self._build_api_url()
+        is_first_fetch = True
+        is_last_data_to_fetch = False
+        first_item_date: Optional[str] = None
+        last_datetime_to_fetch: Optional[datetime] = None
 
-        if not total_events:
-            logger.info("No new data available for api {}.".format(self._base_data.base_data.name))
-            return total_events
+        while True:
+            try:
+                next_url, data = self._get_data_from_api(api_url)
+            except Exception:
+                raise
 
-        logger.info("Successfully got {0} total data from api {1}.".format(total_events_num,
-                                                                           self._base_data.base_data.name))
+            if not data:
+                logger.info("No new data available from api {}.".format(self._base_data.base_data.name))
+                return data
 
-        for event in total_events:
-            yield json.dumps(event)
+            if is_first_fetch:
+                first_item_date = self._get_last_date(data[0])
+                last_datetime_to_fetch = parser.parse(first_item_date) - timedelta(
+                    days=self._base_data.base_data.settings.days_back_to_fetch)
+                is_first_fetch = False
 
-        try:
-            self._current_data_last_date = self._get_last_date_in_data(total_events)
-        except Exception:
-            raise
+            for item in data:
+                if not self._is_item_in_fetch_frame(item, last_datetime_to_fetch):
+                    is_last_data_to_fetch = True
+                    break
+
+                yield json.dumps(item)
+                total_data_num += 1
+
+            if next_url is None or is_last_data_to_fetch:
+                break
+
+            api_url = next_url
+
+        logger.info("Got {0} total data from api {1}".format(total_data_num, self._base_data.base_data.name))
+
+        self._current_data_last_date = first_item_date
 
     def update_start_date_filter(self) -> None:
         new_start_date = self._get_new_start_date()
@@ -74,27 +97,6 @@ class AuthApi(Api):
         for custom_field in self._base_data.base_data.custom_fields:
             yield custom_field
 
-    def _get_total_data_from_api(self) -> tuple[list, int]:
-        total_events = []
-        total_events_num = 0
-        api_url = self._build_api_url()
-
-        while True:
-            try:
-                next_url, events, events_num = self._get_data_from_api(api_url)
-            except Exception:
-                raise
-
-            total_events.extend(events)
-            total_events_num += events_num
-
-            if next_url is None or total_events_num >= self._base_data.base_data.settings.max_fetch_data:
-                break
-
-            api_url = next_url
-
-        return total_events, total_events_num
-
     def _build_api_url(self) -> str:
         api_url = self._general_type_data.http_request.url
         api_filters_num = self._base_data.base_data.get_filters_size()
@@ -111,7 +113,7 @@ class AuthApi(Api):
 
         return api_url
 
-    def _get_data_from_api(self, url: str) -> tuple[str, list, int]:
+    def _get_data_from_api(self, url: str) -> tuple[Optional[str], list]:
         try:
             response = self._get_response_from_api(url)
         except Exception:
@@ -120,20 +122,21 @@ class AuthApi(Api):
         json_data = json.loads(response.content)
         next_url = self._get_json_path_value_from_data(
             self._general_type_data.general_type_data.json_paths.next_url, json_data)
-        events = self._get_json_path_value_from_data(
+        data = self._get_json_path_value_from_data(
             self._general_type_data.general_type_data.json_paths.data, json_data)
 
-        if events is None:
+        if data is None:
             logger.error(
                 "The json path for api {}'s data is wrong. Please change your configuration.".format(
                     self._base_data.base_data.name))
             raise Api.ApiError
 
-        events_num = len(events)
+        data_size = len(data)
 
-        logger.info("Successfully got {0} data from api {1}.".format(events_num, self._base_data.base_data.name))
+        if data:
+            logger.info("Successfully got {0} data from api {1}.".format(data_size, self._base_data.base_data.name))
 
-        return next_url, events, events_num
+        return next_url, data
 
     def _get_response_from_api(self, url: str):
         try:
@@ -164,37 +167,36 @@ class AuthApi(Api):
 
         return response
 
-    def _get_last_date_in_data(self, data: list[dict]):
-        last_date: Optional[datetime] = None
+    def _get_last_date(self, first_item: dict) -> str:
+        first_item_date = self._get_json_path_value_from_data(
+            self._general_type_data.general_type_data.json_paths.data_date, first_item)
 
-        for event in data:
-            event_date = self._get_json_path_value_from_data(
-                self._general_type_data.general_type_data.json_paths.data_date, event)
+        if first_item_date is None:
+            logger.error(
+                "The json path for api {}'s data date is wrong. Please change your configuration.".format(
+                    self._base_data.base_data.name))
+            raise Api.ApiError
 
-            if event_date is None:
-                logger.error(
-                    "The json path for api {}'s data date is wrong. Please change your configuration.".format(
-                        self._base_data.base_data.name))
-                raise Api.ApiError
+        return first_item_date
 
-            event_date_datetime = parser.parse(event_date)
-
-            if last_date is None:
-                last_date = event_date_datetime
-                continue
-
-            if last_date < event_date_datetime:
-                last_date = event_date_datetime
-
-        return str(last_date)
-
-    def _get_json_path_value_from_data(self, json_path: str, data: dict):
+    def _get_json_path_value_from_data(self, json_path: str, data: dict) -> Any:
         match = parse(json_path).find(data)
 
         if not match:
             return None
 
         return match[0].value
+
+    def _is_item_in_fetch_frame(self, item: dict, last_datetime_to_fetch: datetime) -> bool:
+        item_date = self._get_json_path_value_from_data(
+            self._general_type_data.general_type_data.json_paths.data_date, item)
+
+        item_datetime = parser.parse(item_date)
+
+        if item_datetime < last_datetime_to_fetch:
+            return False
+
+        return True
 
     def _get_new_start_date(self) -> str:
         new_start_date = str(parser.parse(self._current_data_last_date) + timedelta(seconds=1))

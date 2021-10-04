@@ -120,7 +120,8 @@ class ApisManager:
                 is_data_exist = True
                 logzio_shipper.add_log_to_send(data)
 
-            logzio_shipper.send_to_logzio()
+            if is_data_exist:
+                logzio_shipper.send_to_logzio()
         except requests.exceptions.InvalidURL:
             logger.error("Failed to send data to Logz.io...")
             os.kill(os.getpid(), signal.SIGTERM)
@@ -159,11 +160,11 @@ class ApisManager:
             line_num = self._get_api_line_num_in_file(api_name, file_lines)
 
             if not file_lines:
-                file_lines.append("{0}: {1}".format(api_name, last_start_date))
+                file_lines.append("{0}: {1}\n".format(api_name, last_start_date))
             elif line_num == -1:
-                file_lines.append("\n{0}: {1}".format(api_name, last_start_date))
+                file_lines.append("{0}: {1}\n".format(api_name, last_start_date))
             else:
-                file_lines[line_num] = "\n{0}: {1}".format(api_name, last_start_date)
+                file_lines[line_num] = "{0}: {1}\n".format(api_name, last_start_date)
 
             file.seek(0)
             file.writelines(file_lines)

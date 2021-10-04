@@ -40,7 +40,7 @@ class ConfigReader:
     API_CREDENTIALS_KEY_CONFIG_KEY = 'key'
     API_SETTINGS_CONFIG_KEY = 'settings'
     API_SETTINGS_TIME_INTERVAL_CONFIG_KEY = 'time_interval'
-    API_SETTINGS_MAX_FETCH_DATA_CONFIG_KEY = 'max_fetch_data'
+    API_SETTINGS_DAYS_BACK_FETCH_CONFIG_KEY = 'days_back_fetch'
     API_FILTERS_CONFIG_KEY = 'filters'
     API_CUSTOM_FIELDS_CONFIG_KEY = 'custom_fields'
     API_START_DATE_NAME_CONFIG_KEY = 'start_date_name'
@@ -225,19 +225,19 @@ class ConfigReader:
                          "be whole positive integer.".format(api_group_type, api_num))
             return None
 
-        max_fetch_data = settings.get(ConfigReader.API_SETTINGS_MAX_FETCH_DATA_CONFIG_KEY)
+        days_back_to_fetch = settings.get(ConfigReader.API_SETTINGS_DAYS_BACK_FETCH_CONFIG_KEY)
 
-        if max_fetch_data is None:
+        if days_back_to_fetch is None:
             return ApiSettings(time_interval)
 
         try:
-            int(max_fetch_data)
+            int(days_back_to_fetch)
         except ValueError:
-            logger.error("Your configuration is not valid: the max_fetch_data (under settings) of {0} api #{1} must "
+            logger.error("Your configuration is not valid: the days_back_fetch (under settings) of {0} api #{1} must "
                          "be whole positive integer.".format(api_group_type, api_num))
             return None
 
-        return ApiSettings(time_interval, max_fetch_data)
+        return ApiSettings(time_interval, days_back_to_fetch)
 
     def _get_api_filters(self, config_api_data: dict) -> Optional[list[ApiFilter]]:
         api_filters = []
