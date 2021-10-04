@@ -94,7 +94,7 @@ class ApisManager:
             pass
     #TODO: Fix self._apis.append(AzureGraph(oauth_api_data))
 
-    def _run_api_scheduled_task(self, api: Api):
+    def _run_api_scheduled_task(self, api: Api) -> None:
         logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)
 
         for api_custom_field in api.get_api_custom_fields():
@@ -109,7 +109,7 @@ class ApisManager:
             if self._event.wait(timeout=api.get_api_time_interval()):
                 break
 
-    def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper):
+    def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper) -> None:
         logger.info("Task is running for api {}...".format(api.get_api_name()))
 
         is_data_exist = False
@@ -152,7 +152,7 @@ class ApisManager:
             "Task is over. A new Task for api {0} will run in {1} minute/s.".format(api.get_api_name(),
                                                                                     int(api.get_api_time_interval() / 60)))
 
-    def _write_last_start_date_to_file(self, api_name: str, last_start_date: str):
+    def _write_last_start_date_to_file(self, api_name: str, last_start_date: str) -> None:
         self._lock.acquire()
 
         with open(ApisManager.LAST_START_DATES_FILE, 'r+') as file:
