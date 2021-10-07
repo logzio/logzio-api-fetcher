@@ -91,8 +91,7 @@ class ApisManager:
         if oauth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
             pass
         else:
-            pass
-    #TODO: Fix self._apis.append(AzureGraph(oauth_api_data))
+            self._apis.append(AzureGraph(oauth_api_data))
 
     def _run_api_scheduled_task(self, api: Api) -> None:
         logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)
@@ -132,7 +131,6 @@ class ApisManager:
             return
         except requests.HTTPError as e:
             logger.error("Failed to send data to Logz.io...")
-
             if e.response.status_code == 401:
                 os.kill(os.getpid(), signal.SIGTERM)
                 return
@@ -140,7 +138,7 @@ class ApisManager:
             logger.error("Failed to send data to Logz.io...")
             os.kill(os.getpid(), signal.SIGTERM)
             return
-        except Exception:
+        except Exception as e:
             logger.error("Failed to send data to Logz.io...")
             is_data_sent_successfully = False
 

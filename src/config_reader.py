@@ -116,7 +116,7 @@ class ConfigReader:
         if oauth_api_base_data is None:
             return None
 
-        if oauth_api_base_data.base_data.type == self._api_general_type:
+        if oauth_api_base_data.base_data.type in self._oauth_api_types:
             api_general_type_data = self._get_oauth_api_general_type_data(config_oauth_api_data, oauth_api_num)
 
             if api_general_type_data is None:
@@ -124,7 +124,7 @@ class ConfigReader:
 
             return OAuthApiData(oauth_api_base_data, api_general_type_data)
 
-        return OAuthApiData(oauth_api_base_data)
+        return None
 
     def _get_auth_api_base_data(self, config_auth_api_data: dict, auth_api_num: int) -> Optional[AuthApiBaseData]:
         api_base_data = self._get_api_basic_data(config_auth_api_data, ConfigReader.AUTH_API, auth_api_num)
