@@ -21,7 +21,7 @@ class AuthApi(Api):
         self._api_http_request = api_general_type_data.http_request
         super().__init__(api_base_data.base_data, api_general_type_data.general_type_data)
 
-    def fetch_data(self) -> Generator:
+    def fetch_data(self) -> Generator[str, None, list[str]]:
         total_data_num = 0
         api_url = self._build_api_url()
         is_first_fetch = True

@@ -78,7 +78,7 @@ class ConfigReader:
 
         return LogzioConnection(logzio_url, logzio_token)
 
-    def get_auth_apis_data(self) -> Generator:
+    def get_auth_apis_data(self) -> Generator[AuthApiData, None, None]:
         auth_api_num = 1
 
         if ConfigReader.AUTH_APIS_CONFIG_KEY in self._config_data:
@@ -86,7 +86,7 @@ class ConfigReader:
                 yield self._get_auth_api_data(config_auth_api_data, auth_api_num)
                 auth_api_num += 1
 
-    def get_oauth_apis_data(self) -> Generator:
+    def get_oauth_apis_data(self) -> Generator[OAuthApiData, None, None]:
         oauth_api_num = 1
 
         if ConfigReader.OAUTH_APIS_CONFIG_KEY in self._config_data:

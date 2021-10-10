@@ -9,9 +9,10 @@ from typing import Generator, Any, Optional
 from jsonpath_ng import parse
 from dateutil import parser
 from requests import Response
-from src.data.base_data.api_base_data import ApiBaseData
-from src.data.base_data.api_filter import ApiFilter
-from src.data.general_type_data.api_general_type_data import ApiGeneralTypeData
+from .data.base_data.api_base_data import ApiBaseData
+from .data.base_data.api_filter import ApiFilter
+from .data.base_data.api_custom_field import ApiCustomField
+from .data.general_type_data.api_general_type_data import ApiGeneralTypeData
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class Api(ABC):
         pass
 
     @abstractmethod
-    def fetch_data(self) -> Generator:
+    def fetch_data(self) -> Generator[str, None, list[str]]:
         pass
 
     @abstractmethod
@@ -79,7 +80,7 @@ class Api(ABC):
     def get_api_time_interval(self) -> int:
         return self._base_data.settings.time_interval
 
-    def get_api_custom_fields(self) -> Generator:
+    def get_api_custom_fields(self) -> Generator[ApiCustomField, None, None]:
         for custom_field in self._base_data.custom_fields:
             yield custom_field
 
@@ -138,9 +139,9 @@ class Api(ABC):
 
         return next_url, data
 
-    def _get_response_from_api(self, url: str):
+    def _get_response_from_api(self, url: str) -> Response:
         try:
-            response = self._send_request( url)
+            response = self._send_request(url)
             response.raise_for_status()
         except requests.HTTPError as e:
             logger.error(

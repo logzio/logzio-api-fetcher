@@ -33,12 +33,12 @@ class ApiBaseData:
         return self._settings
 
     @property
-    def filters(self) -> Generator:
+    def filters(self) -> Generator[ApiFilter, None, None]:
         for filter in self._filters:
             yield filter
 
     @property
-    def custom_fields(self) -> Generator:
+    def custom_fields(self) -> Generator[ApiCustomField, None, None]:
         for custom_field in self._custom_fields:
             yield custom_field
 
