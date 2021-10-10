@@ -118,8 +118,8 @@ class LogzioShipper:
     def _add_custom_fields_to_log(self, log: str) -> str:
         json_log = json.loads(log)
 
-        for field in self._custom_fields:
-            json_log[field.key] = field.value
+        for custom_field in self._custom_fields:
+            json_log[custom_field.key] = custom_field.value
 
         return json.dumps(json_log)
 
