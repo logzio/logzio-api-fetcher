@@ -3,7 +3,7 @@ logzio:
   token: 123456789a
 
 auth_apis:
-  - type: cisco_secure_x
+  - type: general
     name: cisco 1
     credentials:
       id: 1e98d35f67648ffd1cac
@@ -11,7 +11,15 @@ auth_apis:
     settings:
       time_interval: 1
       days_back_fetch: 30
-  - type: cisco_secure_x
+    start_date_name: start_date
+    http_request:
+      method: GET
+      url: https://api.amp.cisco.com/v1/events
+    json_paths:
+      next_url: metadata.links.next
+      data: data
+      data_date: date
+  - type: general
     name: cisco 2
     credentials:
       id: 1e98d35f67648ffd1cac
@@ -19,3 +27,11 @@ auth_apis:
     settings:
       time_interval: 1
       days_back_fetch: 30
+    start_date_name: start_date
+    http_request:
+      method: GET
+      url: https://api.amp.cisco.com/v1/events
+    json_paths:
+      next_url: metadata.links.next
+      data: data
+      data_date: date

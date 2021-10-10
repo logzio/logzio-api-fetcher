@@ -68,7 +68,7 @@ class TestUtils:
         if is_auth_api:
             for auth_api_data in base_config_reader.get_auth_apis_data():
                 if auth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
-                    return GeneralAuthApi(auth_api_data.base_data, auth_api_data.general_data)
+                    return GeneralAuthApi(auth_api_data.base_data, auth_api_data.general_type_data)
 
                 return CiscoSecureX(auth_api_data.base_data)
 
