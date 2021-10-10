@@ -1,0 +1,16 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: 123456789a
+
+auth_apis:
+  - type: cisco_secure_x
+    name: cisco
+    credentials:
+      id: 1e98d35f67648ffd1cac
+      key: 221a50a2-a35e-47be-9042-af98d1a0d231
+    settings:
+      time_interval: 1
+      days_back_fetch: 30
+    custom_fields:
+      field1: test1
+      field2: test2
