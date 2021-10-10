@@ -1,28 +1,36 @@
 import json
 import logging
 import urllib.parse
+import requests
+
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Generator, Any, Optional
-
-import requests
 from jsonpath_ng import parse
 from dateutil import parser
 from requests import Response
-
 from src.data.base_data.api_base_data import ApiBaseData
 from src.data.base_data.api_filter import ApiFilter
 from src.data.general_type_data.api_general_type_data import ApiGeneralTypeData
+
 
 logger = logging.getLogger(__name__)
 
 
 class Api(ABC):
 
-    def __init__(self, general_type_data: ApiGeneralTypeData, base_data: ApiBaseData):
-        self._general_type_data = general_type_data
-        self._base_data = base_data
+    def __init__(self, api_base_data: ApiBaseData, api_general_type_data: ApiGeneralTypeData):
+        self._base_data = api_base_data
+        self._general_type_data = api_general_type_data
         self._current_data_last_date: Optional[str] = None
+
+    @property
+    def base_data(self) -> ApiBaseData:
+        return self._base_data
+
+    @property
+    def general_type_data(self) -> ApiGeneralTypeData:
+        return self._general_type_data
 
     class ApiError(Exception):
         pass
@@ -34,7 +42,6 @@ class Api(ABC):
     @abstractmethod
     def _send_request(self, url) -> Response:
         pass
-
 
     def _get_json_path_value_from_data(self, json_path: str, data: dict) -> Any:
         match = parse(json_path).find(data)
@@ -106,8 +113,7 @@ class Api(ABC):
 
         return new_start_date
 
-    def _get_data_from_api(self, url: str) -> tuple[
-        Optional[str], list]:
+    def _get_data_from_api(self, url: str) -> tuple[Optional[str], list]:
         try:
             response = self._get_response_from_api(url)
         except Exception:

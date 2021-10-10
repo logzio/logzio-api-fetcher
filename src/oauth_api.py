@@ -1,17 +1,17 @@
 import json
 import logging
 import time
+import requests
+
 from datetime import datetime, timedelta
 from typing import Generator, Optional
-
-import requests
 from dateutil import parser
 from requests import Response
-
 from .api import Api
 from .data.api_http_request import ApiHttpRequest
 from .data.base_data.oauth_api_base_data import OAuthApiBaseData
 from .data.general_type_data.oauth_api_general_type_data import OAuthApiGeneralTypeData
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class OAuthApi(Api):
         self.token_expire = 0
         self._token_request = oauth_config.token_http_request
         self._data_request = oauth_config.data_http_request
-        super().__init__(general_config.general_type_data, oauth_config.base_data)
+        super().__init__(oauth_config.base_data, general_config.general_type_data)
 
     def get_token(self) -> [str, int]:
         token_response = requests.post(self._token_request.url,

@@ -1,17 +1,16 @@
 import logging
 import json
+import requests
 
 from typing import Generator, Optional
 from datetime import datetime, timedelta
-
-import requests
 from dateutil import parser
 from requests import Response
-
 from .api import Api
 from .data.api_http_request import ApiHttpRequest
 from .data.base_data.auth_api_base_data import AuthApiBaseData
 from .data.general_type_data.auth_api_general_type_data import AuthApiGeneralTypeData
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +18,8 @@ logger = logging.getLogger(__name__)
 class AuthApi(Api):
 
     def __init__(self, api_base_data: AuthApiBaseData, api_general_type_data: AuthApiGeneralTypeData) -> None:
-        super().__init__(api_general_type_data.general_type_data, api_base_data.base_data)
         self._api_http_request = api_general_type_data.http_request
+        super().__init__(api_base_data.base_data, api_general_type_data.general_type_data)
 
     def fetch_data(self) -> Generator:
         total_data_num = 0
