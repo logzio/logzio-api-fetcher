@@ -173,7 +173,7 @@ class ApisManager:
         line_num = 0
 
         for line in file_lines:
-            if line.startswith(api_name):
+            if line.split(':')[0] == api_name:
                 return line_num
 
             line_num += 1
