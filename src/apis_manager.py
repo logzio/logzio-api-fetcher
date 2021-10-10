@@ -40,10 +40,10 @@ class ApisManager:
         self._event = threading.Event()
         self._lock = threading.Lock()
 
-        if not self._read_data_from_config():
-            sys.exit(1)
-
     def run(self) -> None:
+        if not self._read_data_from_config():
+            return
+
         if len(self._apis) == 0:
             return
 

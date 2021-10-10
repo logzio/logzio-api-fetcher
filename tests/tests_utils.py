@@ -48,10 +48,9 @@ class TestUtils:
 
         ApisManager.CONFIG_FILE = config_file
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
-        apis_manager = ApisManager()
         logzio_requests = []
 
-        apis_manager.run()
+        ApisManager().run()
 
         for request in httpretty.latest_requests():
             if request.url.startswith(self.api_url):

@@ -2,7 +2,7 @@ from logging.config import fileConfig
 from src.apis_manager import ApisManager
 
 
-def main():
+def main() -> None:
     fileConfig('logging_config.ini', disable_existing_loggers=False)
     ApisManager().run()
 

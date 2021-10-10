@@ -22,6 +22,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
     CUSTOM_FIELDS_CONFIG_FILE = 'tests/config/cisco_secure_x/custom_fields_config.yaml'
     MULTIPLE_CONFIG_FILE = 'tests/config/cisco_secure_x/multiple_config.yaml'
     TIME_INTERVAL_CONFIG_FILE = 'tests/config/cisco_secure_x/time_interval_config.yaml'
+    BAD_CONFIG_FILE = 'tests/config/cisco_secure_x/bad_config.yaml'
 
     CISCO_SECURE_X_BODY_JSON = 'tests/api_body/cisco_secure_x_body.json'
 
@@ -171,3 +172,17 @@ class CiscoSecureXApiTests(unittest.TestCase):
         base_cisco_secure_x.update_start_date_filter()
 
         self.assertEqual('2021-10-05T10%3A10%3A11%2B00%3A00', base_cisco_secure_x.get_last_start_date())
+
+    def test_bad_config(self) -> None:
+        queue = multiprocessing.Queue()
+        self.tests_utils.start_process_and_wait_until_finished(queue,
+                                                               CiscoSecureXApiTests.BAD_CONFIG_FILE,
+                                                               self.tests_utils.run_auth_api_process,
+                                                               status=200,
+                                                               sleep_time=1)
+
+        requests_num, sent_logs_num, sent_bytes = queue.get()
+
+        self.assertEqual(0, requests_num)
+        self.assertEqual(0, sent_logs_num)
+        self.assertEqual(0, sent_bytes)
