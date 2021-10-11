@@ -111,11 +111,11 @@ auth_apis:
       event_type%5B%5D: '1090519054'
 ```
 
-### Run the Docker Container
+### Run The Docker Container
 
 ```shell
 run docker --name logzio-api-fetcher \
--v "$(pwd)":/shared \
+-v "$(pwd)":/app/src/shared \
 logzio/logzio-api-fetcher
 ```
 

@@ -1,0 +1,27 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: McvJQAtOrFUZQRFMrvSqnKSEJhjjFZHz
+
+auth_apis:
+  - type: general
+    name: cisco general
+    credentials:
+      id: 1e98d35f67648ffd1cac
+      key: 221a50a2-a35e-47be-9042-af98d1a0d231
+    settings:
+      time_interval: 1
+      days_back_fetch: 5
+    start_date_name: start_date
+    http_request:
+      method: GET
+      url: https://api.amp.cisco.com/v1/events
+      headers:
+        content-type: application/json
+    json_paths:
+      next_url: metadata.links.next
+      data: data
+      data_date: date
+    filters:
+      event_type%5B%5D: 109051905
+    custom_fields:
+      test: test
