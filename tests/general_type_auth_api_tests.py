@@ -21,6 +21,7 @@ class GeneralTypeAuthApiTests(unittest.TestCase):
     CUSTOM_FIELDS_CONFIG_FILE = 'tests/config/general_type_auth_api/custom_fields_config.yaml'
     MULTIPLE_CONFIG_FILE = 'tests/config/general_type_auth_api/multiple_config.yaml'
     TIME_INTERVAL_CONFIG_FILE = 'tests/config/general_type_auth_api/time_interval_config.yaml'
+    HTTP_REQUEST_HEADERS_CONFIG_FILE = 'tests/config/general_type_auth_api/http_request_headers_config.yaml'
     BAD_CONFIG_FILE = 'tests/config/general_type_auth_api/bad_config.yaml'
 
     CISCO_SECURE_X_BODY_JSON = 'tests/api_body/cisco_secure_x_body.json'
@@ -90,6 +91,22 @@ class GeneralTypeAuthApiTests(unittest.TestCase):
         self.assertEqual(data_num, sent_logs_num)
         self.assertEqual(data_bytes, sent_bytes)
 
+    def test_sending_data_with_http_request_headers(self) -> None:
+        queue = multiprocessing.Queue()
+        self.tests_utils.start_process_and_wait_until_finished(queue,
+                                                               GeneralTypeAuthApiTests.HTTP_REQUEST_HEADERS_CONFIG_FILE,
+                                                               self.tests_utils.run_auth_api_process,
+                                                               status=200,
+                                                               sleep_time=10)
+
+        requests_num, sent_logs_num, sent_bytes = queue.get()
+        data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
+            self.cisco_secure_x_json_body['data'])
+
+        self.assertEqual(math.ceil(sent_bytes / LogzioShipper.MAX_BULK_SIZE_BYTES), requests_num)
+        self.assertEqual(data_num, sent_logs_num)
+        self.assertEqual(data_bytes, sent_bytes)
+
     def test_sending_data_iterations(self) -> None:
         queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
@@ -106,7 +123,7 @@ class GeneralTypeAuthApiTests(unittest.TestCase):
         self.assertEqual(data_num * 2, sent_logs_num)
         self.assertEqual(data_bytes * 2, sent_bytes)
 
-    def test_sending_data_multiple_cisco_secure_x(self) -> None:
+    def test_sending_data_multiple_general_type_apis(self) -> None:
         queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                GeneralTypeAuthApiTests.MULTIPLE_CONFIG_FILE,
