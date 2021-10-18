@@ -1,0 +1,38 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: 123456789a
+
+oauth_apis:
+  - type: azure_graph
+    name: azure_test
+    credentials:
+      id: <<AZURE_AD_SECRET_ID>>
+      key: <<AZURE_AD_SECRET_VALUE>>
+    token_http_request:
+      url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
+      body: client_id=<<CLIENT_ID>>
+        &scope=https://graph.microsoft.com/.default
+        &client_secret=<<AZURE_AD_SECRET_VALUE>>
+        &grant_type=client_credentials
+      method: GET
+    data_http_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      headers:
+    start_date_name: createdDateTime
+    json_paths:
+      data_date: createdDateTime
+    filters:
+      top: 100
+    settings:
+      time_interval: 1
+auth_apis:
+  - type: cisco_secure_x
+    name: cisco
+    credentials:
+      id: 1e98d35f67648ffd1cac
+      key: 221a50a2-a35e-47be-9042-af98d1a0d231
+    settings:
+      time_interval: 1
+      days_back_fetch: 30
+    filters:
+      event_type%5B%5D: '1090519054'

@@ -68,9 +68,45 @@ The following parameters are for general type only:
 | json_paths.data_date | The json path to the data's date value inside the response of the auth api. | Required | - |
 
 #### oauth_apis
+The following configuration uses OAuth 2.0 flow.
+
+Supported types:
+
+- azure_graph
+- general
+
+The following parameters are for every type:
+
+| Parameter Name | Description | Required/Optional | Default |
+| --- | --- | ---| ---|
+| type | The type of the auth api. Currently we support the following types: cisco_secure_x, general. | Required | - |
+| name | The name of the auth api. Please make names unique. | Required | - |
+| credentials.id | The auth api credentials id. | Required | - |
+| credentials.key | The auth api credentials key. | Required | - |
+| http_request.method | The HTTP method. Can be GET or POST. | Required | - |
+| http_request.url | The oauth api url. Make sure the url is without `?` at the end. | Required | - |
+| http_request.headers | Pairs of key and value the represents the headers of the HTTP request. | Optional | - |
+| http_request.body | The body of the HTTP request. Will be added to HTTP POST requests only. | Optional | - |
+| token_http_request.method | The HTTP method. Can be GET or POST. | Required | - |
+| token_http_request.url | The oauth api token request  url. Make sure the url is without `?` at the end. | Required | - |
+| token_http_request.headers | Pairs of key and value the represents the headers of the HTTP request. | Optional | - |
+| token_http_request.body | The body of the HTTP request. Will be added to HTTP POST requests only. | Optional | - |
+| json_paths.next_url | The json path to the next url value inside the response of the auth api. | Required/Optional for Azure | - |
+| json_paths.data | The json path to the data value inside the response of the auth api. | Required/Optional for Azure | - |
+| json_paths.data_date | The json path to the data's date value inside the response of the auth api. | Required | - |
+| settings.time_interval | The auth api time interval between runs. | Required | - |
+| settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
+| filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
+| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. | Optional | - |
+
+The following parameters are for general type only:
+
+| Parameter Name | Description | Required/Optional | Default |
+| --- | --- | ---| ---|
+| start_date_name| The start date parameter name of the auth api url. | Required | - |
 
 #### Example
-
+Auth apis and Oauth apis can be combined in the same config file. Seperated for readbility.
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -109,6 +145,61 @@ auth_apis:
       data_date: date
     filters:
       event_type%5B%5D: '1090519054'
+```
+
+```yaml
+logzio:
+  url: https://listener.logz.io:8071
+  token: 123456789a
+
+oauth_apis:
+  - type: azure_graph
+    name: azure_test
+    credentials:
+      id: <<AZURE_AD_SECRET_ID>>
+      key: <<AZURE_AD_SECRET_VALUE>>
+    token_http_request:
+      url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
+      body: client_id=<<AZURE_AD_CLIENT_ID>>
+        &scope=https://graph.microsoft.com/.default
+        &client_secret=<<AZURE_AD_SECRET_VALUE>>
+        &grant_type=client_credentials
+      headers:
+      method: GET
+    data_http_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      headers:
+    json_paths:
+      data_date: createdDateTime
+      next_url:
+      data:
+    settings:
+      time_interval: 1
+      days_back_fetch: 30
+  - type: general
+    name: general_test
+    credentials:
+      id: aaaa-bbbb-cccc
+      key: abcabcabc
+    token_http_request:
+      url: https://login.microsoftonline.com/abcd-efgh-abcd-efgh/oauth2/v2.0/token
+      body: client_id=aaaa-bbbb-cccc
+            &scope=https://graph.microsoft.com/.default
+            &client_secret=abcabcabc
+            &grant_type=client_credentials
+      headers:
+      method: GET
+    data_http_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/directoryAudits
+      headers:
+    json_paths:
+      data_date: activityDateTime
+      data: value
+      next_url: '@odata.nextLink'
+    settings:
+      time_interval: 1
+    start_date_name: activityDateTime
+
 ```
 
 ### Run The Docker Container

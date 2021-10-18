@@ -1,0 +1,49 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: 123456789a
+
+oauth_apis:
+  - type: azure_graph
+    name: azure_test
+    credentials:
+      id: aaaa-bbbb-cccc
+      key: abcabcabc
+    token_http_request:
+      url: https://login.microsoftonline.com/abcd-efgh-abcd-efgh/oauth2/v2.0/token
+      body: client_id=aaaa-bbbb-cccc
+        &scope=https://graph.microsoft.com/.default
+        &client_secret=abcabcabc
+        &grant_type=client_credentials
+      type: POST
+    data_http_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      method: GET
+    start_date_name: createdDateTime
+    json_paths:
+      data_date: createdDateTime
+    settings:
+      time_interval: 1
+
+  - type: general
+    name: general_test2
+    credentials:
+      id: aaaa-bbbb-cccc
+      key: abcabcabc
+    token_http_request:
+      url: https://login.microsoftonline.com/abcd-efgh-abcd-efgh/oauth2/v2.0/token
+      body: client_id=aaaa-bbbb-cccc
+        &scope=https://graph.microsoft.com/.default
+        &client_secret=abcabcabc
+        &grant_type=client_credentials
+      headers:
+      type: POST
+    data_http_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      method: GET
+    json_paths:
+      data_date: createdDateTime
+      data: value
+      next_url: '@odata.nextLink'
+    settings:
+      time_interval: 1
+    start_date_name: createdDateTime

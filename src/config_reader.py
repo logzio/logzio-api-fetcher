@@ -18,12 +18,10 @@ from .data.general_type_data.oauth_api_general_type_data import OAuthApiGeneralT
 from .data.general_type_data.api_json_paths import ApiJsonPaths
 from .data.api_http_request import ApiHttpRequest
 
-
 logger = logging.getLogger(__name__)
 
 
 class ConfigReader:
-
     AUTH_API = 'auth'
     OAUTH_API = 'oauth'
 
@@ -252,7 +250,8 @@ class ConfigReader:
         api_custom_fields = []
 
         if ConfigReader.API_CUSTOM_FIELDS_CONFIG_KEY in config_api_data:
-            for api_custom_field_key, api_custom_field_value in config_api_data[ConfigReader.API_CUSTOM_FIELDS_CONFIG_KEY].items():
+            for api_custom_field_key, api_custom_field_value in config_api_data[
+                ConfigReader.API_CUSTOM_FIELDS_CONFIG_KEY].items():
                 api_custom_fields.append(ApiCustomField(api_custom_field_key, api_custom_field_value))
 
         return api_custom_fields
@@ -289,7 +288,7 @@ class ConfigReader:
         api_start_date_name = self._get_api_start_date_name(config_api_data, api_group_type, api_num)
         api_json_paths = self._get_api_json_paths(config_api_data, api_group_type, api_num)
 
-        if api_start_date_name is None or api_json_paths is None:
+        if (api_start_date_name is None and api_group_type != self.OAUTH_API) or api_json_paths is None:
             return None
 
         return ApiGeneralTypeData(api_start_date_name, api_json_paths)
@@ -306,19 +305,19 @@ class ConfigReader:
         return api_start_date_name
 
     def _get_api_json_paths(self, config_api_data: dict, api_group_type: str, api_num: int) -> Optional[ApiJsonPaths]:
-        try:
-            api_json_paths = config_api_data[ConfigReader.GENERAL_API_JSON_PATHS_CONFIG_KEY]
+        api_json_paths = config_api_data[ConfigReader.GENERAL_API_JSON_PATHS_CONFIG_KEY]
+        api_data_date_json_path = api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY)
+        api_next_url_json_path = api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY)
+        api_data_json_path = api_json_paths.get(ConfigReader.GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY)
 
-            api_next_url_json_path = api_json_paths[ConfigReader.GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY]
-            api_data_json_path = api_json_paths[ConfigReader.GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY]
-            api_data_date_json_path = api_json_paths[ConfigReader.GENERAL_API_JSON_PATHS_DATA_DATE_CONFIG_KEY]
-        except KeyError:
+        if api_data_date_json_path is not None:
+            return ApiJsonPaths(api_next_url_json_path, api_data_json_path, api_data_date_json_path)
+        else:
             logger.error(
                 "Your configuration is not valid: the general type {0} api #{1} must have json_paths with next_url, "
                 "data and data_date.".format(api_group_type, api_num))
+        if api_data_date_json_path is None:
             return None
-
-        return ApiJsonPaths(api_next_url_json_path, api_data_json_path, api_data_date_json_path)
 
     def _get_auth_api_http_request(self, config_auth_api_data: dict, auth_api_num: int) -> Optional[ApiHttpRequest]:
         try:
@@ -353,7 +352,7 @@ class ConfigReader:
 
             api_token_http_request_method = api_token_http_request[ConfigReader.API_HTTP_REQUEST_METHOD_CONFIG_KEY]
             api_token_url = api_token_http_request[ConfigReader.API_HTTP_REQUEST_URL_CONFIG_KEY]
-            api_data_http_request_method = api_token_http_request[ConfigReader.API_HTTP_REQUEST_METHOD_CONFIG_KEY]
+            api_data_http_request_method = api_data_http_request[ConfigReader.API_HTTP_REQUEST_METHOD_CONFIG_KEY]
             api_data_url = api_data_http_request[ConfigReader.API_HTTP_REQUEST_URL_CONFIG_KEY]
         except TypeError:
             logger.error(
@@ -379,7 +378,8 @@ class ConfigReader:
 
         token_http_request = ApiHttpRequest(api_token_http_request_method,
                                             api_token_url,
-                                            api_token_http_request.get(ConfigReader.API_HTTP_REQUEST_HEADERS_CONFIG_KEY),
+                                            api_token_http_request.get(
+                                                ConfigReader.API_HTTP_REQUEST_HEADERS_CONFIG_KEY),
                                             api_token_http_request.get(ConfigReader.API_HTTP_REQUEST_BODY_CONFIG_KEY))
         data_http_request = ApiHttpRequest(api_data_http_request_method,
                                            api_data_url,
