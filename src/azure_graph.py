@@ -1,10 +1,9 @@
 import logging
-import parser
-import urllib
-from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta
 from src.data.oauth_api_data import OAuthApiData
 from src.oauth_api import OAuthApi
+
 
 logger = logging.getLogger(__name__)
 
