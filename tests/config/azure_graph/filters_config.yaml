@@ -15,10 +15,10 @@ oauth_apis:
         &client_secret=<<AZURE_AD_SECRET_VALUE>>
         &grant_type=client_credentials
       headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
-      headers:
+      method: GET
     start_date_name: createdDateTime
     json_paths:
       data_date: createdDateTime

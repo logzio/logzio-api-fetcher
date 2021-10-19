@@ -98,12 +98,8 @@ The following parameters are for every type:
 | settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
 | filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
 | custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. | Optional | - |
+| start_date_name| The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)| Required | - |
 
-The following parameters are for general type only:
-
-| Parameter Name | Description | Required/Optional | Default |
-| --- | --- | ---| ---|
-| start_date_name| The start date parameter name of the auth api url. | Required | - |
 
 #### Example
 Auth apis and Oauth apis can be combined in the same config file. Seperated for readbility.
