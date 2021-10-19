@@ -3,7 +3,7 @@ from src.apis_manager import ApisManager
 
 
 def main() -> None:
-    fileConfig('logging_config.ini', disable_existing_loggers=False)
+    fileConfig('src/logging_config.ini', disable_existing_loggers=False)
     ApisManager().run()
 
 

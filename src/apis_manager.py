@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 class ApisManager:
 
-    CONFIG_FILE = 'shared/config.yaml'
-    LAST_START_DATES_FILE = 'shared/last_start_dates.txt'
+    CONFIG_FILE = 'src/shared/config.yaml'
+    LAST_START_DATES_FILE = 'src/shared/last_start_dates.txt'
 
     API_GENERAL_TYPE = 'general'
     API_CISCO_SECURE_X_TYPE = 'cisco_secure_x'
