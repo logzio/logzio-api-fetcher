@@ -13,11 +13,13 @@ jobs:
         with:
           python-version: '3.x'
       - name: Add credentials to config files
-      run: |
-        grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_ID>>\b/${{ secrets.CISCO_SECURE_X_API_ID }}/g' @
-        grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_KEY>>\b/${{ secrets.CISCO_SECURE_X_API_KEY }}/g' @
-        
-
+        run: |
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_ID>>\b/${{ secrets.CISCO_SECURE_X_API_ID }}/g' @
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_KEY>>\b/${{ secrets.CISCO_SECURE_X_API_KEY }}/g' @
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<AZURE_AD_SECRET_ID>>\b/${{ secrets.AZURE_AD_SECRET_ID }}/g' @
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<AZURE_AD_SECRET_VALUE>>\b/${{ secrets.AZURE_AD_SECRET_VALUE }}/g' @
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CLIENT_ID>>\b/${{ secrets.AZURE_AD_CLIENT_ID }}/g' @
+          grep -rli 'old-word' * | xargs -i@ sed -i 's/<<AZURE_AD_TENANT_ID>>\b/${{ secrets.AZURE_AD_TENANT_ID }}/g' @
       - name: Run unit tests
         run: |
           pip install pytest
