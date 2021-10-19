@@ -1,36 +1,61 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: Automatic tests, code-coverage and
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  push:
+    branches:
+      - main
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Add credentials to config files
+      run: |
+        grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_ID>>\b/${{ secrets.CISCO_SECURE_X_API_ID }}/g' @
+        grep -rli 'old-word' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_KEY>>\b/${{ secrets.CISCO_SECURE_X_API_KEY }}/g' @
+        
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Run unit tests
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          pip install pytest
+          pip install httpretty
+          pip install requests
+          pip install pyyaml
+          pip install jsonpath-ng
+          pip install python-dateutil
+          pip install pytest-cov
+          pytest --cov-report xml:code_coverage.xml --cov=src tests/*_tests.py
+      - name: Code-coverage
+        run: |
+          # Get line-rate
+          line_rate=$(head -2 code_coverage.xml | tail -1 | egrep -o "line-rate=\"[0-1]\.?[0-9]*\"" | egrep -o "[0-1]\.?[0-9]*")
+
+          # Print line-rate
+          echo | awk -v num=$line_rate '{ printf "line-rate: %d%\n", (num * 100) }'
+
+          # Check code-coverage conditions
+          echo | awk -v num=$line_rate '{ if (num < 0.8) { printf "line-rate is less than 80%"; exit 1 } else { exit 0 }}'
+          exit_code=$?
+          if [ $exit_code -eq 1 ]; then
+            exit 1
+          fi
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: my-docker-hub-namespace/my-docker-hub-repository
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
