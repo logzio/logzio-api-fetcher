@@ -107,6 +107,8 @@ The following parameters are for general type only:
 
 #### Example
 Auth apis and Oauth apis can be combined in the same config file. Seperated for readbility.
+
+#### Auth api config:
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -147,6 +149,7 @@ auth_apis:
       event_type%5B%5D: '1090519054'
 ```
 
+### OAuth Api config:
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -165,7 +168,7 @@ oauth_apis:
         &client_secret=<<AZURE_AD_SECRET_VALUE>>
         &grant_type=client_credentials
       headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       headers:
@@ -188,7 +191,7 @@ oauth_apis:
             &client_secret=abcabcabc
             &grant_type=client_credentials
       headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/directoryAudits
       headers:

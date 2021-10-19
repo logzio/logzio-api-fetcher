@@ -24,7 +24,7 @@ class AzureGraphApiTests(unittest.TestCase):
     AZURE_GRAPH_BODY_JSON = 'tests/api_body/azure_graph_body.json'
     AZURE_GRAPH_TOKEN_BODY_JSON = 'tests/api_body/azure_graph_token_body.json'
     AZURE_GRAPH_TEST_URL = "https://graph.microsoft.com/v1.0/auditLogs/signIns"
-    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/c96a62e5-1e49-4187-b394-08b694e8bb0d/oauth2/v2.0/token'
+    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/<<AZURE_ID_TENANT_IKD>>/oauth2/v2.0/token'
     AZURE_GRAPH_TEST_TOKEN = "1234-abcd-efgh-5678"
     azure_graph_json_body: dict = None
     azure_graph_token_json_body: dict = None
