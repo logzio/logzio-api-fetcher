@@ -2,3 +2,4 @@ pyyaml
 requests
 urllib3
 python-dateutil
+jsonpath-ng
