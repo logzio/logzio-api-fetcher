@@ -28,8 +28,8 @@ auth_apis:
   - type: cisco_secure_x
     name: cisco
     credentials:
-      id: 1e98d35f67648ffd1cac
-      key: 221a50a2-a35e-47be-9042-af98d1a0d231
+      id: <<CISCO_SECURE_X_API_ID>>
+      key: <<CISCO_SECURE_X_API_KEY>>
     settings:
       time_interval: 2
       days_back_fetch: 30
