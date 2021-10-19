@@ -205,10 +205,17 @@ oauth_apis:
 
 ```
 
+### Create start date file
+Create an empty text file named last_start_dates.txt in the same directory as the config file:
+
+```shell
+$ touch last_start_dates.txt
+```
+
 ### Run The Docker Container
 
 ```shell
-run docker --name logzio-api-fetcher \
+docker run --name logzio-api-fetcher \
 -v "$(pwd)":/app/src/shared \
 logzio/logzio-api-fetcher
 ```
