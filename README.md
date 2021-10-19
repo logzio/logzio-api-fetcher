@@ -98,15 +98,13 @@ The following parameters are for every type:
 | settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
 | filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
 | custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. | Optional | - |
+| start_date_name| The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)| Required | - |
 
-The following parameters are for general type only:
-
-| Parameter Name | Description | Required/Optional | Default |
-| --- | --- | ---| ---|
-| start_date_name| The start date parameter name of the auth api url. | Required | - |
 
 #### Example
 Auth apis and Oauth apis can be combined in the same config file. Seperated for readbility.
+
+#### Auth api config:
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -147,6 +145,7 @@ auth_apis:
       event_type%5B%5D: '1090519054'
 ```
 
+### OAuth Api config:
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -165,7 +164,7 @@ oauth_apis:
         &client_secret=<<AZURE_AD_SECRET_VALUE>>
         &grant_type=client_credentials
       headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       headers:
@@ -188,7 +187,7 @@ oauth_apis:
             &client_secret=abcabcabc
             &grant_type=client_credentials
       headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/directoryAudits
       headers:
@@ -202,10 +201,17 @@ oauth_apis:
 
 ```
 
+### Create start date file
+Create an empty text file named last_start_dates.txt in the same directory as the config file:
+
+```shell
+$ touch last_start_dates.txt
+```
+
 ### Run The Docker Container
 
 ```shell
-run docker --name logzio-api-fetcher \
+docker run --name logzio-api-fetcher \
 -v "$(pwd)":/app/src/shared \
 logzio/logzio-api-fetcher
 ```

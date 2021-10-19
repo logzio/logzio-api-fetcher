@@ -17,6 +17,7 @@ oauth_apis:
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      method: GET
       headers:
         content-type: application/json
     json_paths:

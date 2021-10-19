@@ -6,19 +6,18 @@ oauth_apis:
   - type: azure_graph
     name: azure_test
     credentials:
-      id: 1a0d6381-d66b-4e82-a977-cf9781310991
-      key: x__VZ3cIawTtT5G-553g31251zzir2mQ_8
-    token_http_request:
-      url: https://login.microsoftonline.com/c96a62e5-1e49-4187-b394-08b694e8bb0d/oauth2/v2.0/token
-      body: client_id=1a0d6381-d66b-4e82-a977-cf9781310991
-        &scope=https://graph.microsoft.com/.default
-        &client_secret=x__VZ3cIawTtT5G-553g31251zzir2mQ_8
-        &grant_type=client_credentials
-      headers:
-      method: GET
+      id: <<AZURE_AD_SECRET_ID>>
+      key: <<AZURE_AD_SECRET_VALUE>>
+      token_http_request:
+        url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
+        body: client_id=<<CLIENT_ID>>
+          &scope=https://graph.microsoft.com/.default
+          &client_secret=<<AZURE_AD_SECRET_VALUE>>
+          &grant_type=client_credentials
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
-      headers:
+      method: GET
     start_date_name: createdDateTime
     json_paths:
       data_date: createdDateTime
@@ -36,8 +35,7 @@ oauth_apis:
         &scope=https://graph.microsoft.com/.default
         &client_secret=<<AZURE_AD_SECRET_VALUE>>
         &grant_type=client_credentials
-      headers:
-      method: GET
+      method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       headers:

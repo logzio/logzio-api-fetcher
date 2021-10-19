@@ -17,7 +17,7 @@ oauth_apis:
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/directoryAudits/signIns
-      headers:
+      method: GET
     json_paths:
       data_date: activityDateTime
       data: value
@@ -40,7 +40,7 @@ oauth_apis:
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/directoryAudits
-      headers:
+      method: GET
     json_paths:
       data_date: createdDateTime
       data: value
