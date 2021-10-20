@@ -47,8 +47,9 @@ class TestUtils:
         self.second_api_body = second_api_body
 
     def start_process_and_wait_until_finished(self, queue: multiprocessing.Queue, config_file: str,
-                                              delegate: Callable[[str], None], status: int, sleep_time: int,is_multi_test:bool=False) -> None:
-        process = multiprocessing.Process(target=delegate, args=(config_file, status, queue,is_multi_test))
+                                              delegate: Callable[[str], None], status: int, sleep_time: int,
+                                              is_multi_test: bool = False) -> None:
+        process = multiprocessing.Process(target=delegate, args=(config_file, status, queue, is_multi_test))
         process.start()
 
         time.sleep(sleep_time)
@@ -56,7 +57,8 @@ class TestUtils:
         process.join()
 
     @httpretty.activate
-    def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue) -> None:
+    def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
+                             is_multi_test: bool) -> None:
         httpretty.register_uri(self.api_http_method, self.api_url, body=json.dumps(self.api_body), status=200)
         httpretty.register_uri(httpretty.POST, TestUtils.LOGZIO_URL, status=status)
 
