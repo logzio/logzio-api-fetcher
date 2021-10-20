@@ -15,7 +15,7 @@ from .api import Api
 from .cisco_secure_x import CiscoSecureX
 from .general_auth_api import GeneralAuthApi
 from .logzio_shipper import LogzioShipper
-
+from .oauth_api import OAuthApi
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class ApisManager:
 
     def _add_oauth_api(self, oauth_api_data: OAuthApiData) -> None:
         if oauth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
-            pass
+            self._apis.append(OAuthApi(oauth_api_data.base_data, oauth_api_data.general_type_data))
         else:
             self._apis.append(AzureGraph(oauth_api_data))
 

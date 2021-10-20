@@ -19,12 +19,12 @@ oauth_apis:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       method: GET
     json_paths:
-      data_date: activityDateTime
+      data_date: createdDateTime
       data: value
       next_url: '@odata.nextLink'
     settings:
       time_interval: 1
-    start_date_name: activityDateTime
+    start_date_name: createdDateTime
     custom_fields:
       field1: test1
       field2: test2

@@ -23,7 +23,6 @@ class GeneralTypeAuthApiTests(unittest.TestCase):
     TIME_INTERVAL_CONFIG_FILE = 'tests/config/general_type_auth_api/time_interval_config.yaml'
     HTTP_REQUEST_HEADERS_CONFIG_FILE = 'tests/config/general_type_auth_api/http_request_headers_config.yaml'
     BAD_CONFIG_FILE = 'tests/config/general_type_auth_api/bad_config.yaml'
-
     CISCO_SECURE_X_BODY_JSON = 'tests/api_body/cisco_secure_x_body.json'
 
     cisco_secure_x_json_body: dict = None

@@ -24,7 +24,8 @@ class AzureGraphApiTests(unittest.TestCase):
     AZURE_GRAPH_BODY_JSON = 'tests/api_body/azure_graph_body.json'
     AZURE_GRAPH_TOKEN_BODY_JSON = 'tests/api_body/azure_graph_token_body.json'
     AZURE_GRAPH_TEST_URL = "https://graph.microsoft.com/v1.0/auditLogs/signIns"
-    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/<<AZURE_ID_TENANT_IKD>>/oauth2/v2.0/token'
+    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0' \
+                                 '/token'
     AZURE_GRAPH_TEST_TOKEN = "1234-abcd-efgh-5678"
     azure_graph_json_body: dict = None
     azure_graph_token_json_body: dict = None
@@ -108,9 +109,9 @@ class AzureGraphApiTests(unittest.TestCase):
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
-        self.assertEqual(math.ceil(sent_bytes / 2 / LogzioShipper.MAX_BULK_SIZE_BYTES) , requests_num)
-        self.assertEqual(data_num , sent_logs_num)
-        self.assertEqual(data_bytes , sent_bytes)
+        self.assertEqual(math.ceil(sent_bytes / 2 / LogzioShipper.MAX_BULK_SIZE_BYTES), requests_num)
+        self.assertEqual(data_num, sent_logs_num)
+        self.assertEqual(data_bytes, sent_bytes)
 
     def test_sending_data_multiple_azure_graph(self) -> None:
         queue = multiprocessing.Queue()

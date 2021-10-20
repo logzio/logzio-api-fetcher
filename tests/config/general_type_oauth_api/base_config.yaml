@@ -25,4 +25,4 @@ oauth_apis:
     settings:
       time_interval: 1
       days_back_fetch: 30
-    start_date_name: activityDateTime
+    start_date_name: createdDateTime

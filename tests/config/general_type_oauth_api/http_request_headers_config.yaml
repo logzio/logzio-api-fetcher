@@ -21,7 +21,7 @@ oauth_apis:
       headers:
         content-type: application/json
     json_paths:
-      data_date: activityDateTime
+      data_date: createdDateTime
       data: value
       next_url: '@odata.nextLink'
     settings:
@@ -29,4 +29,4 @@ oauth_apis:
       days_back_fetch: 1
     filters:
       top: 100
-    start_date_name: activityDateTime
+    start_date_name: createdDateTime

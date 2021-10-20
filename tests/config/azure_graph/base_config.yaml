@@ -20,8 +20,7 @@ oauth_apis:
       method: GET
     json_paths:
       data_date: createdDateTime
-      next_url:
-      data:
     settings:
       time_interval: 1
       days_back_fetch: 30
+    start_date_name: createdDateTime

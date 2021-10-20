@@ -3,6 +3,8 @@ import logging
 import multiprocessing
 import json
 import math
+from urllib.parse import unquote
+
 import httpretty
 
 from src.azure_graph import AzureGraph
@@ -24,7 +26,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
     AZURE_GRAPH_BODY_JSON = 'tests/api_body/azure_graph_body.json'
     AZURE_GRAPH_TEST_URL = "https://graph.microsoft.com/v1.0/auditLogs/signIns"
     AZURE_GRAPH_TEST_TOKEN = "1234-abcd-efgh-5678"
-    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/c96a62e5-1e49-4187-b394-08b694e8bb0d/oauth2/v2.0/token'
+    AZURE_GRAPH_TOKEN_TEST_URL = 'https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token'
     AZURE_GRAPH_TOKEN_BODY_JSON = 'tests/api_body/azure_graph_token_body.json'
     azure_graph_json_body: dict = None
 
@@ -48,7 +50,6 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
         total_data_bytes, total_data_num = self.tests_utils.get_azure_graph_api_total_data_bytes_and_num(
             GeneralTypeOAuthApiTests.BASE_CONFIG_FILE)
         base_azure_graph = self.tests_utils.get_first_api(GeneralTypeOAuthApiTests.BASE_CONFIG_FILE, is_auth_api=False)
-
         fetched_data_bytes, fetched_data_num = self.tests_utils.get_api_fetch_data_bytes_and_num(
             base_azure_graph)
 
@@ -82,7 +83,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
     def test_sending_data(self) -> None:
         queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
-                                                               GeneralTypeOAuthApiTests.BASE_CONFIG_FILE,
+                                                               self.BASE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
                                                                status=200,
                                                                sleep_time=10)
@@ -182,16 +183,17 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
     def test_last_start_date(self) -> None:
         httpretty.register_uri(httpretty.GET, self.AZURE_GRAPH_TEST_URL,
                                body=json.dumps(GeneralTypeOAuthApiTests.azure_graph_json_body), status=200)
-
         base_azure_graph = self.tests_utils.get_first_api(GeneralTypeOAuthApiTests.CUSTOM_FIELDS_CONFIG_FILE,
                                                           is_auth_api=False)
+        httpretty.register_uri(httpretty.POST, base_azure_graph.get_token_request.url,
+                               body=json.dumps(self.azure_graph_token_json_body), status=200)
 
         for _ in base_azure_graph.fetch_data():
             continue
 
         base_azure_graph.update_start_date_filter()
 
-        self.assertEqual('2021-10-05T10%3A10%3A11%2B00%3A00', base_azure_graph.get_last_start_date())
+        self.assertEqual('2020-03-13T19:15:42.619583+00:00', unquote(base_azure_graph.get_last_start_date()))
 
     def test_bad_config(self) -> None:
         queue = multiprocessing.Queue()

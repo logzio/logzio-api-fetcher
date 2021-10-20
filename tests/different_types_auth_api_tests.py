@@ -4,8 +4,6 @@ import multiprocessing
 import json
 import math
 
-import httpretty
-
 from src.cisco_secure_x import CiscoSecureX
 from src.logzio_shipper import LogzioShipper
 from .tests_utils import TestUtils

@@ -8,12 +8,12 @@ oauth_apis:
     credentials:
       id: <<AZURE_AD_SECRET_ID>>
       key: <<AZURE_AD_SECRET_VALUE>>
-      token_http_request:
-        url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
-        body: client_id=<<CLIENT_ID>>
-          &scope=https://graph.microsoft.com/.default
-          &client_secret=<<AZURE_AD_SECRET_VALUE>>
-          &grant_type=client_credentials
+    token_http_request:
+      url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
+      body: client_id=<<CLIENT_ID>>
+        &scope=https://graph.microsoft.com/.default
+        &client_secret=<<AZURE_AD_SECRET_VALUE>>
+        &grant_type=client_credentials
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
@@ -38,7 +38,7 @@ oauth_apis:
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
-      headers:
+      method: GET
     start_date_name: activityDateTime
     json_paths:
       data_date: activityDateTime

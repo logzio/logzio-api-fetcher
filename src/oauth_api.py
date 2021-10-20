@@ -119,3 +119,11 @@ class OAuthApi(Api):
                                      data=self._data_request.body)
 
         return response
+
+    @property
+    def get_data_request(self):
+        return self._data_request
+
+    @property
+    def get_token_request(self):
+        return self._token_request

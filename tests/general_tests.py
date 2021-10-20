@@ -19,7 +19,6 @@ class GeneralTests(unittest.TestCase):
 
     BASE_CONFIG_FILE = 'tests/config/cisco_secure_x/base_config.yaml'
     CISCO_SECURE_X_BODY_JSON = 'tests/api_body/cisco_secure_x_body.json'
-
     BAD_LOGZIO_URL = 'https://bad.endpoint:1234'
     BAD_URI = 'https:/bad.uri:1234'
     BAD_CONNECTION_ADAPTER_URL = 'bad://connection.adapter:1234'

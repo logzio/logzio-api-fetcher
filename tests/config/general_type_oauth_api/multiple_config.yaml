@@ -16,15 +16,15 @@ oauth_apis:
         &grant_type=client_credentials
       method: POST
     data_http_request:
-      url: https://graph.microsoft.com/v1.0/directoryAudits/signIns
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       method: GET
     json_paths:
-      data_date: activityDateTime
+      data_date: createdDateTime
       data: value
       next_url: '@odata.nextLink'
     settings:
       time_interval: 1
-    start_date_name: activityDateTime
+    start_date_name: createdDateTime
 
   - type: general
     name: general_test2
@@ -39,7 +39,7 @@ oauth_apis:
         &grant_type=client_credentials
       method: POST
     data_http_request:
-      url: https://graph.microsoft.com/v1.0/auditLogs/directoryAudits
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       method: GET
     json_paths:
       data_date: createdDateTime

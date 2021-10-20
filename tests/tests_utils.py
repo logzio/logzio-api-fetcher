@@ -28,11 +28,6 @@ class TestUtils:
     LOGZIO_TOKEN = '123456789a'
     LAST_START_DATES_FILE = 'tests/last_start_dates.txt'
 
-    # def __init__(self, api_http_method: str, api_url: str, api_body: dict) -> None:
-    #     self.api_http_method = api_http_method
-    #     self.api_url = api_url
-    #     self.api_body = api_body
-
     def __init__(self, api_http_method: str, api_url: str, api_body: dict, token_http_method: str = None,
                  token_url: str = None, token_body: dict = None, second_http_method: str = None,
                  second_api_url: str = None, second_api_body: dict = None) -> None:
@@ -47,8 +42,9 @@ class TestUtils:
         self.second_api_body = second_api_body
 
     def start_process_and_wait_until_finished(self, queue: multiprocessing.Queue, config_file: str,
-                                              delegate: Callable[[str], None], status: int, sleep_time: int,is_multi_test:bool=False) -> None:
-        process = multiprocessing.Process(target=delegate, args=(config_file, status, queue,is_multi_test))
+                                              delegate: Callable[[str], None], status: int, sleep_time: int,
+                                              is_multi_test: bool = False) -> None:
+        process = multiprocessing.Process(target=delegate, args=(config_file, status, queue, is_multi_test))
         process.start()
 
         time.sleep(sleep_time)
@@ -56,7 +52,8 @@ class TestUtils:
         process.join()
 
     @httpretty.activate
-    def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue) -> None:
+    def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
+                             is_multi_test: bool) -> None:
         httpretty.register_uri(self.api_http_method, self.api_url, body=json.dumps(self.api_body), status=200)
         httpretty.register_uri(httpretty.POST, TestUtils.LOGZIO_URL, status=status)
 
@@ -84,7 +81,7 @@ class TestUtils:
                                body=json.dumps(self.token_body))
         httpretty.register_uri(self.api_http_method, self.api_url, body=json.dumps(self.api_body), status=200,
                                headers={AzureGraph.OAUTH_AUTHORIZATION_HEADER:
-                                            AzureGraphApiTests.AZURE_GRAPH_TEST_URL})
+                                            AzureGraphApiTests.AZURE_GRAPH_TEST_TOKEN})
         if is_multi_test:
             httpretty.register_uri(self.second_http_method, self.second_api_url, body=json.dumps(self.second_api_body),
                                    status=200)
@@ -158,18 +155,18 @@ class TestUtils:
 
         for oauth_api_data in config_reader.get_oauth_apis_data():
             azure_graph = AzureGraph(oauth_api_data)
-
             token, token_expire = azure_graph.get_token()
+
+        url = self.api_url
         while True:
-            response = requests.get(url=self.api_url, headers={OAuthApi.OAUTH_AUTHORIZATION_HEADER:
-                                                                   token,
-                                                               AzureGraph.OAUTH_TOKEN_REQUEST_CONTENT_TYPE: AzureGraph.OAUTH_APPLICATION_JSON_CONTENT_TYPE})
+            response = requests.get(url=url, headers={OAuthApi.OAUTH_AUTHORIZATION_HEADER:
+                                                          token,
+                                                      AzureGraph.OAUTH_TOKEN_REQUEST_CONTENT_TYPE: AzureGraph.OAUTH_APPLICATION_JSON_CONTENT_TYPE})
             json_data = json.loads(response.content)
             data_bytes, data_num = self.get_api_data_bytes_and_num_from_json_data(
                 json_data[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
             total_data_bytes += data_bytes
             total_data_num += data_num
-
             next_url = json_data.get(AzureGraph.NEXT_LINK)
 
             if next_url is None:
