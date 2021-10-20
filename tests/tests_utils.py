@@ -217,7 +217,12 @@ class TestUtils:
             if request.url == self.LOGZIO_HTTPPRETTY_URL:
                 requests_num += 1
 
-                for log in gzip.decompress(request.parsed_body).splitlines():
+                try:
+                    decompressed_gzip = gzip.decompress(request.parsed_body).splitlines()
+                except TypeError:
+                    continue
+
+                for log in decompressed_gzip:
                     sent_logs_num += 1
                     sent_bytes += len(log)
 
