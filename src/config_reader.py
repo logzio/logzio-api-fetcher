@@ -387,28 +387,3 @@ class ConfigReader:
                                            api_data_http_request.get(ConfigReader.API_HTTP_REQUEST_BODY_CONFIG_KEY))
 
         return token_http_request, data_http_request
-
-    '''
-    def _get_oauth_urls(self, config_oauth_api_data: dict) -> Optional[OAuthApiUrls]:
-        try:
-            api_data_url = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_DATA_URL_CONFIG_KEY][
-                ConfigReader.GENERAL_API_URL_CONFIG_KEY]
-            api_token_url = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY][
-                ConfigReader.GENERAL_API_URL_CONFIG_KEY]
-            api_data_body = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_DATA_URL_CONFIG_KEY].get(
-                ConfigReader.GENERAL_API_URL_BODY_CONFIG_KEY)
-            api_token_body = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY].get(
-                ConfigReader.GENERAL_API_URL_BODY_CONFIG_KEY)
-            api_data_headers = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_DATA_URL_CONFIG_KEY].get(
-                ConfigReader.GENERAL_API_URL_HEADERS_CONFIG_KEY)
-            api_token_headers = config_oauth_api_data[ConfigReader.GENERAL_OAUTH_API_TOKEN_URL_CONFIG_KEY].get(
-                ConfigReader.GENERAL_API_URL_CONFIG_KEY)
-        except TypeError:
-            logger.error(
-                "Your configuration is not valid: general type oauth_api must have data_url and token_url. "
-                "Please check your configuration.")
-            return None
-
-        return OAuthApiUrls(ApiHttpRequest(api_data_url, api_data_headers, api_data_body),
-                            ApiHttpRequest(api_token_url, api_token_headers, api_token_body))
-    '''
