@@ -1,0 +1,21 @@
+logzio:
+  url: https://listener.logz.io:8071
+  token: 123456789a
+
+auth_apis:
+  - type: general
+    name: cisco
+    credentials:
+      id: <<CISCO_SECURE_X_API_ID>>
+      key: <<CISCO_SECURE_X_API_KEY>>
+    settings:
+      time_interval: 1
+      days_back_fetch: 30
+    start_date_name: start_date
+    http_request:
+      method: GET
+      url: https://api.amp.cisco.com/v1/events
+    json_paths:
+      next_url: metadata.links.next
+      data: data
+      data_date: date
