@@ -100,11 +100,12 @@ The following parameters are for every type:
 | custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. | Optional | - |
 | start_date_name| The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)| Required | - |
 
+### Example
 
-#### Example
-Auth apis and Oauth apis can be combined in the same config file. Seperated for readbility.
+Auth apis and Oauth apis can be combined in the same config file. Separated for readability.
 
 #### Auth api config:
+
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -145,7 +146,8 @@ auth_apis:
       event_type%5B%5D: '1090519054'
 ```
 
-### OAuth Api config:
+#### OAuth Api config:
+
 ```yaml
 logzio:
   url: https://listener.logz.io:8071
@@ -201,7 +203,8 @@ oauth_apis:
 
 ```
 
-### Create start date file
+### Create Last Start Dates Text File
+
 Create an empty text file named last_start_dates.txt in the same directory as the config file:
 
 ```shell
