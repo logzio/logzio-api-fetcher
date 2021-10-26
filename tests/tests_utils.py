@@ -48,7 +48,8 @@ class TestUtils:
         process.start()
 
         time.sleep(sleep_time)
-        os.kill(process.pid, signal.SIGTERM)
+        os.system('kill -15 ' + str(process.pid))
+        #os.kill(process.pid, signal.SIGTERM)
         process.join()
 
     @httpretty.activate
