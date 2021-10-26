@@ -30,7 +30,7 @@ jobs:
           pip install jsonpath-ng
           pip install python-dateutil
           pip install pytest-cov
-          pytest --cov-report xml:code_coverage.xml --cov=src tests/*_tests.py
+          pytest --cov-report xml:code_coverage.xml --cov=src tests/cisco_secure_x_api_tests.py
       - name: Code-coverage
         run: |
           # Get line-rate
