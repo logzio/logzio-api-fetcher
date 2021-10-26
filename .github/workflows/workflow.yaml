@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.x'
       - name: Add credentials to config files
         run: |
           cd tests/config
@@ -31,7 +31,7 @@ jobs:
           pip install jsonpath-ng
           pip install python-dateutil
           pip install pytest-cov
-          pytest --cov-report xml:code_coverage.xml --cov=src tests/test_tests.py
+          pytest --cov-report xml:code_coverage.xml --cov=src tests/*_tests.py
       - name: Code-coverage
         run: |
           # Get line-rate
