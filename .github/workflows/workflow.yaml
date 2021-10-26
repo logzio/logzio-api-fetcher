@@ -14,7 +14,7 @@ jobs:
           python-version: '3.x'
       - name: Add credentials to config files
         run: |
-          cd tests
+          cd tests/config
           grep -rli '<<CISCO_SECURE_X_API_ID>>' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_ID>>/${{ secrets.CISCO_SECURE_X_API_ID }}/g' @
           grep -rli '<<CISCO_SECURE_X_API_KEY>>' * | xargs -i@ sed -i 's/<<CISCO_SECURE_X_API_KEY>>/${{ secrets.CISCO_SECURE_X_API_KEY }}/g' @
           grep -rli '<<AZURE_AD_SECRET_ID>>' * | xargs -i@ sed -i 's/<<AZURE_AD_SECRET_ID>>/${{ secrets.AZURE_AD_SECRET_ID }}/g' @
