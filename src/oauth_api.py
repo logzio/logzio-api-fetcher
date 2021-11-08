@@ -44,7 +44,7 @@ class OAuthApi(Api):
     def fetch_data(self) -> Generator:
         if time.time() > (self.token_expire - 60):
             self.token, token_expire = self.get_token()
-            self.token_expire = time.time() + token_expire
+            self.token_expire = time.time() + int(token_expire)
         return self._get_total_data_from_api()
 
     def _get_total_data_from_api(self) -> Generator:
