@@ -12,7 +12,7 @@ from .data.base_data.api_custom_field import ApiCustomField
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 
 class LogzioShipper:
@@ -26,10 +26,10 @@ class LogzioShipper:
     CONNECTION_TIMEOUT_SECONDS = 5
 
     def __init__(self, logzio_url: str, token: str) -> None:
-        self._logzio_url = "{0}/?token={1}&type=api_fetcher".format(logzio_url, token)
+        self._logzio_url = "{0}/?token={1}".format(logzio_url, token)
         self._logs = []
         self._bulk_size = 0
-        self._custom_fields: list[ApiCustomField] = []
+        self._custom_fields = {'type': 'api_fetcher'}
 
     def add_log_to_send(self, log: str) -> None:
         enriched_log = self._add_custom_fields_to_log(log)
@@ -103,7 +103,7 @@ class LogzioShipper:
             raise
 
     def add_custom_field_to_list(self, custom_field: ApiCustomField) -> None:
-        self._custom_fields.append(custom_field)
+        self._custom_fields[custom_field.key] = custom_field.value
 
     def _is_log_valid_to_be_sent(self, log: str, log_size: int) -> bool:
         if log_size > LogzioShipper.MAX_LOG_SIZE_BYTES:
@@ -118,8 +118,8 @@ class LogzioShipper:
     def _add_custom_fields_to_log(self, log: str) -> str:
         json_log = json.loads(log)
 
-        for custom_field in self._custom_fields:
-            json_log[custom_field.key] = custom_field.value
+        for key, value in self._custom_fields.items():
+            json_log[key] = value
 
         return json.dumps(json_log)
 
