@@ -12,7 +12,7 @@ from .data.base_data.api_custom_field import ApiCustomField
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 
 class LogzioShipper:
