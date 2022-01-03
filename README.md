@@ -53,7 +53,7 @@ The following parameters are for every type:
 | settings.time_interval | The auth api time interval between runs. | Required | - |
 | settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
 | filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
-| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io | Optional | type = api_fetcher |
+| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io. | Optional | type = api_fetcher |
 
 The following parameters are for general type only:
 
@@ -98,7 +98,7 @@ The following parameters are for every type:
 | settings.time_interval | The auth api time interval between runs. | Required | - |
 | settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
 | filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
-| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io | Optional | type = api_fetcher |
+| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io. | Optional | type = api_fetcher |
 | start_date_name| The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)| Required | - |
 
 ### Example
