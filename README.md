@@ -238,8 +238,7 @@ You can find the file inside your mounted host directory that you created.
 
 If you stopped the container, you can continue from the exact place you stopped, by adding the date to the api filters in the configuration.
 
+## Changelog:
 
-
-
-
-
+- **0.0.4**:
+  - Bug fix for `azure_graph` task fails when trying to get start date from file.
