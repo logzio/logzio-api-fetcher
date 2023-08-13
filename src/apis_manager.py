@@ -120,25 +120,25 @@ class ApisManager:
 
             if is_data_exist:
                 logzio_shipper.send_to_logzio()
-        except requests.exceptions.InvalidURL:
-            logger.error("Failed to send data to Logz.io...")
+        except requests.exceptions.InvalidURL as e:
+            logger.error(f"Failed to send data to Logz.io... Invalid url: {e}")
             os.kill(os.getpid(), signal.SIGTERM)
             return
-        except InvalidSchema:
-            logger.error("Failed to send data to Logz.io...")
+        except InvalidSchema as e:
+            logger.error(f"Failed to send data to Logz.io... Invalid schema: {e}")
             os.kill(os.getpid(), signal.SIGTERM)
             return
         except requests.HTTPError as e:
-            logger.error("Failed to send data to Logz.io...")
+            logger.error(f"Failed to send data to Logz.io... HTTP error: {e}")
             if e.response.status_code == 401:
                 os.kill(os.getpid(), signal.SIGTERM)
                 return
-        except Api.ApiError:
-            logger.error("Failed to send data to Logz.io...")
+        except Api.ApiError as e:
+            logger.error(f"Failed to send data to Logz.io... API error: {e}")
             os.kill(os.getpid(), signal.SIGTERM)
             return
         except Exception as e:
-            logger.error("Failed to send data to Logz.io...")
+            logger.error(f"Failed to send data to Logz.io... exception: {e}")
             is_data_sent_successfully = False
 
         if is_data_exist and is_data_sent_successfully:

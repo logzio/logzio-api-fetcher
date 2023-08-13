@@ -1,4 +1,5 @@
 import logging
+import urllib
 
 from datetime import datetime, timedelta
 from src.data.oauth_api_data import OAuthApiData
@@ -25,11 +26,12 @@ class AzureGraph(OAuthApi):
         api_url = self._data_request.url
         api_filters_num = self._base_data.get_filters_size()
         if self._current_data_last_date is not None:
-            start_date = self._get_new_start_date()
+            start_date_str = self._get_new_start_date()
+            new_start_date = start_date_str.split('.')[0]
         else:
             start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
-        new_start_date = start_date.isoformat(' ', 'seconds')
-        new_start_date = new_start_date.replace(' ', 'T')
+            new_start_date = start_date.isoformat(' ', 'seconds')
+            new_start_date = new_start_date.replace(' ', 'T')
         api_url += "?$filter=" + self._general_type_data.json_paths.data_date + ' gt ' + new_start_date + 'Z'
         if api_filters_num > 0:
             api_url += '&$'
