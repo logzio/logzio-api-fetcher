@@ -102,6 +102,17 @@ class Api(ABC):
 
         return True
 
+    def get_start_date_filter(self) -> str:
+        if self._current_data_last_date is not None:
+            start_date_str = self._get_new_start_date()
+            new_start_date = start_date_str.split('.')[0]
+        else:
+            start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
+            new_start_date = start_date.isoformat(' ', 'seconds')
+            new_start_date = new_start_date.replace(' ', 'T')
+            new_start_date += 'Z'
+        return new_start_date
+
     def _get_new_start_date(self) -> str:
         new_start_date = str(parser.parse(self._current_data_last_date) + timedelta(seconds=1))
         new_start_date = new_start_date.replace(' ', 'T')

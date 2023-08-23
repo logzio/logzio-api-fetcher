@@ -68,14 +68,7 @@ class AuthApi(Api):
             self._general_type_data.start_date_name)
         api_url += '?'
         if date_filter_index == -1:
-            if self._current_data_last_date is not None:
-                start_date_str = self._get_new_start_date()
-                new_start_date = start_date_str.split('.')[0]
-            else:
-                start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
-                new_start_date = start_date.isoformat(' ', 'seconds')
-                new_start_date = new_start_date.replace(' ', 'T')
-                new_start_date += 'Z'
+            new_start_date = self.get_start_date_filter()
             api_url += self._general_type_data.start_date_name + '=' + new_start_date
             if api_filters_num > 0:
                 api_url += '&'
