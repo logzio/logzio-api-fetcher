@@ -11,7 +11,6 @@ from .data.api_http_request import ApiHttpRequest
 from .data.base_data.auth_api_base_data import AuthApiBaseData
 from .data.general_type_data.auth_api_general_type_data import AuthApiGeneralTypeData
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -65,9 +64,21 @@ class AuthApi(Api):
     def _build_api_url(self) -> str:
         api_url = self._api_http_request.url
         api_filters_num = self._base_data.get_filters_size()
-
-        if api_filters_num > 0:
-            api_url += '?'
+        date_filter_index = self._base_data.get_filter_index(
+            self._general_type_data.start_date_name)
+        api_url += '?'
+        if date_filter_index == -1:
+            if self._current_data_last_date is not None:
+                start_date_str = self._get_new_start_date()
+                new_start_date = start_date_str.split('.')[0]
+            else:
+                start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
+                new_start_date = start_date.isoformat(' ', 'seconds')
+                new_start_date = new_start_date.replace(' ', 'T')
+                new_start_date += 'Z'
+            api_url += self._general_type_data.start_date_name + '=' + new_start_date
+            if api_filters_num > 0:
+                api_url += '&'
 
         for api_filter in self._base_data.filters:
             api_url += api_filter.key + '=' + str(api_filter.value)

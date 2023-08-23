@@ -12,7 +12,6 @@ from .data.api_http_request import ApiHttpRequest
 from .data.base_data.oauth_api_base_data import OAuthApiBaseData
 from .data.general_type_data.oauth_api_general_type_data import OAuthApiGeneralTypeData
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -105,7 +104,7 @@ class OAuthApi(Api):
         return api_url
 
     def _send_request(self, url: str) -> Response:
-        request_headers = {self.OAUTH_AUTHORIZATION_HEADER: self.token,
+        request_headers = {self.OAUTH_AUTHORIZATION_HEADER: f"Bearer {self.token}",
                            self.OAUTH_TOKEN_REQUEST_CONTENT_TYPE: self.OAUTH_APPLICATION_JSON_CONTENT_TYPE}
         if self._data_request.headers is not None:
             request_headers.update(self._data_request.headers)
@@ -116,7 +115,7 @@ class OAuthApi(Api):
         else:
             response = requests.post(url=url,
                                      headers=request_headers,
-                                     data=self._data_request.body)
+                                     data=json.dumps(self._data_request.body))
 
         return response
 

@@ -32,7 +32,8 @@ class AzureGraph(OAuthApi):
             start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
             new_start_date = start_date.isoformat(' ', 'seconds')
             new_start_date = new_start_date.replace(' ', 'T')
-        api_url += "?$filter=" + self._general_type_data.json_paths.data_date + ' gt ' + new_start_date + 'Z'
+            new_start_date += 'Z'
+        api_url += "?$filter=" + self._general_type_data.json_paths.data_date + ' gt ' + new_start_date
         if api_filters_num > 0:
             api_url += '&$'
         for api_filter in self._base_data.filters:

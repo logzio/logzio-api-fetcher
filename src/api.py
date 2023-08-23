@@ -14,7 +14,6 @@ from .data.base_data.api_filter import ApiFilter
 from .data.base_data.api_custom_field import ApiCustomField
 from .data.general_type_data.api_general_type_data import ApiGeneralTypeData
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -54,16 +53,12 @@ class Api(ABC):
 
     def update_start_date_filter(self) -> None:
         new_start_date = self._get_new_start_date()
-
         filter_index = self._base_data.get_filter_index(
             self._general_type_data.start_date_name)
 
-        if filter_index == -1:
-            self._base_data.append_filters(ApiFilter(
-                self._general_type_data.start_date_name, new_start_date))
-            return
-
-        self._base_data.update_filter_value(filter_index, new_start_date)
+        # If date is a filter in the filters list, update the list value (cisco secure x).
+        if filter_index != -1:
+            self._base_data.update_filter_value(filter_index, new_start_date)
 
     def get_last_start_date(self) -> Optional[str]:
         for api_filter in self._base_data.filters:
@@ -115,14 +110,17 @@ class Api(ABC):
         return new_start_date
 
     def _get_data_from_api(self, url: str) -> tuple[Optional[str], list]:
+        next_url = None
         try:
             response = self._get_response_from_api(url)
         except Exception:
             raise
 
         json_data = json.loads(response.content)
-        next_url = self._get_json_path_value_from_data(
-            self._general_type_data.json_paths.next_url, json_data)
+
+        if self._general_type_data.json_paths.next_url:
+            next_url = self._get_json_path_value_from_data(
+                self._general_type_data.json_paths.next_url, json_data)
         data = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data, json_data)
 
