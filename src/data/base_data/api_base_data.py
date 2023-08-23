@@ -8,12 +8,14 @@ from .api_custom_field import ApiCustomField
 class ApiBaseData:
 
     def __init__(self, api_type: str, api_name: str, api_credentials: ApiCredentials, api_settings: ApiSettings,
-                 api_filters: list[ApiFilter], api_custom_fields: list[ApiCustomField]) -> None:
+                 api_filters: list[ApiFilter],
+                 api_custom_fields: list[ApiCustomField], date_filter: str = None) -> None:
         self._type = api_type
         self._name = api_name
         self._credentials = api_credentials
         self._settings = api_settings
         self._filters = api_filters
+        self._date_filter_value = date_filter
         self._custom_fields = api_custom_fields
 
     @property
