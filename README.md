@@ -78,28 +78,28 @@ Supported types:
 
 The following parameters are for every type:
 
-| Parameter Name | Description | Required/Optional | Default |
-| --- | --- | ---| ---|
-| type | The type of the auth api. Currently we support the following types: cisco_secure_x, general. | Required | - |
-| name | The name of the auth api. Please make names unique. | Required | - |
-| credentials.id | The auth api credentials id. | Required | - |
-| credentials.key | The auth api credentials key. | Required | - |
-| http_request.method | The HTTP method. Can be GET or POST. | Required | - |
-| http_request.url | The oauth api url. Make sure the url is without `?` at the end. | Required | - |
-| http_request.headers | Pairs of key and value the represents the headers of the HTTP request. | Optional | - |
-| http_request.body | The body of the HTTP request. Will be added to HTTP POST requests only. | Optional | - |
-| token_http_request.method | The HTTP method. Can be GET or POST. | Required | - |
-| token_http_request.url | The oauth api token request  url. Make sure the url is without `?` at the end. | Required | - |
-| token_http_request.headers | Pairs of key and value the represents the headers of the HTTP request. | Optional | - |
-| token_http_request.body | The body of the HTTP request. Will be added to HTTP POST requests only. | Optional | - |
-| json_paths.next_url | The json path to the next url value inside the response of the auth api. | Required/Optional for Azure | - |
-| json_paths.data | The json path to the data value inside the response of the auth api. | Required/Optional for Azure | - |
-| json_paths.data_date | The json path to the data's date value inside the response of the auth api. | Required | - |
-| settings.time_interval | The auth api time interval between runs. | Required | - |
-| settings.days_back_fetch | The max days back to fetch from the auth api. | Optional | 14 (days) |
-| filters | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api. | Optional | - |
-| custom_fields | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io. | Optional | type = api_fetcher |
-| start_date_name| The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)| Required | - |
+| Parameter Name             | Description                                                                                                                                                               | Required/Optional | Default |
+|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---| ---|
+| type                       | The type of the auth api. Currently we support the following types: azure_graph, general.                                                                                 | Required | - |
+| name                       | The name of the auth api. Please make names unique.                                                                                                                       | Required | - |
+| credentials.id             | The auth api credentials id.                                                                                                                                              | Required | - |
+| credentials.key            | The auth api credentials key.                                                                                                                                             | Required | - |
+| data_http_request.method   | The HTTP method. Can be GET or POST.                                                                                                                                      | Required | - |
+| data_http_request.url           | The oauth api url. Make sure the url is without `?` at the end.                                                                                                           | Required | - |
+| data_http_request.headers       | Pairs of key and value the represents the headers of the HTTP request.                                                                                                    | Optional | - |
+| data_http_request.body          | The body of the HTTP request. Will be added to HTTP POST requests only.                                                                                                   | Optional | - |
+| token_http_request.method  | The HTTP method. Can be GET or POST.                                                                                                                                      | Required | - |
+| token_http_request.url     | The oauth api token request  url. Make sure the url is without `?` at the end.                                                                                            | Required | - |
+| token_http_request.headers | Pairs of key and value the represents the headers of the HTTP request.                                                                                                    | Optional | - |
+| token_http_request.body    | The body of the HTTP request. Will be added to HTTP POST requests only.                                                                                                   | Optional | - |
+| json_paths.next_url        | The json path to the next url value inside the response of the auth api.                                                                                                  | Required/Optional for Azure | - |
+| json_paths.data            | The json path to the data value inside the response of the auth api.                                                                                                      | Required/Optional for Azure | - |
+| json_paths.data_date       | The json path to the data's date value inside the response of the auth api.                                                                                               | Required | - |
+| settings.time_interval     | The auth api time interval between runs.                                                                                                                                  | Required | - |
+| settings.days_back_fetch   | The max days back to fetch from the auth api.                                                                                                                             | Optional | 14 (days) |
+| filters                    | Pairs of key and value of parameters that can be added to the auth api url. Make sure the keys and values are valid for the auth api.                                     | Optional | - |
+| custom_fields              | Pairs of key and value that will be added to each data and be sent to Logz.io. Create **type** field to override the default type, to search your data easily in Logz.io. | Optional | type = api_fetcher |
+| start_date_name            | The start date parameter name of the oauth api url. (Same as json_paths.data_date in most cases)                                                                          | Required | - |
 
 ### Example
 
