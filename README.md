@@ -170,6 +170,7 @@ oauth_apis:
       method: POST
     data_http_request:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+      method: GET
       headers:
     json_paths:
       data_date: createdDateTime
@@ -240,6 +241,9 @@ If you stopped the container, you can continue from the exact place you stopped,
 
 ## Changelog:
 
+- **0.0.6**:
+  - Improved documentation.
+  - Added error log.
 - **0.0.5**:
   - Bug fix for `azure_graph` task fails on second cycle.
   - Changed start date filter mechanics for auth_api.
