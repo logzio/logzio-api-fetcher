@@ -289,7 +289,7 @@ class ConfigReader:
         api_json_paths = self._get_api_json_paths(config_api_data, api_group_type, api_num)
 
         if (api_start_date_name is None and api_group_type != self.OAUTH_API) or api_json_paths is None:
-            logger.error("Your configuration is not valid:\"api_json_paths\" must exist for all api types, \"api_start_date_name\" must exist for non oauth api types")
+            logger.error("Your configuration is not valid:\"json_paths\" must exist for all api types, \"start_date_name\" must exist for non oauth api types")
             return None
 
         return ApiGeneralTypeData(api_start_date_name, api_json_paths)
