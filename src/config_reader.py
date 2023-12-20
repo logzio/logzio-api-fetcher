@@ -152,8 +152,11 @@ class ConfigReader:
                                                                self._oauth_api_types))
             return None
 
-        api_token_http_request, api_data_http_request = self._get_oauth_api_http_requests(config_oauth_api_data,
-                                                                                          oauth_api_num)
+        try:
+            api_token_http_request, api_data_http_request = self._get_oauth_api_http_requests(config_oauth_api_data,
+                                                                                              oauth_api_num)
+        except TypeError:
+            return None
 
         if api_token_http_request is None or api_data_http_request is None:
             return None
@@ -289,6 +292,8 @@ class ConfigReader:
         api_json_paths = self._get_api_json_paths(config_api_data, api_group_type, api_num)
 
         if (api_start_date_name is None and api_group_type != self.OAUTH_API) or api_json_paths is None:
+            logger.error(
+                "Your configuration is not valid:\"json_paths\" must exist for all api types, \"start_date_name\" must exist for non oauth api types")
             return None
 
         return ApiGeneralTypeData(api_start_date_name, api_json_paths)
@@ -297,8 +302,8 @@ class ConfigReader:
         try:
             api_start_date_name = config_api_data[ConfigReader.API_START_DATE_NAME_CONFIG_KEY]
         except KeyError:
-            logger.error(
-                "Your configuration is not valid: the general type {0} api #{1} must have start_date_name.".format(
+            logger.warning(
+                "Missing field in config: the general type {0} api #{1} must have start_date_name.".format(
                     api_group_type, api_num))
             return None
 
@@ -349,11 +354,15 @@ class ConfigReader:
         try:
             api_token_http_request = config_oauth_api_data[ConfigReader.OAUTH_API_TOKEN_HTTP_REQUEST_CONFIG_KEY]
             api_data_http_request = config_oauth_api_data[ConfigReader.OAUTH_API_DATA_HTTP_REQUEST_CONFIG_KEY]
-
             api_token_http_request_method = api_token_http_request[ConfigReader.API_HTTP_REQUEST_METHOD_CONFIG_KEY]
             api_token_url = api_token_http_request[ConfigReader.API_HTTP_REQUEST_URL_CONFIG_KEY]
             api_data_http_request_method = api_data_http_request[ConfigReader.API_HTTP_REQUEST_METHOD_CONFIG_KEY]
             api_data_url = api_data_http_request[ConfigReader.API_HTTP_REQUEST_URL_CONFIG_KEY]
+        except KeyError as e:
+            logger.error(
+                "Your configuration is not valid: missing parameter: \"{}\" from token_http_request or"
+                " data_http_request for oauth_api.".format(e.args[0]))
+            return None
         except TypeError:
             logger.error(
                 "Your configuration is not valid: the general type oauth api #{} must have token_http_request and"
