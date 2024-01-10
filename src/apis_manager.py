@@ -7,6 +7,7 @@ import requests
 from typing import Optional
 from requests.sessions import InvalidSchema
 from .azure_graph import AzureGraph
+from .azure_mail_reports import AzureMailReports
 from .config_reader import ConfigReader
 from .data.logzio_connection import LogzioConnection
 from .data.auth_api_data import AuthApiData
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class ApisManager:
-
+    API_AZURE_MAIL_REPORTS_TYPE = "azure_mail_reports"
     CONFIG_FILE = 'src/shared/config.yaml'
     LAST_START_DATES_FILE = 'src/shared/last_start_dates.txt'
 
@@ -30,7 +31,7 @@ class ApisManager:
     API_AZURE_GRAPH_TYPE = 'azure_graph'
 
     AUTH_API_TYPES = [API_GENERAL_TYPE, API_CISCO_SECURE_X_TYPE]
-    OAUTH_API_TYPES = [API_GENERAL_TYPE, API_AZURE_GRAPH_TYPE]
+    OAUTH_API_TYPES = [API_GENERAL_TYPE, API_AZURE_GRAPH_TYPE, API_AZURE_MAIL_REPORTS_TYPE]
 
     def __init__(self) -> None:
         self._apis: list[Api] = []
@@ -89,8 +90,10 @@ class ApisManager:
     def _add_oauth_api(self, oauth_api_data: OAuthApiData) -> None:
         if oauth_api_data.base_data.base_data.type == ApisManager.API_GENERAL_TYPE:
             self._apis.append(OAuthApi(oauth_api_data.base_data, oauth_api_data.general_type_data))
-        else:
+        elif oauth_api_data.base_data.base_data.type == ApisManager.API_AZURE_GRAPH_TYPE:
             self._apis.append(AzureGraph(oauth_api_data))
+        elif oauth_api_data.base_data.base_data.type == ApisManager.API_AZURE_MAIL_REPORTS_TYPE:
+            self._apis.append(AzureMailReports(oauth_api_data))
 
     def _run_api_scheduled_task(self, api: Api) -> None:
         logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)

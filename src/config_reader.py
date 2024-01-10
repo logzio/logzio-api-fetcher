@@ -42,6 +42,7 @@ class ConfigReader:
     API_FILTERS_CONFIG_KEY = 'filters'
     API_CUSTOM_FIELDS_CONFIG_KEY = 'custom_fields'
     API_START_DATE_NAME_CONFIG_KEY = 'start_date_name'
+    API_END_DATE_NAME_CONFIG_KEY = "end_date_name"
     GENERAL_AUTH_API_HTTP_REQUEST_CONFIG_KEY = 'http_request'
     OAUTH_API_TOKEN_HTTP_REQUEST_CONFIG_KEY = 'token_http_request'
     OAUTH_API_DATA_HTTP_REQUEST_CONFIG_KEY = 'data_http_request'
@@ -289,6 +290,7 @@ class ConfigReader:
     def _get_api_general_type_data(self, config_api_data, api_group_type: str,
                                    api_num: int) -> Optional[ApiGeneralTypeData]:
         api_start_date_name = self._get_api_start_date_name(config_api_data, api_group_type, api_num)
+        api_end_date_name = self._get_api_end_date_name(config_api_data, api_group_type, api_num)
         api_json_paths = self._get_api_json_paths(config_api_data, api_group_type, api_num)
 
         if (api_start_date_name is None and api_group_type != self.OAUTH_API) or api_json_paths is None:
@@ -296,7 +298,7 @@ class ConfigReader:
                 "Your configuration is not valid:\"json_paths\" must exist for all api types, \"start_date_name\" must exist for non oauth api types")
             return None
 
-        return ApiGeneralTypeData(api_start_date_name, api_json_paths)
+        return ApiGeneralTypeData(api_start_date_name,api_end_date_name, api_json_paths)
 
     def _get_api_start_date_name(self, config_api_data: dict, api_group_type: str, api_num: int) -> Optional[str]:
         try:
@@ -308,6 +310,17 @@ class ConfigReader:
             return None
 
         return api_start_date_name
+
+    def _get_api_end_date_name(self, config_api_data: dict, api_group_type: str, api_num: int) -> Optional[str]:
+        try:
+            api_end_date_name = config_api_data[ConfigReader.API_END_DATE_NAME_CONFIG_KEY]
+        except KeyError:
+            logger.warning(
+                "Missing field in config: the general type {0} api #{1} must have end_date_name.".format(
+                    api_group_type, api_num))
+            return None
+
+        return api_end_date_name
 
     def _get_api_json_paths(self, config_api_data: dict, api_group_type: str, api_num: int) -> Optional[ApiJsonPaths]:
         api_json_paths = config_api_data[ConfigReader.GENERAL_API_JSON_PATHS_CONFIG_KEY]

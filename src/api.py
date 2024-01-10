@@ -2,6 +2,7 @@ import json
 import logging
 import urllib.parse
 import requests
+import xmltodict
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -94,9 +95,7 @@ class Api(ABC):
     def _is_item_in_fetch_frame(self, item: dict, last_datetime_to_fetch: datetime) -> bool:
         item_date = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data_date, item)
-
         item_datetime = parser.parse(item_date)
-
         if item_datetime < last_datetime_to_fetch:
             return False
 
@@ -128,24 +127,19 @@ class Api(ABC):
             raise
 
         json_data = json.loads(response.content)
-
         if self._general_type_data.json_paths.next_url:
             next_url = self._get_json_path_value_from_data(
                 self._general_type_data.json_paths.next_url, json_data)
         data = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data, json_data)
-
         if data is None:
             logger.error(
                 "The json path for api {}'s data is wrong. Please change your configuration.".format(
                     self._base_data.name))
             raise Api.ApiError
-
         data_size = len(data)
-
         if data:
             logger.info("Successfully got {0} data from api {1}.".format(data_size, self._base_data.name))
-
         return next_url, data
 
     def _get_response_from_api(self, url: str) -> Response:
@@ -156,13 +150,10 @@ class Api(ABC):
             logger.error(
                 "Something went wrong while trying to get the data from api {0}. response: {1}".format(
                     self._base_data.name, e))
-
             if e.response.status_code == 400 or e.response.status_code == 401:
                 raise Api.ApiError()
-
             raise
         except Exception as e:
             logger.error("Something went wrong with api {0}. response: {1}".format(self._base_data.name, e))
             raise
-
         return response
