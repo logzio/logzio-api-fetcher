@@ -2,7 +2,6 @@ import json
 import logging
 import urllib.parse
 import requests
-import xmltodict
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -11,7 +10,6 @@ from jsonpath_ng import parse
 from dateutil import parser
 from requests import Response
 from .data.base_data.api_base_data import ApiBaseData
-from .data.base_data.api_filter import ApiFilter
 from .data.base_data.api_custom_field import ApiCustomField
 from .data.general_type_data.api_general_type_data import ApiGeneralTypeData
 
