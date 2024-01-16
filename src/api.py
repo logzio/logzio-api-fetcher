@@ -10,7 +10,6 @@ from jsonpath_ng import parse
 from dateutil import parser
 from requests import Response
 from .data.base_data.api_base_data import ApiBaseData
-from .data.base_data.api_filter import ApiFilter
 from .data.base_data.api_custom_field import ApiCustomField
 from .data.general_type_data.api_general_type_data import ApiGeneralTypeData
 
@@ -94,9 +93,7 @@ class Api(ABC):
     def _is_item_in_fetch_frame(self, item: dict, last_datetime_to_fetch: datetime) -> bool:
         item_date = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data_date, item)
-
         item_datetime = parser.parse(item_date)
-
         if item_datetime < last_datetime_to_fetch:
             return False
 
@@ -122,31 +119,33 @@ class Api(ABC):
 
     def _get_data_from_api(self, url: str) -> tuple[Optional[str], list]:
         next_url = None
+        json_data = self._parse_response_to_json(url)
+        if self._general_type_data.json_paths.next_url:
+            next_url = self._get_json_path_value_from_data(
+                self._general_type_data.json_paths.next_url, json_data)
+        data = self._parse_and_verify_data_received(json_data)
+        return next_url, data
+
+    def _parse_response_to_json(self, url):
         try:
             response = self._get_response_from_api(url)
         except Exception:
             raise
-
         json_data = json.loads(response.content)
+        return json_data
 
-        if self._general_type_data.json_paths.next_url:
-            next_url = self._get_json_path_value_from_data(
-                self._general_type_data.json_paths.next_url, json_data)
+    def _parse_and_verify_data_received(self, json_data):
         data = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data, json_data)
-
         if data is None:
             logger.error(
                 "The json path for api {}'s data is wrong. Please change your configuration.".format(
                     self._base_data.name))
             raise Api.ApiError
-
         data_size = len(data)
-
         if data:
             logger.info("Successfully got {0} data from api {1}.".format(data_size, self._base_data.name))
-
-        return next_url, data
+            return data
 
     def _get_response_from_api(self, url: str) -> Response:
         try:
@@ -156,13 +155,24 @@ class Api(ABC):
             logger.error(
                 "Something went wrong while trying to get the data from api {0}. response: {1}".format(
                     self._base_data.name, e))
-
             if e.response.status_code == 400 or e.response.status_code == 401:
                 raise Api.ApiError()
-
             raise
         except Exception as e:
             logger.error("Something went wrong with api {0}. response: {1}".format(self._base_data.name, e))
             raise
-
         return response
+
+    def get_current_time_utc_string(self):
+        time = datetime.utcnow()
+        time = time.isoformat(' ', 'seconds')
+        time = time.replace(' ', 'T')
+        time += 'Z'
+        return time
+
+    def _get_next_page_url(self, json_data: dict):
+        if self._general_type_data.json_paths.next_url:
+            next_url = self._get_json_path_value_from_data(
+                self._general_type_data.json_paths.next_url, json_data)
+            return next_url
+        return None

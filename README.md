@@ -74,6 +74,7 @@ The following configuration uses OAuth 2.0 flow.
 Supported types:
 
 - azure_graph
+- azure_mail_reports
 - general
 
 The following parameters are for every type:
@@ -202,8 +203,40 @@ oauth_apis:
     settings:
       time_interval: 1
     start_date_name: activityDateTime
+  - type: azure_mail_reports
+    name: mail_reports
+    credentials:
+      id: <<AZURE_AD_SECRET_ID>>
+      key: <<AZURE_AD_SECRET_VALUE>>
+    token_http_request:
+      url: https://login.microsoftonline.com/abcd-efgh-abcd-efgh/oauth2/v2.0/token
+      body: client_id=<<AZURE_AD_CLIENT_ID>>
+        &scope=https://outlook.office365.com/.default
+        &client_secret=<<AZURE_AD_SECRET_VALUE>>
+        &grant_type=client_credentials
+      headers:
+      method: POST
+    data_http_request:
+      url: https://reports.office365.com/ecp/reportingwebservice/reporting.svc/MessageTrace
+      method: GET
+      headers:
+    json_paths:
+      data_date: EndDate
+      next_url:
+      data:
+    filters:
+      format: Json
+    settings:
+      time_interval: 60 # for mail reports we suggest no less than 60 minutes
+      days_back_fetch: 8 # for mail reports we suggest up to 8 days
+    start_date_name: StartDate
+    end_date_name: EndDate
 
 ```
+### Azure mail reports type important notes and limitations
+* We recommend setting the `days_back_fetch` parameter to no more than `8d` (~192 hours) as this might cause unexpected errors with the API.
+* We recommend setting the `time_interval` parameter to no less than `60`, to avoid short time frames in which messages trace will be missed.
+* Microsoft may delay trace events for up to 24 hours, and events are not guaranteed to be sequential during this delay. For more information, see the Data granularity, persistence, and availability section of the MessageTrace report topic in the Microsoft documentation: [MessageTrace report API](https://learn.microsoft.com/en-us/previous-versions/office/developer/o365-enterprise-developers/jj984335(v=office.15)#data-granularity-persistence-and-availability) 
 
 ### Create Last Start Dates Text File
 
@@ -241,6 +274,8 @@ If you stopped the container, you can continue from the exact place you stopped,
 
 ## Changelog:
 
+- **0.1.0**:
+  - Added `azure_mail_reports` type.
 - **0.0.6**:
   - Improved documentation.
   - Added error log.

@@ -62,6 +62,7 @@ class OAuthApi(Api):
 
             if not data:
                 logger.info("No new data available from api {}.".format(self._base_data.name))
+                self._set_current_data_last_date(first_item_date)
                 return data
 
             if is_first_fetch:
@@ -85,7 +86,7 @@ class OAuthApi(Api):
 
         logger.info("Got {0} total data from api {1}".format(total_data_num, self._base_data.name))
 
-        self._current_data_last_date = first_item_date
+        self._set_current_data_last_date(first_item_date)
 
     def _build_api_url(self) -> str:
         api_url = self._data_request.url
@@ -126,3 +127,8 @@ class OAuthApi(Api):
     @property
     def get_token_request(self):
         return self._token_request
+
+    def _set_current_data_last_date(self, date):
+        if date:
+            self._current_data_last_date = date
+
