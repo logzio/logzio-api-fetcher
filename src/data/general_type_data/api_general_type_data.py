@@ -3,7 +3,8 @@ from .api_json_paths import ApiJsonPaths
 
 class ApiGeneralTypeData:
 
-    def __init__(self, api_start_date_name: str, api_end_date_name: str, api_json_paths: ApiJsonPaths) -> None:
+    def __init__(self, api_start_date_name: str, api_end_date_name: str,
+                 api_json_paths: ApiJsonPaths) -> None:
         self._start_date_name = api_start_date_name
         self._end_date_name = api_end_date_name
         self._json_paths = api_json_paths

@@ -119,15 +119,22 @@ class Api(ABC):
 
     def _get_data_from_api(self, url: str) -> tuple[Optional[str], list]:
         next_url = None
+        json_data = self._parse_response_to_json(url)
+        if self._general_type_data.json_paths.next_url:
+            next_url = self._get_json_path_value_from_data(
+                self._general_type_data.json_paths.next_url, json_data)
+        data = self._parse_and_verify_data_received(json_data)
+        return next_url, data
+
+    def _parse_response_to_json(self, url):
         try:
             response = self._get_response_from_api(url)
         except Exception:
             raise
-
         json_data = json.loads(response.content)
-        if self._general_type_data.json_paths.next_url:
-            next_url = self._get_json_path_value_from_data(
-                self._general_type_data.json_paths.next_url, json_data)
+        return json_data
+
+    def _parse_and_verify_data_received(self, json_data):
         data = self._get_json_path_value_from_data(
             self._general_type_data.json_paths.data, json_data)
         if data is None:
@@ -138,7 +145,7 @@ class Api(ABC):
         data_size = len(data)
         if data:
             logger.info("Successfully got {0} data from api {1}.".format(data_size, self._base_data.name))
-        return next_url, data
+            return data
 
     def _get_response_from_api(self, url: str) -> Response:
         try:
@@ -155,3 +162,17 @@ class Api(ABC):
             logger.error("Something went wrong with api {0}. response: {1}".format(self._base_data.name, e))
             raise
         return response
+
+    def get_current_time_utc_string(self):
+        time = datetime.utcnow()
+        time = time.isoformat(' ', 'seconds')
+        time = time.replace(' ', 'T')
+        time += 'Z'
+        return time
+
+    def _get_next_page_url(self, json_data: dict):
+        if self._general_type_data.json_paths.next_url:
+            next_url = self._get_json_path_value_from_data(
+                self._general_type_data.json_paths.next_url, json_data)
+            return next_url
+        return None

@@ -50,6 +50,7 @@ class ConfigReader:
     API_HTTP_REQUEST_URL_CONFIG_KEY = 'url'
     API_HTTP_REQUEST_HEADERS_CONFIG_KEY = 'headers'
     API_HTTP_REQUEST_BODY_CONFIG_KEY = 'body'
+    API_HTTP_REQUEST_PAGE_SIZE = 'page_size'
     GENERAL_API_JSON_PATHS_CONFIG_KEY = 'json_paths'
     GENERAL_API_JSON_PATHS_NEXT_URL_CONFIG_KEY = 'next_url'
     GENERAL_API_JSON_PATHS_DATA_CONFIG_KEY = 'data'
@@ -298,7 +299,7 @@ class ConfigReader:
                 "Your configuration is not valid:\"json_paths\" must exist for all api types, \"start_date_name\" must exist for non oauth api types")
             return None
 
-        return ApiGeneralTypeData(api_start_date_name,api_end_date_name, api_json_paths)
+        return ApiGeneralTypeData(api_start_date_name, api_end_date_name, api_json_paths)
 
     def _get_api_start_date_name(self, config_api_data: dict, api_group_type: str, api_num: int) -> Optional[str]:
         try:
@@ -406,6 +407,7 @@ class ConfigReader:
         data_http_request = ApiHttpRequest(api_data_http_request_method,
                                            api_data_url,
                                            api_data_http_request.get(ConfigReader.API_HTTP_REQUEST_HEADERS_CONFIG_KEY),
-                                           api_data_http_request.get(ConfigReader.API_HTTP_REQUEST_BODY_CONFIG_KEY))
+                                           api_data_http_request.get(ConfigReader.API_HTTP_REQUEST_BODY_CONFIG_KEY),
+                                           api_data_http_request.get(ConfigReader.API_HTTP_REQUEST_PAGE_SIZE))
 
         return token_http_request, data_http_request
