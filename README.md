@@ -274,6 +274,8 @@ If you stopped the container, you can continue from the exact place you stopped,
 
 ## Changelog:
 
+- **0.1.1**:
+  - Bug fix for `security_alerts` task fails on second cycle.
 - **0.1.0**:
   - Added `azure_mail_reports` type.
 - **0.0.6**:
