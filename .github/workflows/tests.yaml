@@ -7,13 +7,13 @@ on:
     branches:
       - main
 jobs:
-  deploy:
+  tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.9'
       - name: Add credentials to config files
         run: |
           cd tests
@@ -23,7 +23,7 @@ jobs:
           grep -rli '<<AZURE_AD_SECRET_VALUE>>' * | xargs -i@ sed -i 's/<<AZURE_AD_SECRET_VALUE>>/${{ secrets.AZURE_AD_SECRET_VALUE }}/g' @
           grep -rli '<<CLIENT_ID>>' * | xargs -i@ sed -i 's/<<CLIENT_ID>>/${{ secrets.AZURE_AD_CLIENT_ID }}/g' @
           grep -rli '<<AZURE_AD_TENANT_ID>>' * | xargs -i@ sed -i 's/<<AZURE_AD_TENANT_ID>>/${{ secrets.AZURE_AD_TENANT_ID }}/g' @
-      - name: Run unit tests
+      - name: Install dependencies
         run: |
           pip install pytest
           pip install httpretty
@@ -32,6 +32,8 @@ jobs:
           pip install jsonpath-ng
           pip install python-dateutil
           pip install pytest-cov
+      - name: Run unit tests
+        run: |
           pytest --cov-report xml:code_coverage.xml --cov=src tests/*_tests.py
       - name: Code-coverage
         run: |
