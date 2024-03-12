@@ -1,5 +1,6 @@
-pyyaml
-requests
-urllib3
-python-dateutil
+pyyaml~=6.0.1
+requests~=2.31.0
+urllib3~=2.2.1
+python-dateutil~=2.9.0.post0
 jsonpath-ng
+httpretty~=1.1.4
