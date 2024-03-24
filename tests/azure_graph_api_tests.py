@@ -87,7 +87,8 @@ class AzureGraphApiTests(unittest.TestCase):
                                                                AzureGraphApiTests.BASE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
                                                                status=200,
-                                                               sleep_time=10)
+                                                               sleep_time=10,
+                                                               should_get=True)
 
         # requests_num, sent_logs_num, sent_bytes = queue.get()
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
