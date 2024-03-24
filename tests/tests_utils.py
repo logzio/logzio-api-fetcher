@@ -43,16 +43,17 @@ class TestUtils:
 
     def start_process_and_wait_until_finished(self, queue: multiprocessing.Queue, config_file: str,
                                               delegate: Callable[[str], None], status: int, sleep_time: int,
-                                              is_multi_test: bool = False) -> None:
+                                              is_multi_test: bool = False, should_get: bool = False) -> None:
         process = multiprocessing.Process(target=delegate, args=(config_file, status, queue, is_multi_test))
         process.start()
 
         time.sleep(sleep_time)
-        process.terminate()
-        print(f"TEST is alive: {process.is_alive()}")
-        # os.kill(process.pid, signal.SIGTERM)
-        process.join()
+        os.kill(process.pid, signal.SIGTERM)
 
+        if should_get:
+            requests_num, sent_logs_num, sent_bytes = queue.get()
+            print("TEST should_get works?", requests_num, sent_logs_num, sent_bytes)
+        process.join()
 
     @httpretty.activate
     def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
