@@ -49,8 +49,9 @@ class TestUtils:
         process.join()
 
         time.sleep(sleep_time)
-        os.kill(process.pid, signal.SIGTERM)
-        
+        process.kill()
+        # os.kill(process.pid, signal.SIGTERM)
+
 
     @httpretty.activate
     def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
