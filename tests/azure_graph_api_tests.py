@@ -5,7 +5,6 @@ import json
 import math
 
 import httpretty
-from queue import Queue
 
 from src.azure_graph import AzureGraph
 from src.logzio_shipper import LogzioShipper
@@ -83,7 +82,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertNotEqual(total_data_num, fetched_data_num)
 
     def test_sending_data(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.BASE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
@@ -99,7 +98,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertEqual(data_bytes, sent_bytes)
 
     def test_sending_data_iterations(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.DAYS_BACK_FETCH_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
@@ -115,7 +114,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertEqual(data_bytes, sent_bytes)
 
     def test_sending_data_multiple_azure_graph(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.MULTIPLE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
@@ -131,7 +130,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertEqual(data_bytes, sent_bytes)
 
     def test_sending_data_with_custom_fields(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.CUSTOM_FIELDS_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
@@ -150,7 +149,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertEqual(data_bytes, sent_bytes)
 
     def test_time_interval(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.TIME_INTERVAL_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
@@ -182,7 +181,7 @@ class AzureGraphApiTests(unittest.TestCase):
         self.assertEqual('2020-03-13T19:15:41.6195833Z', azure_graph.get_last_start_date())
 
     def test_bad_config(self) -> None:
-        queue = Queue()
+        queue = multiprocessing.Queue()
         self.tests_utils.start_process_and_wait_until_finished(queue,
                                                                AzureGraphApiTests.BAD_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
