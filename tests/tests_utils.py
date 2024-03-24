@@ -49,6 +49,7 @@ class TestUtils:
 
         time.sleep(sleep_time)
         process.terminate()
+        print(f"TEST is alive: {process.is_alive()}")
         # os.kill(process.pid, signal.SIGTERM)
         process.join()
 
