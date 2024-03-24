@@ -151,6 +151,8 @@ class ApisManager:
         logger.info(
             "Task is over. A new Task for api {0} will run in {1} minute/s.".format(api.get_api_name(),
                                                                                     int(api.get_api_time_interval() / 60)))
+        return
+
 
     def _write_last_start_date_to_file(self, api_name: str, last_start_date: str) -> None:
         self._lock.acquire()
