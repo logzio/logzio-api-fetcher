@@ -46,10 +46,11 @@ class TestUtils:
                                               is_multi_test: bool = False) -> None:
         process = multiprocessing.Process(target=delegate, args=(config_file, status, queue, is_multi_test))
         process.start()
+        process.join()
 
         time.sleep(sleep_time)
         os.kill(process.pid, signal.SIGTERM)
-        process.join()
+        
 
     @httpretty.activate
     def run_auth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
