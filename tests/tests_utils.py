@@ -97,7 +97,7 @@ class TestUtils:
                 continue
 
             logzio_requests.append(request)
-
+        logger.info("TEST: putting data in the queue")
         queue.put(self._get_sending_data_results(logzio_requests))
 
     def get_first_api(self, config_file: str, is_auth_api: bool) -> Api:
@@ -226,4 +226,5 @@ class TestUtils:
                     sent_logs_num += 1
                     sent_bytes += len(log)
 
+        logger.info(f"TEST: _get_sending_data_results params {requests_num}, {sent_logs_num}, {sent_bytes}")
         return int(requests_num / 2), int(sent_logs_num / 2), int(sent_bytes / 2)
