@@ -89,9 +89,9 @@ class AzureGraphApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
         if queue.empty():
-            print("TEST: queue empty")
+            logger.info("TEST: queue empty")
         else:
-            print("TEST: queue not empty")
+            logger.info("TEST: queue not empty")
         requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
