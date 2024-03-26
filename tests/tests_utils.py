@@ -61,7 +61,7 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run()
+        ApisManager().run(test=True)
 
         for request in httpretty.latest_requests():
             if request.url.startswith(self.api_url):
@@ -90,7 +90,7 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run()  # test_sending_data is stuck here, never reaching after this line
+        ApisManager().run(test=True)  # test_sending_data is stuck here, never reaching after this line
 
         for request in httpretty.latest_requests():
             if request.url.startswith(self.api_url):
