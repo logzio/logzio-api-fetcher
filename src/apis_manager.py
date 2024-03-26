@@ -2,7 +2,6 @@ import logging
 import os
 import signal
 import threading
-from time import sleep
 
 import requests
 
@@ -42,7 +41,7 @@ class ApisManager:
         self._event = threading.Event()
         self._lock = threading.Lock()
 
-    def run(self, test=False) -> None:
+    def run(self) -> None:
         if not self._read_data_from_config():
             return
 
@@ -54,12 +53,6 @@ class ApisManager:
 
         for thread in self._threads:
             thread.start()
-
-        if test:
-            sleep(2)
-            os.kill(os.getpid(), signal.SIGTERM)
-            self.__exit_gracefully()
-            return
 
         signal.sigwait([signal.SIGINT, signal.SIGTERM])
         self.__exit_gracefully()

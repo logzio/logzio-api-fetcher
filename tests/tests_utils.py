@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class TestUtils:
     LOGZIO_HTTPPRETTY_URL = 'https://listener.logz.io:8071/?token=123456789a&type=api_fetcher'
+    LOGZIO_HTTPPRETTY_URL2 = 'https://listener.logz.io:8071/?token=123456789a'
     LOGZIO_URL = 'https://listener.logz.io:8071'
     LOGZIO_TOKEN = '123456789a'
     LAST_START_DATES_FILE = 'tests/last_start_dates.txt'
@@ -61,7 +62,7 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run(test=True)
+        ApisManager().run()
 
         for request in httpretty.latest_requests():
             if request.url.startswith(self.api_url):
@@ -76,9 +77,7 @@ class TestUtils:
                               is_multi_test: bool) -> None:
         from tests.azure_graph_api_tests import AzureGraphApiTests
         httpretty.register_uri(httpretty.POST, TestUtils.LOGZIO_URL, status=status)
-        httpretty.register_uri(self.token_http_method,
-                               self.token_url,
-                               body=json.dumps(self.token_body))
+        httpretty.register_uri(self.token_http_method, self.token_url, body=json.dumps(self.token_body))
         httpretty.register_uri(self.api_http_method, self.api_url, body=json.dumps(self.api_body), status=200,
                                headers={AzureGraph.OAUTH_AUTHORIZATION_HEADER:
                                             AzureGraphApiTests.AZURE_GRAPH_TEST_TOKEN})
@@ -92,7 +91,7 @@ class TestUtils:
 
         logger.info("TEST: starting API Manager")
         p = multiprocessing.Process(target=ApisManager().run, args=(True, ))
-        # ApisManager().run(test=True)  # test_sending_data is stuck here, never reaching after this line
+        # ApisManager().run()  # test_sending_data is stuck here, never reaching after this line
         p.start()
         time.sleep(2)
         p.kill()
@@ -221,7 +220,8 @@ class TestUtils:
         sent_bytes = 0
 
         for request in latest_requests:
-            if request.url == self.LOGZIO_HTTPPRETTY_URL:
+            logger.info(f"TEST: checking request {request}")
+            if request.url in (self.LOGZIO_HTTPPRETTY_URL, self.LOGZIO_HTTPPRETTY_URL2):
                 requests_num += 1
 
                 try:
