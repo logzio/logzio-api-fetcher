@@ -90,7 +90,7 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run()
+        ApisManager().run()  # test_sending_data is stuck here, never reaching after this line
 
         for request in httpretty.latest_requests():
             if request.url.startswith(self.api_url):
