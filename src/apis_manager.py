@@ -56,8 +56,10 @@ class ApisManager:
             thread.start()
 
         if test:
-            sleep(5)
+            sleep(2)
+            os.kill(os.getpid(), signal.SIGTERM)
             self.__exit_gracefully()
+            return
 
         signal.sigwait([signal.SIGINT, signal.SIGTERM])
         self.__exit_gracefully()
