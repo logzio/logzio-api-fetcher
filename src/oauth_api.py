@@ -35,10 +35,8 @@ class OAuthApi(Api):
         super().__init__(oauth_config.base_data, general_config.general_type_data)
 
     def get_token(self) -> [str, int]:
-        print(f"NAAMA TEST {self._token_request.url}\n{self._token_request.body}")
         token_response = requests.post(self._token_request.url,
                                        self._token_request.body)
-        print(token_response.content)
         return json.loads(token_response.content)[self.OAUTH_ACCESS_TOKEN], json.loads(token_response.content)[
             self.OAUTH_TOKEN_EXPIRE]
 

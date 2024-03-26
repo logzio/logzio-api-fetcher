@@ -90,7 +90,7 @@ class TestUtils:
         logzio_requests = []
 
         logger.info("TEST: starting API Manager")
-        p = multiprocessing.Process(target=ApisManager().run, args=(True, ))
+        p = multiprocessing.Process(target=ApisManager().run)
         # ApisManager().run()  # test_sending_data is stuck here, never reaching after this line
         p.start()
         time.sleep(2)
