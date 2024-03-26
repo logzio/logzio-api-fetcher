@@ -90,9 +90,16 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run(test=True)  # test_sending_data is stuck here, never reaching after this line
+        logger.info("TEST: starting API Manager")
+        p = multiprocessing.Process(target=ApisManager().run, args=(True, ))
+        # ApisManager().run(test=True)  # test_sending_data is stuck here, never reaching after this line
+        p.start()
+        time.sleep(2)
+        p.kill()
+        logger.info("TEST: Finished API Manager!")
 
         for request in httpretty.latest_requests():
+            logger.info("TEST: reading requests")
             if request.url.startswith(self.api_url):
                 continue
 
