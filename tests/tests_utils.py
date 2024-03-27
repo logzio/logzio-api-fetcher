@@ -89,14 +89,15 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        logger.info("TEST: starting API Manager")
-        p = multiprocessing.Process(target=ApisManager().run)
-        # ApisManager().run()  # test_sending_data is stuck here, never reaching after this line
-        p.start()
-        time.sleep(2)
-        p.kill()
+        # logger.info("TEST: starting API Manager")
+        # p = multiprocessing.Process(target=ApisManager().run)
+        ApisManager(True).run()  # test_sending_data is stuck here, never reaching after this line
+        # p.start()
+        # time.sleep(2)
+        # p.kill()
         logger.info("TEST: Finished API Manager!")
 
+        # this now doesn't work, because the requests are made in a separate process
         for request in httpretty.latest_requests():
             logger.info("TEST: reading requests")
             if request.url.startswith(self.api_url):
