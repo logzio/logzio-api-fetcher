@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class TestUtils:
     LOGZIO_HTTPPRETTY_URL = 'https://listener.logz.io:8071/?token=123456789a&type=api_fetcher'
+    LOGZIO_HTTPPRETTY_URL2 = 'https://listener.logz.io:8071/?token=123456789a'
     LOGZIO_URL = 'https://listener.logz.io:8071'
     LOGZIO_TOKEN = '123456789a'
     LAST_START_DATES_FILE = 'tests/last_start_dates.txt'
@@ -76,9 +77,7 @@ class TestUtils:
                               is_multi_test: bool) -> None:
         from tests.azure_graph_api_tests import AzureGraphApiTests
         httpretty.register_uri(httpretty.POST, TestUtils.LOGZIO_URL, status=status)
-        httpretty.register_uri(self.token_http_method,
-                               self.token_url,
-                               body=json.dumps(self.token_body))
+        httpretty.register_uri(self.token_http_method, self.token_url, body=json.dumps(self.token_body))
         httpretty.register_uri(self.api_http_method, self.api_url, body=json.dumps(self.api_body), status=200,
                                headers={AzureGraph.OAUTH_AUTHORIZATION_HEADER:
                                             AzureGraphApiTests.AZURE_GRAPH_TEST_TOKEN})
@@ -90,14 +89,22 @@ class TestUtils:
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
 
-        ApisManager().run()
+        # logger.info("TEST: starting API Manager")
+        # p = multiprocessing.Process(target=ApisManager().run)
+        ApisManager(True).run()  # test_sending_data is stuck here, never reaching after this line
+        # p.start()
+        # time.sleep(2)
+        # p.kill()
+        logger.info("TEST: Finished API Manager!")
 
+        # this now doesn't work, because the requests are made in a separate process
         for request in httpretty.latest_requests():
+            logger.info("TEST: reading requests")
             if request.url.startswith(self.api_url):
                 continue
 
             logzio_requests.append(request)
-
+        logger.info("TEST: putting data in the queue")
         queue.put(self._get_sending_data_results(logzio_requests))
 
     def get_first_api(self, config_file: str, is_auth_api: bool) -> Api:
@@ -214,7 +221,8 @@ class TestUtils:
         sent_bytes = 0
 
         for request in latest_requests:
-            if request.url == self.LOGZIO_HTTPPRETTY_URL:
+            logger.info(f"TEST: checking request {request}")
+            if request.url in (self.LOGZIO_HTTPPRETTY_URL, self.LOGZIO_HTTPPRETTY_URL2):
                 requests_num += 1
 
                 try:
@@ -226,4 +234,5 @@ class TestUtils:
                     sent_logs_num += 1
                     sent_bytes += len(log)
 
+        logger.info(f"TEST: _get_sending_data_results params {requests_num}, {sent_logs_num}, {sent_bytes}")
         return int(requests_num / 2), int(sent_logs_num / 2), int(sent_bytes / 2)
