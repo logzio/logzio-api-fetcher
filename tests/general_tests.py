@@ -53,7 +53,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, _, sent_bytes = queue.get()
+        requests_num, _, sent_bytes = queue.get(False)
 
         self.assertEqual(math.ceil(sent_bytes / 2 / LogzioShipper.MAX_BULK_SIZE_BYTES) * 2, requests_num)
 
@@ -118,7 +118,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=500,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -130,7 +130,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=502,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -142,7 +142,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=503,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -154,7 +154,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=504,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 

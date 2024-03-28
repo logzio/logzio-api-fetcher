@@ -87,7 +87,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
@@ -103,7 +103,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
@@ -119,7 +119,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
@@ -135,7 +135,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
@@ -151,7 +151,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
         custom_fields_azure_graph = self.tests_utils.get_first_api(GeneralTypeOAuthApiTests.CUSTOM_FIELDS_CONFIG_FILE,
@@ -170,7 +170,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
@@ -202,7 +202,7 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=1)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
 
         self.assertEqual(0, requests_num)
         self.assertEqual(0, sent_logs_num)
