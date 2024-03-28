@@ -6,8 +6,8 @@ auth_apis:
   - type: cisco_secure_x
     name: cisco
     credentials:
-      id: <<CISCO_SECURE_X_API_ID>>
-      key: <<CISCO_SECURE_X_API_KEY>>
+      id: client-f2c53860-e1c5-4716-92d6-f3767d88cea2
+      key: PrBcwznVI7B0bjB_cTfm_zm9vQj9UPFe-ocD1qaJ7zES5NajMJ9gtg
     settings:
       time_interval: 1
       days_back_fetch: 30

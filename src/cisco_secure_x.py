@@ -16,6 +16,7 @@ class CiscoSecureX(AuthApi):
     HTTP_METHOD = 'GET'
     URL = 'https://api.amp.cisco.com/v1/events'
     START_DATE_NAME = 'start_date'
+    END_DATE_NAME = 'end_date'
     NEXT_URL_JSON_PATH = 'metadata.links.next'
     DATA_JSON_PATH = 'data'
     DATA_DATE_JSON_PATH = 'date'
@@ -25,6 +26,7 @@ class CiscoSecureX(AuthApi):
         json_paths = ApiJsonPaths(api_next_url_json_path=CiscoSecureX.NEXT_URL_JSON_PATH,
                                   api_data_json_path=CiscoSecureX.DATA_JSON_PATH,
                                   api_data_date_json_path=CiscoSecureX.DATA_DATE_JSON_PATH)
-        general_type_data = ApiGeneralTypeData(CiscoSecureX.START_DATE_NAME, json_paths)
+        general_type_data = ApiGeneralTypeData(CiscoSecureX.START_DATE_NAME, CiscoSecureX.END_DATE_NAME, json_paths)
+
         super().__init__(api_base_data,
                          AuthApiGeneralTypeData(general_type_data, http_request))

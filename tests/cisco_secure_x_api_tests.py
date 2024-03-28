@@ -3,8 +3,7 @@ import logging
 import multiprocessing
 import json
 import math
-
-import httpretty
+import responses
 
 from src.cisco_secure_x import CiscoSecureX
 from src.logzio_shipper import LogzioShipper
@@ -83,7 +82,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.cisco_secure_x_json_body['data'])
 
@@ -99,7 +98,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.cisco_secure_x_json_body['data'])
 
@@ -115,7 +114,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.cisco_secure_x_json_body['data'])
 
@@ -131,7 +130,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=10)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.cisco_secure_x_json_body['data'])
         custom_fields_cisco_secure_x = self.tests_utils.get_first_api(CiscoSecureXApiTests.CUSTOM_FIELDS_CONFIG_FILE,
@@ -150,7 +149,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.cisco_secure_x_json_body['data'])
 
@@ -158,9 +157,9 @@ class CiscoSecureXApiTests(unittest.TestCase):
         self.assertEqual(data_num, sent_logs_num)
         self.assertEqual(data_bytes, sent_bytes)
 
-    @httpretty.activate
+    @responses.activate
     def test_last_start_date(self) -> None:
-        httpretty.register_uri(httpretty.GET, CiscoSecureX.URL,
+        responses.add(responses.GET, CiscoSecureX.URL,
                                body=json.dumps(CiscoSecureXApiTests.cisco_secure_x_json_body), status=200)
 
         base_cisco_secure_x = self.tests_utils.get_first_api(CiscoSecureXApiTests.CUSTOM_FIELDS_CONFIG_FILE,
@@ -181,7 +180,7 @@ class CiscoSecureXApiTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=1)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
 
         self.assertEqual(0, requests_num)
         self.assertEqual(0, sent_logs_num)
