@@ -2,6 +2,7 @@ import logging
 import os
 import signal
 import threading
+
 import requests
 
 from typing import Optional
@@ -33,12 +34,13 @@ class ApisManager:
     AUTH_API_TYPES = [API_GENERAL_TYPE, API_CISCO_SECURE_X_TYPE]
     OAUTH_API_TYPES = [API_GENERAL_TYPE, API_AZURE_GRAPH_TYPE, API_AZURE_MAIL_REPORTS_TYPE]
 
-    def __init__(self) -> None:
+    def __init__(self, test=False) -> None:
         self._apis: list[Api] = []
         self._logzio_connection: Optional[LogzioConnection] = None
         self._threads = []
         self._event = threading.Event()
         self._lock = threading.Lock()
+        self.test = test
 
     def run(self) -> None:
         if not self._read_data_from_config():
@@ -107,7 +109,8 @@ class ApisManager:
             thread.start()
             thread.join()
 
-            if self._event.wait(timeout=api.get_api_time_interval()):
+            if self._event.wait(timeout=api.get_api_time_interval()) or self.test:
+                logger.info("TEST: stopping shipping due to test or timeout")
                 break
 
     def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper) -> None:

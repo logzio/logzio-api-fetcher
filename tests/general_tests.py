@@ -3,7 +3,7 @@ import logging
 import multiprocessing
 import json
 import math
-import httpretty
+import responses
 import requests
 
 from requests.sessions import InvalidSchema
@@ -158,9 +158,9 @@ class GeneralTests(unittest.TestCase):
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
-    @httpretty.activate
+    @responses.activate
     def test_send_bad_format(self) -> None:
-        httpretty.register_uri(httpretty.POST, self.tests_utils.LOGZIO_URL, status=400)
+        responses.add(responses.POST, self.tests_utils.LOGZIO_URL, status=400)
 
         logzio_shipper = LogzioShipper(self.tests_utils.LOGZIO_URL, self.tests_utils.LOGZIO_TOKEN)
 
@@ -175,9 +175,9 @@ class GeneralTests(unittest.TestCase):
 
         self.assertRaises(requests.ConnectionError, logzio_shipper.send_to_logzio)
 
-    @httpretty.activate
+    @responses.activate
     def test_sending_bad_logzio_token(self) -> None:
-        httpretty.register_uri(httpretty.POST, self.tests_utils.LOGZIO_URL, status=401)
+        responses.add(responses.POST, self.tests_utils.LOGZIO_URL, status=401)
 
         logzio_shipper = LogzioShipper(self.tests_utils.LOGZIO_URL, self.tests_utils.LOGZIO_TOKEN)
 

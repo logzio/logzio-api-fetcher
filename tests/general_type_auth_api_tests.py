@@ -3,7 +3,7 @@ import logging
 import multiprocessing
 import json
 import math
-import httpretty
+import responses
 
 from src.cisco_secure_x import CiscoSecureX
 from src.logzio_shipper import LogzioShipper
@@ -173,9 +173,9 @@ class GeneralTypeAuthApiTests(unittest.TestCase):
         self.assertEqual(data_num, sent_logs_num)
         self.assertEqual(data_bytes, sent_bytes)
 
-    @httpretty.activate
+    @responses.activate
     def test_last_start_date(self) -> None:
-        httpretty.register_uri(httpretty.GET, CiscoSecureX.URL,
+        responses.add(responses.GET, CiscoSecureX.URL,
                                body=json.dumps(GeneralTypeAuthApiTests.cisco_secure_x_json_body), status=200)
 
         base_cisco_secure_x = self.tests_utils.get_first_api(GeneralTypeAuthApiTests.CUSTOM_FIELDS_CONFIG_FILE,

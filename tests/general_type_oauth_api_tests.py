@@ -4,8 +4,7 @@ import multiprocessing
 import json
 import math
 from urllib.parse import unquote
-
-import httpretty
+import responses
 
 from src.azure_graph import AzureGraph
 from src.logzio_shipper import LogzioShipper
@@ -179,13 +178,13 @@ class GeneralTypeOAuthApiTests(unittest.TestCase):
         self.assertEqual(data_num, sent_logs_num)
         self.assertEqual(data_bytes, sent_bytes)
 
-    @httpretty.activate
+    @responses.activate
     def test_last_start_date(self) -> None:
-        httpretty.register_uri(httpretty.GET, self.AZURE_GRAPH_TEST_URL,
+        responses.add(responses.GET, self.AZURE_GRAPH_TEST_URL,
                                body=json.dumps(GeneralTypeOAuthApiTests.azure_graph_json_body), status=200)
         base_azure_graph = self.tests_utils.get_first_api(GeneralTypeOAuthApiTests.CUSTOM_FIELDS_CONFIG_FILE,
                                                           is_auth_api=False)
-        httpretty.register_uri(httpretty.POST, base_azure_graph.get_token_request.url,
+        responses.add(responses.POST, base_azure_graph.get_token_request.url,
                                body=json.dumps(self.azure_graph_token_json_body), status=200)
 
         for _ in base_azure_graph.fetch_data():
