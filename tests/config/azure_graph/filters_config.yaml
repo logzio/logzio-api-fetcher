@@ -20,6 +20,7 @@ oauth_apis:
       url: https://graph.microsoft.com/v1.0/auditLogs/signIns
       method: GET
     start_date_name: createdDateTime
+    end_date_name: EndDate
     json_paths:
       data_date: createdDateTime
     filters:
