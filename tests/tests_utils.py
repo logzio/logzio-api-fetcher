@@ -66,6 +66,7 @@ class TestUtils:
 
         ApisManager(True).run()
 
+        logger.info("TEST: filling the queue auth api process test")
         for call in responses.calls:
             if call.request.url.startswith(self.api_url):
                 continue
@@ -92,6 +93,7 @@ class TestUtils:
 
         ApisManager(True).run()
 
+        logger.info("TEST: filling the queue oauth api process test")
         for call in responses.calls:
             if call.request.url.startswith(self.api_url):
                 continue
