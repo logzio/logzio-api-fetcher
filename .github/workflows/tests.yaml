@@ -30,4 +30,4 @@ jobs:
           pip install pytest
       - name: Run unit tests
         run: |
-          pytest --log-cli-level=debug tests/*_tests.py
+          pytest -s --log-cli-level=debug tests/*_tests.py

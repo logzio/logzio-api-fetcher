@@ -48,7 +48,9 @@ class TestUtils:
                                               delegate: Callable[[str], None], status: int, sleep_time: int,
                                               is_multi_test: bool = False) -> None:
         process = multiprocessing.Process(target=delegate, args=(config_file, status, queue, is_multi_test))
+        logger.info("Naama test 3.5")
         process.start()
+        logger.info("Naama test 3.8")
 
         time.sleep(sleep_time)
         os.kill(process.pid, signal.SIGTERM)
@@ -78,6 +80,7 @@ class TestUtils:
     @responses.activate
     def run_oauth_api_process(self, config_file: str, status: int, queue: multiprocessing.Queue,
                               is_multi_test: bool) -> None:
+        logger.info("NAAMA TEST 4.0")
         from tests.azure_graph_api_tests import AzureGraphApiTests
         responses.add(responses.POST, TestUtils.LOGZIO_URL, status=status)
         responses.add(self.token_http_method, self.token_url, body=json.dumps(self.token_body))
@@ -90,10 +93,10 @@ class TestUtils:
         ApisManager.CONFIG_FILE = config_file
         ApisManager.LAST_START_DATES_FILE = TestUtils.LAST_START_DATES_FILE
         logzio_requests = []
-
+        logger.info("NAAMA TEST 4")
         ApisManager(True).run()
 
-        logger.info("TEST: filling the queue oauth api process test")
+        logger.info("NAAMA TEST 5")
         for call in responses.calls:
             if call.request.url.startswith(self.api_url):
                 continue

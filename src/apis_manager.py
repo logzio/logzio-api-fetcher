@@ -98,6 +98,7 @@ class ApisManager:
             self._apis.append(AzureMailReports(oauth_api_data))
 
     def _run_api_scheduled_task(self, api: Api) -> None:
+        logger.info("NAAMA TEST 6")
         logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)
 
         for api_custom_field in api.get_api_custom_fields():
@@ -110,7 +111,7 @@ class ApisManager:
             thread.join()
 
             if self._event.wait(timeout=api.get_api_time_interval()) or self.test:
-                logger.info("TEST: stopping shipping due to test or timeout")
+                logger.info("NAAMA TEST 7")
                 break
 
     def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper) -> None:
