@@ -2,7 +2,6 @@ import logging
 import os
 import signal
 import threading
-
 import requests
 
 from typing import Optional
@@ -113,6 +112,8 @@ class ApisManager:
             if self._event.wait(timeout=api.get_api_time_interval()) or self.test:
                 logger.info("NAAMA TEST 7")
                 break
+            else:
+                logger.info("NAAMA TEST NOT 7")
 
     def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper) -> None:
         logger.info("Task is running for api {}...".format(api.get_api_name()))
