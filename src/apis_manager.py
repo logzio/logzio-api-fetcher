@@ -160,7 +160,6 @@ class ApisManager:
         if self.test:
             logger.info("NAAMA TEST 10")
             os.kill(os.getpid(), signal.SIGTERM)
-            self.__exit_gracefully()
 
     def _write_last_start_date_to_file(self, api_name: str, last_start_date: str) -> None:
         self._lock.acquire()
