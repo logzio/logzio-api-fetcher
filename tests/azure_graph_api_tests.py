@@ -87,7 +87,7 @@ class AzureGraphApiTests(unittest.TestCase):
                                                                AzureGraphApiTests.BASE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
                                                                status=200,
-                                                               sleep_time=30)
+                                                               sleep_time=10)
 
         logger.info("NAAMA TEST 2")
         requests_num, sent_logs_num, sent_bytes = queue.get(False)
@@ -121,7 +121,7 @@ class AzureGraphApiTests(unittest.TestCase):
                                                                AzureGraphApiTests.MULTIPLE_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
                                                                status=200,
-                                                               sleep_time=30)
+                                                               sleep_time=10)
 
         requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
@@ -137,7 +137,7 @@ class AzureGraphApiTests(unittest.TestCase):
                                                                AzureGraphApiTests.CUSTOM_FIELDS_CONFIG_FILE,
                                                                self.tests_utils.run_oauth_api_process,
                                                                status=200,
-                                                               sleep_time=30)
+                                                               sleep_time=10)
 
         requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
