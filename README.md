@@ -274,6 +274,8 @@ If you stopped the container, you can continue from the exact place you stopped,
 
 ## Changelog:
 
+- **0.1.3**:
+  - Support another date format for `azure_graph`.
 - **0.1.2**:
   - Support another date format for `security_alerts`.
 - **0.1.1**:
