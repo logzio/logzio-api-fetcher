@@ -100,16 +100,18 @@ class Api(ABC):
         return True
 
     def get_start_date_filter(self) -> str:
-        if self._current_data_last_date is not None:
-            start_date_str = self._get_new_start_date()
-            new_start_date = start_date_str.split('.')[0].split('+')[0]  # cut out milliseconds and timezone
-            new_start_date += 'Z' if not new_start_date.endswith('Z') else ''
+        if self._current_data_last_date:
+            raw_new_start_date = self._get_new_start_date()
+            formatted_new_start_date = raw_new_start_date.split('.')[0].split('+')[0]  # cut out milliseconds and timezone
+            if formatted_new_start_date == raw_new_start_date:
+                formatted_new_start_date = raw_new_start_date.split('%2E')[0].split('%2B')[0]  # Support HTML encoded dates
+            formatted_new_start_date += 'Z' if not formatted_new_start_date.endswith('Z') else ''
         else:
-            start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
-            new_start_date = start_date.isoformat(' ', 'seconds')
-            new_start_date = new_start_date.replace(' ', 'T')
-            new_start_date += 'Z'
-        return new_start_date
+            raw_new_start_date = datetime.utcnow() - timedelta(days=self.base_data.settings.days_back_to_fetch)
+            formatted_new_start_date = raw_new_start_date.isoformat(' ', 'seconds')
+            formatted_new_start_date = formatted_new_start_date.replace(' ', 'T')
+            formatted_new_start_date += 'Z'
+        return formatted_new_start_date
 
     def _get_new_start_date(self) -> str:
         new_start_date = str(parser.parse(self._current_data_last_date) + timedelta(seconds=1))
