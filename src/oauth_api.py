@@ -131,4 +131,3 @@ class OAuthApi(Api):
     def _set_current_data_last_date(self, date):
         if date:
             self._current_data_last_date = date
-

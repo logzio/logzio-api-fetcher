@@ -33,12 +33,13 @@ class ApisManager:
     AUTH_API_TYPES = [API_GENERAL_TYPE, API_CISCO_SECURE_X_TYPE]
     OAUTH_API_TYPES = [API_GENERAL_TYPE, API_AZURE_GRAPH_TYPE, API_AZURE_MAIL_REPORTS_TYPE]
 
-    def __init__(self) -> None:
+    def __init__(self, test=False) -> None:
         self._apis: list[Api] = []
         self._logzio_connection: Optional[LogzioConnection] = None
         self._threads = []
         self._event = threading.Event()
         self._lock = threading.Lock()
+        self.test = test
 
     def run(self) -> None:
         if not self._read_data_from_config():
@@ -96,6 +97,7 @@ class ApisManager:
             self._apis.append(AzureMailReports(oauth_api_data))
 
     def _run_api_scheduled_task(self, api: Api) -> None:
+        logger.info("NAAMA TEST 6")
         logzio_shipper = LogzioShipper(self._logzio_connection.url, self._logzio_connection.token)
 
         for api_custom_field in api.get_api_custom_fields():
@@ -107,8 +109,11 @@ class ApisManager:
             thread.start()
             thread.join()
 
-            if self._event.wait(timeout=api.get_api_time_interval()):
+            if self._event.wait(timeout=api.get_api_time_interval()) or self.test:
+                logger.info("NAAMA TEST 7")
                 break
+            else:
+                logger.info("NAAMA TEST NOT 7")
 
     def _send_data_to_logzio(self, api: Api, logzio_shipper: LogzioShipper) -> None:
         logger.info("Task is running for api {}...".format(api.get_api_name()))
@@ -151,6 +156,10 @@ class ApisManager:
         logger.info(
             "Task is over. A new Task for api {0} will run in {1} minute/s.".format(api.get_api_name(),
                                                                                     int(api.get_api_time_interval() / 60)))
+
+        if self.test:
+            logger.info("NAAMA TEST 10")
+            os.kill(os.getpid(), signal.SIGTERM)
 
     def _write_last_start_date_to_file(self, api_name: str, last_start_date: str) -> None:
         self._lock.acquire()

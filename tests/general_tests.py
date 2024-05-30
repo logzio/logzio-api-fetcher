@@ -3,7 +3,7 @@ import logging
 import multiprocessing
 import json
 import math
-import httpretty
+import responses
 import requests
 
 from requests.sessions import InvalidSchema
@@ -53,7 +53,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=200,
                                                                sleep_time=70)
 
-        requests_num, _, sent_bytes = queue.get()
+        requests_num, _, sent_bytes = queue.get(False)
 
         self.assertEqual(math.ceil(sent_bytes / 2 / LogzioShipper.MAX_BULK_SIZE_BYTES) * 2, requests_num)
 
@@ -118,7 +118,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=500,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -130,7 +130,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=502,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -142,7 +142,7 @@ class GeneralTests(unittest.TestCase):
                                                                status=503,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
@@ -154,13 +154,13 @@ class GeneralTests(unittest.TestCase):
                                                                status=504,
                                                                sleep_time=10)
 
-        requests_num, _, _ = queue.get()
+        requests_num, _, _ = queue.get(False)
 
         self.assertEqual(LogzioShipper.MAX_RETRIES + 1, requests_num)
 
-    @httpretty.activate
+    @responses.activate
     def test_send_bad_format(self) -> None:
-        httpretty.register_uri(httpretty.POST, self.tests_utils.LOGZIO_URL, status=400)
+        responses.add(responses.POST, self.tests_utils.LOGZIO_URL, status=400)
 
         logzio_shipper = LogzioShipper(self.tests_utils.LOGZIO_URL, self.tests_utils.LOGZIO_TOKEN)
 
@@ -175,9 +175,9 @@ class GeneralTests(unittest.TestCase):
 
         self.assertRaises(requests.ConnectionError, logzio_shipper.send_to_logzio)
 
-    @httpretty.activate
+    @responses.activate
     def test_sending_bad_logzio_token(self) -> None:
-        httpretty.register_uri(httpretty.POST, self.tests_utils.LOGZIO_URL, status=401)
+        responses.add(responses.POST, self.tests_utils.LOGZIO_URL, status=401)
 
         logzio_shipper = LogzioShipper(self.tests_utils.LOGZIO_URL, self.tests_utils.LOGZIO_TOKEN)
 

@@ -114,7 +114,7 @@ class CombinedApiTests(unittest.TestCase):
                                                                sleep_time=10,
                                                                is_multi_test=True)
 
-        requests_num, sent_logs_num, sent_bytes = queue.get()
+        requests_num, sent_logs_num, sent_bytes = queue.get(False)
         data_bytes, data_num = self.tests_utils.get_api_data_bytes_and_num_from_json_data(
             self.azure_graph_json_body[AzureGraph.DEFAULT_GRAPH_DATA_LINK])
 
