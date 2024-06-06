@@ -64,14 +64,14 @@ class TestApiFetcher(unittest.TestCase):
         responses.add(responses.GET, "http://some/api", json=success_res_body, status=200)
 
         a = ApiFetcher(url="http://some/api",
-                       next_url="http://some/api/{res.field}/{res.arr[0]}/{res.objArr[1].f2}")
+                       next_url="http://some/api/{res.field}/{res.arr.[0]}/{res.objArr.[1].f2}")
         result = a.send_request()
 
         # Validate we got the needed response
-        self.assertEqual(result, [success_res_body])
+        self.assertEqual([success_res_body], result)
 
         # Validate that next_url updates the url for next request as expected
-        self.assertEqual(a.url, "http://some/api/abc/1/hello")
+        self.assertEqual("http://some/api/abc/1/hello", a.url)
 
     @responses.activate
     def test_send_bad_request(self):

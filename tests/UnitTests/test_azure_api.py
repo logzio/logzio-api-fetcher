@@ -1,5 +1,6 @@
 from datetime import datetime, UTC, timedelta
 import json
+import os
 from pydantic import ValidationError
 import responses
 import unittest
@@ -7,6 +8,9 @@ import unittest
 from src.apis.azure.AzureApi import AzureApi
 from src.apis.azure.AzureGraph import AzureGraph
 from src.apis.azure.AzureMailReports import AzureMailReports
+
+
+curr_path = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestAzureApi(unittest.TestCase):
@@ -87,7 +91,7 @@ class TestAzureApi(unittest.TestCase):
         # Mock response from Azure Graph API
         token_res_body = {"token_type": "Bearer", "expires_in": 3599,
                           "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBP"}
-        with open("./azure_graph_res_example.json", "r") as data_res_example_file:
+        with open(f"{curr_path}/responsesExamples/azure_graph_res_example.json", "r") as data_res_example_file:
             data_res_body = json.loads(data_res_example_file.read())
 
         # token response
@@ -125,7 +129,7 @@ class TestAzureApi(unittest.TestCase):
         # Mock response from Azure Mail API
         token_res_body = {"token_type": "Bearer", "expires_in": 3599,
                           "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik1uQ19WWmNBVGZNNXBP"}
-        with open("./azure_mail_res_example.json", "r") as data_res_example_file:
+        with open(f"{curr_path}/responsesExamples/azure_mail_res_example.json", "r") as data_res_example_file:
             data_res_body = json.loads(data_res_example_file.read())
 
             # token response

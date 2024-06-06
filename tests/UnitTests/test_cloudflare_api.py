@@ -1,9 +1,13 @@
 import json
+import os
 from pydantic import ValidationError
 import responses
 import unittest
 
 from src.apis.cloudflare.Cloudflare import Cloudflare
+
+
+curr_path = os.path.abspath(os.path.dirname(__file__))
 
 
 class TestCloudflareApi(unittest.TestCase):
@@ -22,7 +26,7 @@ class TestCloudflareApi(unittest.TestCase):
     @responses.activate
     def test_valid_setup(self):
         # Mock response from Cloudflare API
-        with open("./cloudflare_res_example.json", "r") as res_example_file:
+        with open(f"{curr_path}/responsesExamples/cloudflare_res_example.json", "r") as res_example_file:
             res = json.loads(res_example_file.read())
 
         # First Data Request
