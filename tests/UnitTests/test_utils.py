@@ -1,8 +1,4 @@
-import sys
 import unittest
-
-print(sys.path)
-sys.path.append("/Users/naama/Desktop/naama/integrations/logzio-api-fetcher")
 
 from src.utils.processing_functions import extract_vars, get_nested_value, replace_dots, break_key_name, substitute_vars
 

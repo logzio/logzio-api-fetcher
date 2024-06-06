@@ -19,4 +19,4 @@ jobs:
           pip install pytest
           pip install pytest-cov
       - name: Run tests
-        run: pytest --cov-report term --cov=src tests/*_tests.py
+        run: PYTHONPATH=. pytest --cov-report term --cov=src tests/*/test_*.py
