@@ -87,7 +87,8 @@ class ApiFetcher(BaseModel):
             else:
                 # This is set to debug and not error since it could be expected (no new data)
                 logger.debug(f"Did not find data in given '{self.response_data_path}' path. Response: {response}")
-        return []
+                return []
+        return [response]
 
     def _make_call(self):
         """

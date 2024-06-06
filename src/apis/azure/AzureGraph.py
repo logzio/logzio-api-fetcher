@@ -30,7 +30,7 @@ class AzureGraph(AzureApi):
         data_request = ApiFetcher(**data.pop("data_request"),
                                   pagination=PaginationSettings(
                                       type="url",
-                                      url_format="{res.@odata.nextLink}",
+                                      url_format="{res.@odata\\.nextLink}",
                                       stop_indication=StopPaginationSettings(field="value",
                                                                              condition="empty")),
                                   response_data_path="value")

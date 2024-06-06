@@ -30,7 +30,7 @@ class AzureMailReports(AzureApi):
         data_request = ApiFetcher(**data.pop("data_request"),
                                   pagination=PaginationSettings(
                                       type="url",
-                                      url_format="{res.d.@odata.nextLink}",
+                                      url_format="{res.d.@odata\\.nextLink}",
                                       stop_indication=StopPaginationSettings(field="d.results",
                                                                              condition="empty")),
                                   response_data_path="d.results")
