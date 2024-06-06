@@ -1,0 +1,22 @@
+name: Automatic tests
+on:
+  push:
+    branches:
+      - '**'
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install requirements.txt
+          pip install responses
+          pip install pytest
+          pip install pytest-cov
+      - name: Run tests
+        run: pytest --cov-report term --cov=src tests/*_tests.py
