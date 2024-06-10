@@ -36,6 +36,16 @@ class TestOAuthApi(unittest.TestCase):
                                              headers={"Content-Type": "application/gzip"}))
         self.assertEqual(a.data_request.headers.get("Content-Type"), "application/gzip")
 
+    def test_additional_fields_init(self):
+        a = OAuthApi(token_request=ApiFetcher(url="http://my-token-url"),
+                     data_request=ApiFetcher(url="http://my-data-url"),
+                     additional_fields={"type": "test"})
+        self.assertEqual("test", a.additional_fields.get("type"))
+
+        a = OAuthApi(token_request=ApiFetcher(url="http://my-token-url"),
+                     data_request=ApiFetcher(url="http://my-data-url"))
+        self.assertEqual("api-fetcher", a.additional_fields.get("type"))
+
     @responses.activate
     def test_send_request(self):
         token_res = {"access_token": "epZliHdLuj", "expires_in": 1}
@@ -54,7 +64,7 @@ class TestOAuthApi(unittest.TestCase):
         result = a.send_request()
 
         # Ensure we got the needed results
-        self.assertEqual(result, [{"msg": "hi"}, {"msg": "hello", "field": 567}])
+        self.assertEqual([{"msg": "hi"}, {"msg": "hello", "field": 567}], result)
 
         # Test needing to update the token (gave super short expiration in 'token_res')
         with self.assertLogs("src.apis.oauth.OAuth", level='DEBUG') as log:

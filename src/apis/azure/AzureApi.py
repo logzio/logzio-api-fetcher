@@ -8,12 +8,14 @@ from src.apis.general.Api import ReqMethod, ApiFetcher
 class AzureApi(OAuthApi):
     """
     Initialize a general Azure API call to prevent duplication of 'token_request' in subclasses.
+    :param name: Optional custom name for the API.
     :param azure_ad_tenant_id: The Azure AD Tenant id
     :param azure_ad_client_id: The Azure AD Client id
     :param azure_ad_secret_value: The Azure AD Secret value
     :param days_back_fetch: The amount of days to fetch back in the first request
     :param date_filter_key: The name of key to use for the date filter in the request URL params.
     """
+    name: str = Field(default="azure api")
     azure_ad_tenant_id: str = Field(frozen=True)
     azure_ad_client_id: str = Field(frozen=True)
     azure_ad_secret_value: str = Field(frozen=True)

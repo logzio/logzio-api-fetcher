@@ -10,15 +10,15 @@ Configuration [example here](#example).
 ## Azure General
 Below fields are relevant for **all Azure API types**
 
-| Parameter Name        | Description                                                                                         | Required/Optional | Default    |
-|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|------------|
-| name                  | Name of the API (custom name)                                                                       | Optional          | `oauth`    |
-| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -          |
-| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -          |
-| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -          |
-| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -          |
-| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | `1`        |
-| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute) |
+| Parameter Name        | Description                                                                                         | Required/Optional | Default     |
+|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|-------------|
+| name                  | Name of the API (custom name)                                                                       | Optional          | `azure api` |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -           |
+| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -           |
+| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -           |
+| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -           |
+| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | 1 (day)     |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)  |
 
 ## Azure Graph
 The below fields are relevant **in addition** to the required ones listed under Azure General.
@@ -54,6 +54,7 @@ apis:
         type: azure_graph
         field_to_add_to_my_logs: 123
     scrape_interval: 1
+    days_back_fetch: 30
 
   - name: mail reports example
     type: azure_mail_reports
@@ -64,7 +65,8 @@ apis:
       url: https://login.microsoftonline.com/<<AZURE_AD_TENANT_ID>>/oauth2/v2.0/token
       additional_fields:
         type: azure_mail_reports
-    scrape_interval: 60
+    scrape_interval: 60  # for mail reports we suggest no less than 60 minutes
+    days_back_fetch: 8  # for mail reports we suggest up to 8 days
 
   - name: azure general example
     type: azure_general
@@ -74,6 +76,7 @@ apis:
     data_request:
       url: ...
     scrape_interval: 30
+    days_back_fetch: 30
 
 logzio:
   url: https://listener.logz.io:8071

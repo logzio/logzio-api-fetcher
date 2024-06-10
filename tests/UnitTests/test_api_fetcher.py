@@ -30,6 +30,25 @@ class TestApiFetcher(unittest.TestCase):
             # scrape_interval too small
             ApiFetcher(url="https://my-url", scrape_interval=0.5)
 
+            # Invalid stop pagination condition
+            ApiFetcher(url="https://my-url",
+                       pagination=PaginationSettings(type="headers",
+                                                     headers_format={"header": "{res.field}"},
+                                                     stop_indication=StopPaginationSettings(field="results",
+                                                                                            condition="not-existing")))
+
+    def test_invalid_pagination_setup(self):
+        with self.assertRaises(ValueError):
+            # Missing a required field
+            ApiFetcher(url="https://my-url", pagination=PaginationSettings(type="url"))
+
+            # Missing field for stop condition
+            ApiFetcher(url="https://my-url",
+                       pagination=PaginationSettings(type="headers",
+                                                     headers_format={"header": "{res.field}"},
+                                                     stop_indication=StopPaginationSettings(field="results",
+                                                                                            condition="contains")))
+
     def test_change_next_url(self):
         # Init no variables in the URL
         a = ApiFetcher(url="https://random")

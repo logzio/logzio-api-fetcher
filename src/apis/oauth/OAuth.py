@@ -27,6 +27,7 @@ class OAuthApi(BaseModel):
     token_request: ApiFetcher
     data_request: ApiFetcher
     scrape_interval_minutes: int = Field(default=1, alias="scrape_interval", ge=1)
+    additional_fields: dict = Field(default={})
     token: str = Field(default=None, init=False, init_var=True)
     token_expire: float = Field(default=0, init=False, init_var=True)
 
@@ -40,6 +41,11 @@ class OAuthApi(BaseModel):
         # Make sure the content-type exists for the data request
         if not self.data_request.headers.get("Content-Type"):
             self.data_request.headers["Content-Type"] = "application/json"
+
+        # Initialize the type
+        if not self.additional_fields.get("type"):
+            self.additional_fields["type"] = "api-fetcher"
+
         return self
 
     def _update_token(self):

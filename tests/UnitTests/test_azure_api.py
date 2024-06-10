@@ -1,6 +1,6 @@
 from datetime import datetime, UTC, timedelta
 import json
-import os
+from os.path import abspath, dirname
 from pydantic import ValidationError
 import responses
 import unittest
@@ -10,7 +10,7 @@ from src.apis.azure.AzureGraph import AzureGraph
 from src.apis.azure.AzureMailReports import AzureMailReports
 
 
-curr_path = os.path.abspath(os.path.dirname(__file__))
+curr_path = abspath(dirname(__file__))
 
 
 class TestAzureApi(unittest.TestCase):

@@ -22,7 +22,7 @@ API_TYPES_TO_CLASS_NAME_MAPPING = {
     "azure_graph": "AzureGraph",
     "azure_mail_reports": "AzureMailReports",
     "cisco_xdr": "CiscoXdr",
-    "cloudflare": "cloudflare"
+    "cloudflare": "Cloudflare"
 }
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class ConfigReader:
             logger.error(f"Missing read permission for file {conf_file}.")
         except Exception as e:
             logger.error(f"Failed to read config from path {conf_file} due to error {e}.")
-        exit(1)
+        return None
 
     def validate_config(self):
         """
@@ -67,6 +67,8 @@ class ConfigReader:
         api_instances = []
         logzio_shipper_instance = None
         shipper_cls = globals().get("LogzioShipper")
+        if not self.config:
+            return api_instances, logzio_shipper_instance
         apis = self.config.get(INPUT_API_FIELD)
         logzio_conf = self.config.get(OUTPUT_LOGZIO_FIELD)
 
@@ -96,8 +98,3 @@ class ConfigReader:
                 logger.error(f"Failed to create Logzio shipper for config {logzio_conf} due to error: {e}")
 
         return api_instances, logzio_shipper_instance
-
-# Delete in final version. for tests:
-# conf = ConfigReader("../config.yaml")
-# if conf.api_instances:
-#     print(conf.api_instances[0].send_request())

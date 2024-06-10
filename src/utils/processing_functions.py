@@ -161,6 +161,5 @@ def substitute_vars(item, vars_arr, values_dic):
         if value:
             new_item = new_item.replace("{res.%s}" % var, str(value))
         else:
-            raise ValueError(f"The response didn't contain {var} hence it won't be replaced in {item}. Response: "
-                             f"{values_dic}")
+            raise ValueError(f"The response didn't contain {var} hence it won't be replaced in {item}.")
     return new_item

@@ -49,5 +49,5 @@ class StopPaginationSettings(BaseModel):
         elif self.condition == StopCondition.CONTAINS:
             return self.value in field_value
         else:
-            logger.warning("Warning: Got invalid stop condition", self.condition)
+            logger.warning("Got invalid stop condition", self.condition)
         return True

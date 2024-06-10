@@ -69,7 +69,7 @@ class LogzioShipper(BaseModel):
         :return: True if log_size < MAX_LOG_SIZE_BYTES, false otherwise
         """
         if log_size > MAX_LOG_SIZE_BYTES:
-            logger.error(f"Error: The following log size of {log_size} bytes is passing the allowed "
+            logger.error(f"The following log size of {log_size} bytes is passing the allowed "
                          f"{MAX_LOG_SIZE_BYTES} bytes logzio limit. Not sending the log: '{log_to_send}'")
             return False
         return True
@@ -116,7 +116,7 @@ class LogzioShipper(BaseModel):
             return
 
         if self.curr_bulk_size == 0:
-            print("bulk is 0 but logs are:", self.curr_logs)
+            logger.info("bulk is 0 but logs are:", self.curr_logs)
 
         try:
             headers = {"Content-Type": "application/json",
@@ -131,35 +131,35 @@ class LogzioShipper(BaseModel):
             logger.info(f"Successfully sent bulk of {self.curr_bulk_size} bytes to Logz.io.")
             self._reset_logs()
         except requests.ConnectionError as e:
-            logger.error(f"Error: Failed to establish connection to the listener, max retries {MAX_RETRIES} Reached. "
+            logger.error(f"Failed to establish connection to the listener, max retries {MAX_RETRIES} Reached. "
                          f"Please make sure '{self.listener}' is valid. Response: {e}")
             raise
         except RetryError as e:
-            logger.error(f"Error: Something went wrong, max retries {MAX_RETRIES} Reached. Response: {e}")
+            logger.error(f"Something went wrong, max retries {MAX_RETRIES} Reached. Response: {e}")
             raise
         except requests.exceptions.InvalidURL:
-            logger.error("Error: Invalid url. Make sure your url is a valid url.")
+            logger.error("Invalid url. Make sure your url is a valid url.")
             raise
         except InvalidSchema:
-            logger.error("Error: No connection adapters were found for {}. Make sure your url starts with http:// or "
+            logger.error("No connection adapters were found for {}. Make sure your url starts with http:// or "
                          "https://")
             raise
         except requests.HTTPError as e:
             status_code = e.response.status_code
 
             if status_code == 400:
-                logger.error(f"Error: The logs are bad formatted. Response: {e}")
+                logger.error(f"The logs are bad formatted. Response: {e}")
                 raise
 
             if status_code == 401:
-                logger.error("Error: Logzio Shipping Token is missing or invalid. Make sure you’re using the right "
+                logger.error("Logzio Shipping Token is missing or invalid. Make sure you’re using the right "
                              "account token.")
                 raise
 
-            logger.error(f"Error: Somthing went wrong. Response: {e}")
+            logger.error(f"Somthing went wrong. Response: {e}")
             raise
         except Exception as e:
-            logger.error(f"Error: Something went wrong. response: {e}")
+            logger.error(f"Something went wrong. response: {e}")
             raise
 
     def add_log_to_send(self, log, custom_fields=None):

@@ -1,0 +1,43 @@
+apis:
+  - name: logz-api
+    type: general
+    url: https://api.logz.io/v1/scroll
+    headers:
+      X-API-TOKEN: lOgzapiToKEn
+      CONTENT-TYPE: application/json
+    pagination:
+      type: body
+      body_format: {"scroll_id": "{res.scrollId}"}
+      stop_indication:
+        field: "hits"
+        condition: "contains"
+        value: "\"hits\":[]"
+      max_calls: 20
+    body: {
+            "size": 1000,
+            "query": {
+              "bool": {
+                "must": [
+                  {
+                    "query_string": {
+                      "query": "type:lambda-extension-logs"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+    method: POST
+    response_data_path: hits
+    additional_fields:
+      field1: value1
+      field2: 123
+      field3: another value
+      type: logz-api
+  - name: cloudflare test
+    type: cloudflare
+    cloudflare_account_id: c10u5f1ar3acc0un7i6
+    cloudflare_bearer_token: b3ar3r-t0k3n
+    url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since=2024-06-09T14:06:23.635421Z
+    next_url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since={res.result.[0].sent}
+    scrape_interval: 5

@@ -22,7 +22,7 @@ apis:
     cloudflare_bearer_token: <<CLOUDFLARE_BEARER_TOKEN>>
     url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since=2024-05-21T04%3A06%3A20.522451Z
     next_url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since={res.result.[0].sent}
-    scrape_interval_minutes: 5
+    scrape_interval: 5
     additional_fields:
       type: cloudflare
 
