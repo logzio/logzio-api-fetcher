@@ -10,7 +10,6 @@ from src.apis.oauth.OAuth import OAuthApi
 from src.apis.azure.AzureGraph import AzureGraph
 from src.apis.azure.AzureMailReports import AzureMailReports
 from src.apis.cloudflare.Cloudflare import Cloudflare
-from src.apis.cisco.CiscoXdr import CiscoXdr
 from src.output.LogzioShipper import LogzioShipper
 
 INPUT_API_FIELD = "apis"
@@ -21,7 +20,6 @@ API_TYPES_TO_CLASS_NAME_MAPPING = {
     "azure_general": "AzureApi",
     "azure_graph": "AzureGraph",
     "azure_mail_reports": "AzureMailReports",
-    "cisco_xdr": "CiscoXdr",
     "cloudflare": "Cloudflare"
 }
 
