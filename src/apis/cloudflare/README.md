@@ -2,16 +2,16 @@
 By default `cloudflare` API type has built in pagination settings and sets the `response_data_path` to `result` field.  
 
 ## Configuration
-| Parameter Name          | Description                                                                                                         | Required/Optional | Default           |
-|-------------------------|---------------------------------------------------------------------------------------------------------------------|-------------------|-------------------|
-| name                    | Name of the API (custom name)                                                                                       | Optional          | the defined `url` |
-| cloudflare_account_id   | The CloudFlare Account ID                                                                                           | Required          | -                 |
-| cloudflare_bearer_token | The Cloudflare Bearer token                                                                                         | Required          | -                 |
-| url                     | The request URL                                                                                                     | Required          | -                 |
-| next_url                | If needed to update the URL in next requests based on the last response. Supports using variables (see General API) | Optional          | -                 |
-| additional_fields       | Additional custom fields to add to the logs before sending to logzio                                                | Optional          | -                 |
-| scrape_interval         | Time interval to wait between runs (unit: `minutes`)                                                                | Optional          | 1 (minute)        |
-| pagination_off          | True if builtin pagination should be off, False otherwise                                                           | Optional          | `False`           |
+| Parameter Name          | Description                                                                                                                                | Required/Optional | Default           |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------|-------------------|
+| name                    | Name of the API (custom name)                                                                                                              | Optional          | the defined `url` |
+| cloudflare_account_id   | The CloudFlare Account ID                                                                                                                  | Required          | -                 |
+| cloudflare_bearer_token | The Cloudflare Bearer token                                                                                                                | Required          | -                 |
+| url                     | The request URL                                                                                                                            | Required          | -                 |
+| next_url                | If needed to update the URL in next requests based on the last response. Supports using variables (see [General API](./general/README.md)) | Optional          | -                 |
+| additional_fields       | Additional custom fields to add to the logs before sending to logzio                                                                       | Optional          | -                 |
+| scrape_interval         | Time interval to wait between runs (unit: `minutes`)                                                                                       | Optional          | 1 (minute)        |
+| pagination_off          | True if builtin pagination should be off, False otherwise                                                                                  | Optional          | `False`           |
 
 ## Example
 ```Yaml

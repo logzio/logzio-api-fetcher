@@ -5,31 +5,31 @@ For structuring custom API calls use type `general` API with the parameters belo
 - [Example](#example)
 
 ## Configuration
-| Parameter Name     | Description                                                                                                   | Required/Optional | Default                     |
-|--------------------|---------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
-| name               | Name of the API (custom name)                                                                                 | Optional          | the defined `url`           |
-| url                | The request URL                                                                                               | Required          | -                           |
-| headers            | The request Headers                                                                                           | Optional          | `{}`                        |
-| body               | The request body                                                                                              | Optional          | -                           |
-| method             | The request method (`GET` or `POST`)                                                                          | Optional          | `GET`                       |
-| pagination         | Pagination settings if needed (see options below)                                                             | Optional          | -                           |
-| next_url           | If needed to update the URL in next requests based on the last response. Supports using variables (see below) | Optional          | -                           |
-| response_data_path | The path to the data inside the response                                                                      | Optional          | response root               |
-| additional_fields  | Additional custom fields to add to the logs before sending to logzio                                          | Optional          | Add `type` as `api-fetcher` |
-| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                          | Optional          | 1 (minute)                  |
+| Parameter Name     | Description                                                                                                                       | Required/Optional | Default                     |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| name               | Name of the API (custom name)                                                                                                     | Optional          | the defined `url`           |
+| url                | The request URL                                                                                                                   | Required          | -                           |
+| headers            | The request Headers                                                                                                               | Optional          | `{}`                        |
+| body               | The request body                                                                                                                  | Optional          | -                           |
+| method             | The request method (`GET` or `POST`)                                                                                              | Optional          | `GET`                       |
+| pagination         | Pagination settings if needed (see [options below](#pagination-configuration-options))                                            | Optional          | -                           |
+| next_url           | If needed to update the URL in next requests based on the last response. Supports using variables ([see below](#using-variables)) | Optional          | -                           |
+| response_data_path | The path to the data inside the response                                                                                          | Optional          | response root               |
+| additional_fields  | Additional custom fields to add to the logs before sending to logzio                                                              | Optional          | Add `type` as `api-fetcher` |
+| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                                              | Optional          | 1 (minute)                  |
 
 ## Pagination configuration options
 If needed, you can configure pagination.
 
-| Parameter Name   | Description                                                                                                                                  | Required/Optional                                  | Default |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|---------|
-| type             | The pagination type (`url`, `body` or `headers`)                                                                                             | Required                                           | -       |
-| url_format       | If pagination type is `url`, configure the URL format used for the pagination. Supports using variables (see below).                         | Required if pagination type is `url`               | -       |
-| update_first_url | `True` or `False`; If pagination type is `url`, and it's required to append new params to the first request URL and not reset it completely. | Optional if pagination type is `url`               | False   |
-| headers_format   | If pagination type is `headers`, configure the headers format used for the pagination. Supports using variables (see below).                 | Required if pagination type is `headers`           | -       |
-| body_format      | If pagination type is `body`, configure the body format used for the pagination. Supports using variables (see below).                       | Required if pagination type is `body`              | -       |
-| stop_indication  | When should the pagination end based on the response. (see options below).                                                                   | Optional (if not defined will stop on `max_calls`) | -       |
-| max_calls        | Max calls that the pagination can make. (Supports up to 1000)                                                                                | Optional                                           | 1000    |
+| Parameter Name   | Description                                                                                                                                      | Required/Optional                                  | Default |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|---------|
+| type             | The pagination type (`url`, `body` or `headers`)                                                                                                 | Required                                           | -       |
+| url_format       | If pagination type is `url`, configure the URL format used for the pagination. Supports using variables ([see below](#using-variables)).         | Required if pagination type is `url`               | -       |
+| update_first_url | `True` or `False`; If pagination type is `url`, and it's required to append new params to the first request URL and not reset it completely.     | Optional if pagination type is `url`               | False   |
+| headers_format   | If pagination type is `headers`, configure the headers format used for the pagination. Supports using variables ([see below](#using-variables)). | Required if pagination type is `headers`           | -       |
+| body_format      | If pagination type is `body`, configure the body format used for the pagination. Supports using variables ([see below](#using-variables)).       | Required if pagination type is `body`              | -       |
+| stop_indication  | When should the pagination end based on the response. (see [options below](#pagination-stop-indication-configuration)).                          | Optional (if not defined will stop on `max_calls`) | -       |
+| max_calls        | Max calls that the pagination can make. (Supports up to 1000)                                                                                    | Optional                                           | 1000    |
 
 ## Pagination Stop Indication Configuration
 
@@ -39,7 +39,7 @@ If needed, you can configure pagination.
 | condition      | The stop condition (`empty`, `equals` or `contains`)                                    | Required                                        | -       |
 | value          | If condition is `equals` or `contains`, the value of the `field` that we should stop at | Required if condition is `equals` or `contains` | -       |
 
-### Using Variables
+## Using Variables
 Using variables allows taking values from the response of the first request, to structure the request after it.  
 Mathematical operations `+` and `-` are supported, to add or reduce a number from the variable value.
 Use case examples:

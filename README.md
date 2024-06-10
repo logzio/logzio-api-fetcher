@@ -7,7 +7,7 @@ The API Fetcher offers way to configure fetching data from APIs every defined sc
 Download the logzio-api-fetcher image:
 
 ```shell
-docker pull <<DOCER_IMAGE>>
+docker pull logzio/logzio-api-fetcher
 ```
 
 ### Configuration
