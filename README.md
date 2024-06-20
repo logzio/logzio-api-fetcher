@@ -13,11 +13,12 @@ docker pull logzio/logzio-api-fetcher
 ### Configuration
 Create a local config file `config.yaml`.  
 Configure your API inputs under `apis`. For every API, mention the input type under `type` field:
-- [General API Configuration Options](./src/apis/general/README.md)
-- [General OAuth Configuration Options](./src/apis/oauth/README.md)
-- [Azure Graph Configuration Options](./src/apis/azure/README.MD/#azure-graph)
-- [Azure Mail Reports Configuration Options](./src/apis/azure/README.MD/#azure-mail-reports)
-- [Azure General Configuration Options](./src/apis/azure/README.MD/#azure-general)
+- [General API](./src/apis/general/README.md) Configuration Options
+- [General OAuth](./src/apis/oauth/README.md) Configuration Options
+- [Azure Graph](./src/apis/azure/README.MD/#azure-graph) Configuration Options
+- [Azure Mail Reports](./src/apis/azure/README.MD/#azure-mail-reports) Configuration Options
+- [Azure General](./src/apis/azure/README.MD/#azure-general) Configuration Options
+- [Cloudflare](./src/apis/cloudflare/README.md) Configuration Options
 
 And your logzio output under `logzio`:
 
