@@ -101,13 +101,13 @@ class ApiFetcher(BaseModel):
             r = requests.request(method=self.method.value, url=self.url, headers=self.headers, data=self.body)
             r.raise_for_status()
         except requests.ConnectionError:
-            logger.info(f"Failed to establish connection to the {self.name} API.")
+            logger.error(f"Failed to establish connection to the {self.name} API.")
             return None
         except requests.HTTPError as e:
-            logger.info(f"Failed to get data from {self.name} API due to error {e}")
+            logger.error(f"Failed to get data from {self.name} API due to error {e}")
             return None
         except Exception as e:
-            logger.info(f"Failed to send request to {self.name} API due to error {e}")
+            logger.error(f"Failed to send request to {self.name} API due to error {e}")
             return None
 
         if r.status_code in SUCCESS_CODES:
@@ -116,7 +116,7 @@ class ApiFetcher(BaseModel):
             except json.decoder.JSONDecodeError:
                 return r.text
         else:
-            logger.warning("Issue with fetching data from the API: %s", r.text)
+            logger.warning(f"Issue with fetching data from {self.name} API: %s", r.text)
         return None
 
     def _prepare_pagination_next_call(self, res, first_url):

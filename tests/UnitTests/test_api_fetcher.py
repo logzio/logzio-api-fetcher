@@ -97,13 +97,13 @@ class TestApiFetcher(unittest.TestCase):
         # Mock response from some API
         responses.add(responses.GET, "http://not/existing/api", status=404)
 
-        a = ApiFetcher(url="http://not/existing/api",
+        a = ApiFetcher(name="test", url="http://not/existing/api",
                        next_url="http://some/api/{res.field}/{res.arr[0]}/{res.objArr[1].f2}")
 
         # Validate we get the needed error and no data
-        with self.assertLogs("src.apis.general.Api", level='WARN') as log:
+        with self.assertLogs("src.apis.general.Api", level='INFO') as log:
             result = a.send_request()
-        self.assertIn("WARNING:src.apis.general.Api:Issue with fetching data from the API: ", log.output)
+        self.assertIn("ERROR:src.apis.general.Api:Failed to get data from test API due to error 404 Client Error: Not Found for url: http://not/existing/api", log.output)
         self.assertEqual(result, [])
 
     @responses.activate
