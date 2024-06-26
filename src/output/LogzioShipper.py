@@ -11,9 +11,9 @@ from urllib3.util.retry import Retry
 INT_VERSION = "0.2.0"
 
 # Size limitations
-MAX_BODY_SIZE_BYTES = 10 * 1024 * 1024              # 10 MB
-MAX_BULK_SIZE_BYTES = MAX_BODY_SIZE_BYTES / 10      # 1 MB
-MAX_LOG_SIZE_BYTES = 500 * 1000                     # 500 KB
+MAX_BODY_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+MAX_BULK_SIZE_BYTES = MAX_BODY_SIZE_BYTES / 10  # 1 MB
+MAX_LOG_SIZE_BYTES = 500 * 1000  # 500 KB
 
 # Retry Settings
 MAX_RETRIES = 3
@@ -108,6 +108,33 @@ class LogzioShipper(BaseModel):
         self.curr_logs.clear()
         self.curr_bulk_size = 0
 
+    @staticmethod
+    def _handle_exception(exp, msg, *args):
+        """
+        Logs the given error message and raises the exception.
+        :param exp: the exception
+        :param msg: error message to log regarding it
+        :param args: message arguments
+        """
+        logger.error(msg.format(*args))
+        raise exp
+
+    def _handle_http_errors(self, status_code, exp):
+        """
+        Handles HTTP error codes from an exception.
+        :param status_code: the HTTP status code
+        :param exp: the exception itself
+        """
+        if status_code == 400:
+            self._handle_exception(exp, "The logs are bad formatted. Response: {}", exp)
+        elif status_code == 401:
+            logger.error("Logzio Shipping Token is missing or invalid. Make sure you’re using the right account "
+                         "token.")
+            self._handle_exception(exp, "Logzio Shipping Token is missing or invalid. Make sure you’re using the right "
+                                        "account token.")
+        else:
+            self._handle_exception(exp, "Somthing went wrong. Response: {}", exp)
+
     def send_to_logzio(self):
         """
         Sends logs from 'self.curr_logs' to logzio with retry mechanism.
@@ -130,37 +157,21 @@ class LogzioShipper(BaseModel):
             response.raise_for_status()
             logger.info(f"Successfully sent bulk of {self.curr_bulk_size} bytes to Logz.io.")
             self._reset_logs()
+
         except requests.ConnectionError as e:
-            logger.error(f"Failed to establish connection to the listener, max retries {MAX_RETRIES} Reached. "
-                         f"Please make sure '{self.listener}' is valid. Response: {e}")
-            raise
+            self._handle_exception(e, "Failed to establish connection to the listener, max retries {} reached. "
+                                      "Please make sure '{}' is valid. Response: {}", MAX_RETRIES, self.listener, e)
         except RetryError as e:
-            logger.error(f"Something went wrong, max retries {MAX_RETRIES} Reached. Response: {e}")
-            raise
+            self._handle_exception(e, "Something went wrong, max retries {} reached. Response: {}", MAX_RETRIES, e)
         except requests.exceptions.InvalidURL:
-            logger.error("Invalid url. Make sure your url is a valid url.")
-            raise
+            self._handle_exception(requests.exceptions.InvalidURL, "Invalid url. Make sure your url is a valid url.")
         except InvalidSchema:
-            logger.error("No connection adapters were found for {}. Make sure your url starts with http:// or "
-                         "https://")
-            raise
+            self._handle_exception(InvalidSchema, "No connection adapters were found for {}. Make sure your url "
+                                                  "starts with http:// or https://")
         except requests.HTTPError as e:
-            status_code = e.response.status_code
-
-            if status_code == 400:
-                logger.error(f"The logs are bad formatted. Response: {e}")
-                raise
-
-            if status_code == 401:
-                logger.error("Logzio Shipping Token is missing or invalid. Make sure you’re using the right "
-                             "account token.")
-                raise
-
-            logger.error(f"Somthing went wrong. Response: {e}")
-            raise
+            self._handle_http_errors(e.response.status_code, e)
         except Exception as e:
-            logger.error(f"Something went wrong. response: {e}")
-            raise
+            self._handle_exception(e, "Something went wrong. response: {}", e)
 
     def add_log_to_send(self, log, custom_fields=None):
         """
@@ -170,15 +181,14 @@ class LogzioShipper(BaseModel):
         :param custom_fields: custom fields to add to the log
         """
         enriched_log = self._add_custom_fields_to_log(log, custom_fields)
-        enriched_log_size = len(enriched_log)
 
-        if not self._is_valid_log(enriched_log, enriched_log_size):
+        if not self._is_valid_log(enriched_log, len(enriched_log)):
             return
 
         # Bulk size was not reached yet
-        if not self.curr_bulk_size + enriched_log_size > MAX_BULK_SIZE_BYTES:
+        if not self.curr_bulk_size + len(enriched_log) > MAX_BULK_SIZE_BYTES:
             self.curr_logs.append(enriched_log)
-            self.curr_bulk_size += enriched_log_size
+            self.curr_bulk_size += len(enriched_log)
             return
 
         # Bulk size was reached >> send current logs and append the new logs to the new bulk
@@ -188,4 +198,4 @@ class LogzioShipper(BaseModel):
             raise
 
         self.curr_logs.append(enriched_log)
-        self.curr_bulk_size = enriched_log_size
+        self.curr_bulk_size = len(enriched_log)

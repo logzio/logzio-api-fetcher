@@ -36,7 +36,7 @@ class ConfigReader:
         :param conf_file: path to the config file
         """
         self.config = self._read_config(conf_file)
-        self.api_instances, self.logzio_shipper = self.validate_config()
+        self.api_instances, self.logzio_shipper = self.generate_instances()
 
     @staticmethod
     def _read_config(conf_file):
@@ -57,7 +57,7 @@ class ConfigReader:
             logger.error(f"Failed to read config from path {conf_file} due to error {e}.")
         return None
 
-    def validate_config(self):
+    def generate_instances(self):
         """
         Uses 'pydantic' to validate the given APIs config and generates API fetcher per valid config.
         :return: API fetcher (ApiFetcher) instances
@@ -77,7 +77,8 @@ class ConfigReader:
         # Generate API fetchers
         for api_conf in apis:
             try:
-                api_cls = globals().get(API_TYPES_TO_CLASS_NAME_MAPPING.get(api_conf.get("type")))
+                api_type_cls_name = API_TYPES_TO_CLASS_NAME_MAPPING.get(api_conf.get("type"))
+                api_cls = globals().get(api_type_cls_name)
                 api_instance = api_cls(**api_conf)
                 api_instances.append(api_instance)
                 logger.debug(f"Created {api_instance.name}.")

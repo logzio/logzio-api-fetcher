@@ -21,7 +21,11 @@ class TaskManager:
         self.threads = []
         self.event = threading.Event()
 
-    def _send_data_to_logzio(self, api):
+    @staticmethod
+    def _terminate_process():
+        os.kill(os.getpid(), signal.SIGTERM)
+
+    def _run_api_task(self, api):
         """
         Collects data from the API and sends it to Logzio.
         :param api: The API class instance
@@ -38,16 +42,16 @@ class TaskManager:
 
         except requests.exceptions.InvalidURL as e:
             logger.error(f"Failed to send data to Logz.io... Invalid url: {e}")
-            os.kill(os.getpid(), signal.SIGTERM)
+            self._terminate_process()
             return
         except InvalidSchema as e:
             logger.error(f"Failed to send data to Logz.io... Invalid schema: {e}")
-            os.kill(os.getpid(), signal.SIGTERM)
+            self._terminate_process()
             return
         except requests.HTTPError as e:
             logger.error(f"Failed to send data to Logz.io... HTTP error: {e}")
             if e.response.status_code == 401:
-                os.kill(os.getpid(), signal.SIGTERM)
+                self._terminate_process()
                 return
         except Exception as e:
             logger.error(f"Failed to send data to Logz.io... exception: {e}")
@@ -61,7 +65,7 @@ class TaskManager:
         """
         while True:
             logger.debug(f"Starting thread to collect logs from {api.name}")
-            thread = threading.Thread(target=self._send_data_to_logzio, args=(api,))
+            thread = threading.Thread(target=self._run_api_task, args=(api,))
             thread.start()
 
             # Enforce new task to run every scrape_interval

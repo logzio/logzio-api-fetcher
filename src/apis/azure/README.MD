@@ -79,6 +79,6 @@ apis:
     days_back_fetch: 30
 
 logzio:
-  url: https://listener.logz.io:8071
+  url: https://listener-eu.logz.io:8071  # for us-east-1 region delete url param (default) 
   token: <<SHIPPING_TOKEN>>
 ```

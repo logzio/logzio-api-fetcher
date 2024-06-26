@@ -13,4 +13,4 @@ apis:
 
 logzio:
   url: https://listener.logz.io:8071
-  token: <<LOGZIO_SHIPPING_TOKEN>>
+  token: SHipPIngtoKen

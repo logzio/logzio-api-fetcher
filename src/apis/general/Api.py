@@ -97,7 +97,19 @@ class ApiFetcher(BaseModel):
         """
         logger.debug(f"Sending API call with details:\nURL: {self.url}\nHeaders: {self.headers}\nBody: {self.body}")
 
-        r = requests.request(method=self.method.value, url=self.url, headers=self.headers, data=self.body)
+        try:
+            r = requests.request(method=self.method.value, url=self.url, headers=self.headers, data=self.body)
+            r.raise_for_status()
+        except requests.ConnectionError:
+            logger.info(f"Failed to establish connection to the {self.name} API.")
+            return None
+        except requests.HTTPError as e:
+            logger.info(f"Failed to get data from {self.name} API due to error {e}")
+            return None
+        except Exception as e:
+            logger.info(f"Failed to send request to {self.name} API due to error {e}")
+            return None
+
         if r.status_code in SUCCESS_CODES:
             try:
                 return json.loads(r.text)
@@ -107,6 +119,58 @@ class ApiFetcher(BaseModel):
             logger.warning("Issue with fetching data from the API: %s", r.text)
         return None
 
+    def _prepare_pagination_next_call(self, res, first_url):
+        """
+        Updates the next pagination call according to the response from the last call.
+        :param res: the response from the last call
+        :param first_url: needed to support in URL pagination option to append params to the same base URL
+        :return: True if succeeded to update the pagination request, False if failed.
+        """
+        # URL Pagination
+        if self.pagination_settings.pagination_type == PaginationType.URL:
+            new_url = self.pagination_settings.get_next_url(res, first_url)
+            if new_url:
+                self.url = new_url
+            else:
+                logger.debug(f"Stopping pagination due to issue with replacing the URL.")
+                return False
+
+        # Body Pagination
+        elif self.pagination_settings.pagination_type == PaginationType.BODY:
+            new_body = self._format_body(self.pagination_settings.get_next_body(res))
+            if new_body:
+                self.body = new_body
+            else:
+                logger.debug(f"Stopping pagination due to issue with replacing the Body.")
+                return False
+
+        # Headers Pagination
+        else:
+            new_headers = self.pagination_settings.get_next_headers(res)
+            if new_headers:
+                self.headers = new_headers
+            else:
+                logger.debug(f"Stopping pagination due to issue with replacing the Headers.")
+                return False
+        return True
+
+    def _revert_pagination_changes(self, org_url, org_headers, org_body):
+        """
+        The pagination changes the original request information.
+        After it's done, we want to make sure we go reset the info to the original needed request.
+        Specifically for the URL, we will only reset it if there is no next_url defined (because otherwise it will be
+        overwritten anyway after the end of the pagination).
+        :param org_url: the original request URL
+        :param org_headers: the original request headers
+        :param org_body: the original request body
+        """
+        if self.pagination_settings.pagination_type == PaginationType.URL and not self.next_url:
+            self.url = org_url
+        elif self.pagination_settings.pagination_type == PaginationType.BODY:
+            self.body = org_body
+        else:
+            self.headers = org_headers
+
     def _perform_pagination(self, res):
         """
         Performs pagination calls until reaches stop condition or the max allowed calls.
@@ -115,30 +179,14 @@ class ApiFetcher(BaseModel):
         logger.debug(f"Starting pagination for {self.name}")
         call_count = 0
         first_url = self.url
+        org_headers = self.headers
+        org_body = self.body
 
         while not self.pagination_settings.did_pagination_end(res, call_count):
 
-            if self.pagination_settings.pagination_type == PaginationType.URL:
-                new_url = self.pagination_settings.get_next_url(res, first_url)
-                if new_url:
-                    self.url = new_url
-                else:
-                    logger.debug(f"Stopping pagination due to issue with replacing the URL.")
-                    break
-            elif self.pagination_settings.pagination_type == PaginationType.BODY:
-                new_body = self._format_body(self.pagination_settings.get_next_body(res))
-                if new_body:
-                    self.body = new_body
-                else:
-                    logger.debug(f"Stopping pagination due to issue with replacing the Body.")
-                    break
-            elif self.pagination_settings.pagination_type == PaginationType.HEADERS:
-                new_headers = self.pagination_settings.get_next_headers(res)
-                if new_headers:
-                    self.headers = new_headers
-                else:
-                    logger.debug(f"Stopping pagination due to issue with replacing the Headers.")
-                    break
+            # Prepare the next call, if fails >> stop pagination
+            if not self._prepare_pagination_next_call(res, first_url):
+                break
 
             logger.debug(f"Sending pagination call {call_count + 1} for api {self.name} in path '{self.url}'")
             res = self._make_call()
@@ -149,6 +197,8 @@ class ApiFetcher(BaseModel):
                 break
 
             yield self._extract_data_from_path(res)
+
+        self._revert_pagination_changes(first_url, org_headers, org_body)
 
     def update_next_url(self, new_next_url):
         """

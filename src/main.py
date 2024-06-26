@@ -6,13 +6,13 @@ from logging.config import fileConfig
 from src.config.ConfigReader import ConfigReader
 from src.manager.TaskManager import TaskManager
 
-logger_config_path = "./src/utils/logging_config.ini"
-fetcher_config_path = "./src/shared/config.yaml"
+LOGGER_CONFIG_PATH = "./src/utils/logging_config.ini"
+FETCHER_CONFIG_PATH = "./src/shared/config.yaml"
 
 
 def __get_args():
     """
-    Gets config path and level arguments from the run command.
+    Gets the level arguments from the run command.
     :return: arguments
     """
     parser = argparse.ArgumentParser(description='Logzio API Fetcher')
@@ -21,34 +21,39 @@ def __get_args():
     return parser.parse_args()
 
 
-def _setup_logger(level):
+def _setup_logger(level, test):
     """
     Configures the logger and it's logging level.
     :param level: the logger logging level
     """
+    # If test, always set to debug
+    if test:
+        level = "DEBUG"
+
     # Update the level in the config file
-    logging_conf = configparser.RawConfigParser()
-    logging_conf.read(logger_config_path)
+    if level != "INFO":
+        logging_conf = configparser.RawConfigParser()
+        logging_conf.read(LOGGER_CONFIG_PATH)
 
-    logging_conf['logger_root']['level'] = level
-    logging_conf['handler_stream_handler']['level'] = level
+        logging_conf['logger_root']['level'] = level
+        logging_conf['handler_stream_handler']['level'] = level
 
-    with open(logger_config_path, 'w') as configfile:
-        logging_conf.write(configfile)
+        with open(LOGGER_CONFIG_PATH, 'w') as configfile:
+            logging_conf.write(configfile)
 
     # Load the config to the logger
-    fileConfig(logger_config_path, disable_existing_loggers=False)
+    fileConfig(LOGGER_CONFIG_PATH, disable_existing_loggers=False)
     logging.info(f'Starting Logzio API fetcher in {level} level.')
 
 
-def main():
+def main(conf_path=FETCHER_CONFIG_PATH, test=False):
     """
     Get args >> Configure logger >> Read config file >> Start API fetching and shipping task based on config
     """
     args = __get_args()
-    _setup_logger(args.level)
+    _setup_logger(args.level, test)
 
-    conf = ConfigReader(fetcher_config_path)
+    conf = ConfigReader(conf_path)
 
     if conf.api_instances:
         TaskManager(apis=conf.api_instances, logzio_shipper=conf.logzio_shipper).run()

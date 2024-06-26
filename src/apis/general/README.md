@@ -118,6 +118,6 @@ apis:
     next_url: https://url/for/any/request/after/first/?since={res.result.[0].sent}
 
 logzio:
-  url: https://listener-eu.logz.io:8071
+  url: https://listener-eu.logz.io:8071  # for us-east-1 region delete url param (default)
   token: <<SHIPPING_TOKEN>>
 ```
