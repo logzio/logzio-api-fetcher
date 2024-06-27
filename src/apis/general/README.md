@@ -18,7 +18,7 @@ For structuring custom API calls use type `general` API with the parameters belo
 | additional_fields  | Additional custom fields to add to the logs before sending to logzio                                                              | Optional          | Add `type` as `api-fetcher` |
 | scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                                              | Optional          | 1 (minute)                  |
 
-## Pagination configuration options
+## Pagination Configuration Options
 If needed, you can configure pagination.
 
 | Parameter Name   | Description                                                                                                                                      | Required/Optional                                  | Default |
@@ -41,8 +41,9 @@ If needed, you can configure pagination.
 
 ## Using Variables
 Using variables allows taking values from the response of the first request, to structure the request after it.  
-Mathematical operations `+` and `-` are supported, to add or reduce a number from the variable value.
-Use case examples:
+Mathematical operations `+` and `-` are supported, to add or reduce a number from the variable value.  
+
+Use case examples for variable usage:
 1. Update a date filter at every call
 2. Update a page number in pagination
 

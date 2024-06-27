@@ -13,12 +13,150 @@ docker pull logzio/logzio-api-fetcher
 ### Configuration
 Create a local config file `config.yaml`.  
 Configure your API inputs under `apis`. For every API, mention the input type under `type` field:
-- [General API](./src/apis/general/README.md) Configuration Options
-- [General OAuth](./src/apis/oauth/README.md) Configuration Options
-- [Azure Graph](./src/apis/azure/README.MD/#azure-graph) Configuration Options
-- [Azure Mail Reports](./src/apis/azure/README.MD/#azure-mail-reports) Configuration Options
-- [Azure General](./src/apis/azure/README.MD/#azure-general) Configuration Options
-- [Cloudflare](./src/apis/cloudflare/README.md) Configuration Options
+<details>
+  <summary>
+    <span><a href="./src/apis/general/README.md">General API</a></span>
+  </summary>
+For structuring custom API calls use type `general` API with the parameters below.
+
+## Configuration Options
+| Parameter Name     | Description                                                                                                                       | Required/Optional | Default                     |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| name               | Name of the API (custom name)                                                                                                     | Optional          | the defined `url`           |
+| url                | The request URL                                                                                                                   | Required          | -                           |
+| headers            | The request Headers                                                                                                               | Optional          | `{}`                        |
+| body               | The request body                                                                                                                  | Optional          | -                           |
+| method             | The request method (`GET` or `POST`)                                                                                              | Optional          | `GET`                       |
+| pagination         | Pagination settings if needed (see [options below](#pagination-configuration-options))                                            | Optional          | -                           |
+| next_url           | If needed to update the URL in next requests based on the last response. Supports using variables ([see below](#using-variables)) | Optional          | -                           |
+| response_data_path | The path to the data inside the response                                                                                          | Optional          | response root               |
+| additional_fields  | Additional custom fields to add to the logs before sending to logzio                                                              | Optional          | Add `type` as `api-fetcher` |
+| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                                              | Optional          | 1 (minute)                  |
+
+## Pagination Configuration Options
+If needed, you can configure pagination.
+
+| Parameter Name   | Description                                                                                                                                      | Required/Optional                                  | Default |
+|------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|---------|
+| type             | The pagination type (`url`, `body` or `headers`)                                                                                                 | Required                                           | -       |
+| url_format       | If pagination type is `url`, configure the URL format used for the pagination. Supports using variables ([see below](#using-variables)).         | Required if pagination type is `url`               | -       |
+| update_first_url | `True` or `False`; If pagination type is `url`, and it's required to append new params to the first request URL and not reset it completely.     | Optional if pagination type is `url`               | False   |
+| headers_format   | If pagination type is `headers`, configure the headers format used for the pagination. Supports using variables ([see below](#using-variables)). | Required if pagination type is `headers`           | -       |
+| body_format      | If pagination type is `body`, configure the body format used for the pagination. Supports using variables ([see below](#using-variables)).       | Required if pagination type is `body`              | -       |
+| stop_indication  | When should the pagination end based on the response. (see [options below](#pagination-stop-indication-configuration)).                          | Optional (if not defined will stop on `max_calls`) | -       |
+| max_calls        | Max calls that the pagination can make. (Supports up to 1000)                                                                                    | Optional                                           | 1000    |
+
+## Pagination Stop Indication Configuration
+
+| Parameter Name | Description                                                                             | Required/Optional                               | Default |
+|----------------|-----------------------------------------------------------------------------------------|-------------------------------------------------|---------|
+| field          | The name of the field in the response body, to search the stop indication at            | Required                                        | -       |
+| condition      | The stop condition (`empty`, `equals` or `contains`)                                    | Required                                        | -       |
+| value          | If condition is `equals` or `contains`, the value of the `field` that we should stop at | Required if condition is `equals` or `contains` | -       |
+
+
+</details>
+<details>
+  <summary>
+    <span><a href="./src/apis/oauth/README.md">OAuth API</a></span>
+  </summary>
+For structuring custom OAuth calls use type `oauth` API with the parameters below.
+
+## Configuration Options
+| Parameter Name    | Description                                                                                                                   | Required/Optional | Default                     |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| name              | Name of the API (custom name)                                                                                                 | Optional          | the defined `url`           |
+| token_request     | Nest here any detail relevant to the request to get the bearer access token. (Options in [General API](../general/README.md)) | Required          | -                           |
+| data_request      | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md))                           | Required          | -                           |
+| scrape_interval   | Time interval to wait between runs (unit: `minutes`)                                                                          | Optional          | 1 (minute)                  |
+| additional_fields | Additional custom fields to add to the logs before sending to logzio                                                          | Optional          | Add `type` as `api-fetcher` |
+
+</details>
+<details>
+  <summary>
+    <span><a href="./src/apis/azure/README.MD/#azure-graph">Azure Graph</a></span>
+  </summary>
+For Azure Graph, use type `azure_graph` with the below parameters.
+
+## Configuration Options
+| Parameter Name                 | Description                                                          | Required/Optional | Default           |
+|--------------------------------|----------------------------------------------------------------------|-------------------|-------------------|
+| name                           | Name of the API (custom name)                                        | Optional          | `azure api`       |
+| azure_ad_tenant_id             | The Azure AD Tenant id                                               | Required          | -                 |
+| azure_ad_client_id             | The Azure AD Client id                                               | Required          | -                 |
+| azure_ad_secret_value          | The Azure AD Secret value                                            | Required          | -                 |
+| date_filter_key                | The name of key to use for the date filter in the request URL params | Optional          | `createdDateTime` |
+| data_request.url               | The request URL                                                      | Required          | -                 |
+| data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio | Optional          | -                 |
+| days_back_fetch                | The amount of days to fetch back in the first request                | Optional          | 1 (day)           |
+| scrape_interval                | Time interval to wait between runs (unit: `minutes`)                 | Optional          | 1 (minute)        |
+
+</details>
+
+<details>
+  <summary>
+    <span><a href="./src/apis/azure/README.MD/#azure-mail-reports">Azure Mail Reports</a></span>
+  </summary>
+For Azure Mail Reports, use type `azure_mail_reports` with the below parameters.
+
+## Configuration Options
+| Parameter Name                 | Description                                                                 | Required/Optional | Default     |
+|--------------------------------|-----------------------------------------------------------------------------|-------------------|-------------|
+| name                           | Name of the API (custom name)                                               | Optional          | `azure api` |
+| azure_ad_tenant_id             | The Azure AD Tenant id                                                      | Required          | -           |
+| azure_ad_client_id             | The Azure AD Client id                                                      | Required          | -           |
+| azure_ad_secret_value          | The Azure AD Secret value                                                   | Required          | -           |
+| start_date_filter_key          | The name of key to use for the start date filter in the request URL params. | Optional          | `startDate` |
+| end_date_filter_key            | The name of key to use for the end date filter in the request URL params.   | Optional          | `EndDate`   |
+| data_request.url               | The request URL                                                             | Required          | -           |
+| data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio        | Optional          | -           |
+| days_back_fetch                | The amount of days to fetch back in the first request                       | Optional          | 1 (day)     |
+| scrape_interval                | Time interval to wait between runs (unit: `minutes`)                        | Optional          | 1 (minute)  |
+
+
+</details>
+<details>
+  <summary>
+    <span><a href="./src/apis/azure/README.MD/#azure-general">Azure General API</a></span>
+  </summary>
+For structuring custom general Azure API calls use type `azure_general` API with the parameters below.
+
+## Configuration Options
+| Parameter Name        | Description                                                                                         | Required/Optional | Default     |
+|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|-------------|
+| name                  | Name of the API (custom name)                                                                       | Optional          | `azure api` |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -           |
+| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -           |
+| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -           |
+| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -           |
+| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | 1 (day)     |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)  |
+
+</details>
+<details>
+  <summary>
+    <span><a href="./src/apis/cloudflare/README.md">Cloudflare</a></span>
+  </summary>
+For Cloudflare API, use type as `cloudflare`.  
+By default `cloudflare` API type:
+
+- has built in pagination settings
+- sets the `response_data_path` to `result` field.
+
+## Configuration Options
+| Parameter Name          | Description                                                                                                                                | Required/Optional | Default           |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------|-------------------|
+| name                    | Name of the API (custom name)                                                                                                              | Optional          | the defined `url` |
+| cloudflare_account_id   | The CloudFlare Account ID                                                                                                                  | Required          | -                 |
+| cloudflare_bearer_token | The Cloudflare Bearer token                                                                                                                | Required          | -                 |
+| url                     | The request URL                                                                                                                            | Required          | -                 |
+| next_url                | If needed to update the URL in next requests based on the last response. Supports using variables (see [General API](./general/README.md)) | Optional          | -                 |
+| additional_fields       | Additional custom fields to add to the logs before sending to logzio                                                                       | Optional          | -                 |
+| scrape_interval         | Time interval to wait between runs (unit: `minutes`)                                                                                       | Optional          | 1 (minute)        |
+| pagination_off          | True if builtin pagination should be off, False otherwise                                                                                  | Optional          | `False`           |
+
+</details>
+
 
 And your logzio output under `logzio`:
 
