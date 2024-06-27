@@ -17,6 +17,7 @@ Configure your API inputs under `apis`. For every API, mention the input type un
   <summary>
     <span><a href="./src/apis/general/README.md">General API</a></span>
   </summary>
+
 For structuring custom API calls use type `general` API with the parameters below.
 
 ## Configuration Options
@@ -47,12 +48,58 @@ If needed, you can configure pagination.
 | max_calls        | Max calls that the pagination can make. (Supports up to 1000)                                                                                    | Optional                                           | 1000    |
 
 ## Pagination Stop Indication Configuration
-
 | Parameter Name | Description                                                                             | Required/Optional                               | Default |
 |----------------|-----------------------------------------------------------------------------------------|-------------------------------------------------|---------|
 | field          | The name of the field in the response body, to search the stop indication at            | Required                                        | -       |
 | condition      | The stop condition (`empty`, `equals` or `contains`)                                    | Required                                        | -       |
 | value          | If condition is `equals` or `contains`, the value of the `field` that we should stop at | Required if condition is `equals` or `contains` | -       |
+
+## Using Variables
+Using variables allows taking values from the response of the first request, to structure the request after it.  
+Mathematical operations `+` and `-` are supported, in order to add or reduce a number from the variable value.  
+
+Use case examples for variable usage:
+1. Update a date filter at every call
+2. Update a page number in pagination
+
+To use variables:
+- Wrap the variable name in curly brackets
+- Provide the full path to that variable in the response
+- Add `res.` prefix to the path.
+
+Example: Say this is my response:
+```json
+{
+  "field": "value",
+  "another_field": {
+    "nested": 123
+  },
+  "num_arr": [1, 2, 3],
+  "obj_arr": [
+    {
+      "field2": 345
+    },
+    {
+      "field2": 567
+    }
+  ]
+}
+```
+Paths to fields values are structured like so:
+- `{res.field}` = `"value"`
+- `{res.another_field.nested}` = `123`
+- `{res.num_arr.[2]}` = `3`
+- `{res.obj_arr.[0].field2}` = `345`
+
+Using the fields values in the `next_url` for example like so:
+```Yaml
+next_url: https://logz.io/{res.field}/{res.obj_arr[0].field2}
+```
+Would update the URL at every call to have the value of the given fields from the response, in our example the url for the next call would be:
+```
+https://logz.io/value/345
+```
+And in the call after it, it would update again according to the response and the `next_url` structure, and so on.
 
 
 </details>
@@ -60,22 +107,24 @@ If needed, you can configure pagination.
   <summary>
     <span><a href="./src/apis/oauth/README.md">OAuth API</a></span>
   </summary>
+
 For structuring custom OAuth calls use type `oauth` API with the parameters below.
 
 ## Configuration Options
-| Parameter Name    | Description                                                                                                                   | Required/Optional | Default                     |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
-| name              | Name of the API (custom name)                                                                                                 | Optional          | the defined `url`           |
-| token_request     | Nest here any detail relevant to the request to get the bearer access token. (Options in [General API](../general/README.md)) | Required          | -                           |
-| data_request      | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md))                           | Required          | -                           |
-| scrape_interval   | Time interval to wait between runs (unit: `minutes`)                                                                          | Optional          | 1 (minute)                  |
-| additional_fields | Additional custom fields to add to the logs before sending to logzio                                                          | Optional          | Add `type` as `api-fetcher` |
+| Parameter Name    | Description                                                                                                                           | Required/Optional | Default                     |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| name              | Name of the API (custom name)                                                                                                         | Optional          | the defined `url`           |
+| token_request     | Nest here any detail relevant to the request to get the bearer access token. (Options in [General API](./src/apis/general/README.md)) | Required          | -                           |
+| data_request      | Nest here any detail relevant to the data request. (Options in [General API](./src/apis/general/README.md))                           | Required          | -                           |
+| scrape_interval   | Time interval to wait between runs (unit: `minutes`)                                                                                  | Optional          | 1 (minute)                  |
+| additional_fields | Additional custom fields to add to the logs before sending to logzio                                                                  | Optional          | Add `type` as `api-fetcher` |
 
 </details>
 <details>
   <summary>
     <span><a href="./src/apis/azure/README.MD/#azure-graph">Azure Graph</a></span>
   </summary>
+
 For Azure Graph, use type `azure_graph` with the below parameters.
 
 ## Configuration Options
@@ -97,6 +146,7 @@ For Azure Graph, use type `azure_graph` with the below parameters.
   <summary>
     <span><a href="./src/apis/azure/README.MD/#azure-mail-reports">Azure Mail Reports</a></span>
   </summary>
+
 For Azure Mail Reports, use type `azure_mail_reports` with the below parameters.
 
 ## Configuration Options
@@ -119,24 +169,26 @@ For Azure Mail Reports, use type `azure_mail_reports` with the below parameters.
   <summary>
     <span><a href="./src/apis/azure/README.MD/#azure-general">Azure General API</a></span>
   </summary>
+
 For structuring custom general Azure API calls use type `azure_general` API with the parameters below.
 
 ## Configuration Options
-| Parameter Name        | Description                                                                                         | Required/Optional | Default     |
-|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|-------------|
-| name                  | Name of the API (custom name)                                                                       | Optional          | `azure api` |
-| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -           |
-| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -           |
-| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -           |
-| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -           |
-| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | 1 (day)     |
-| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)  |
+| Parameter Name        | Description                                                                                                 | Required/Optional | Default     |
+|-----------------------|-------------------------------------------------------------------------------------------------------------|-------------------|-------------|
+| name                  | Name of the API (custom name)                                                                               | Optional          | `azure api` |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                                                                      | Required          | -           |
+| azure_ad_client_id    | The Azure AD Client id                                                                                      | Required          | -           |
+| azure_ad_secret_value | The Azure AD Secret value                                                                                   | Required          | -           |
+| data_request          | Nest here any detail relevant to the data request. (Options in [General API](./src/apis/general/README.md)) | Required          | -           |
+| days_back_fetch       | The amount of days to fetch back in the first request                                                       | Optional          | 1 (day)     |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                        | Optional          | 1 (minute)  |
 
 </details>
 <details>
   <summary>
     <span><a href="./src/apis/cloudflare/README.md">Cloudflare</a></span>
   </summary>
+
 For Cloudflare API, use type as `cloudflare`.  
 By default `cloudflare` API type:
 
