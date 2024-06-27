@@ -81,8 +81,12 @@ def _get_key_from_nested(next_item, key):
             next_item = None
 
     except AttributeError:
-        logger.debug(f"Failed to find '{key}' in response due to error.")
-        next_item = None
+        # Check if nested value is in a flattened object and extract it
+        try:
+            next_item = _get_key_from_nested(json.loads(next_item), key)
+        except json.decoder.JSONDecodeError:
+            logger.debug(f"Failed to find '{key}' in response due to error.")
+            next_item = None
     return next_item
 
 
