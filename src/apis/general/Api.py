@@ -231,7 +231,7 @@ class ApiFetcher(BaseModel):
             # Perform pagination
             if self.pagination_settings:
                 for data in self._perform_pagination(r):
-                    responses.extend(data)  # bug need to make it go through the extract data path
+                    responses.extend(data)
 
             # Update the url if needed
             if self.next_url:

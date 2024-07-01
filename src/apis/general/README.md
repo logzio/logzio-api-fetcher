@@ -76,11 +76,11 @@ Paths to fields values are structured like so:
 - `{res.num_arr.[2]}` = `3`
 - `{res.obj_arr.[0].field2}` = `345`
 
-Using the fields values in the `next_url` for example like so:
+Using the fields values in the `next_url` for example like the below:
 ```Yaml
 next_url: https://logz.io/{res.field}/{res.obj_arr[0].field2}
 ```
-Would update the URL at every call to have the value of the given fields from the response, in our example the url for the next call would be:
+Would update the URL at every call to have the value of the given fields from the response.  In our example the url for the next call would be:
 ```
 https://logz.io/value/345
 ```
@@ -100,7 +100,7 @@ apis:
           }
     method: POST
     additional_fields:
-      type: my fetcher
+      type: my_fetcher
       another_field: 123
     pagination:
       type: url

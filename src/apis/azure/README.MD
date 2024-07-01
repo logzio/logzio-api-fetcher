@@ -21,6 +21,7 @@ Below fields are relevant for **all Azure API types**
 | scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)  |
 
 ## Azure Graph
+By default `azure_graph` API type has built in pagination settings and sets the `response_data_path` to `value` field.  
 The below fields are relevant **in addition** to the required ones listed under Azure General.
 
 | Parameter Name                 | Description                                                          | Required/Optional | Default           |
@@ -30,6 +31,7 @@ The below fields are relevant **in addition** to the required ones listed under 
 | data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio | Optional          | -                 |
 
 ## Azure Mail Reports
+By default `azure_mail_reports` API type has built in pagination settings and sets the `response_data_path` to `d.results` field.  
 The below fields are relevant **in addition** to the required ones listed under Azure General.
 
 | Parameter Name                 | Description                                                                 | Required/Optional | Default     |

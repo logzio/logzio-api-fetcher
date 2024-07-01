@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from pydantic import ValidationError
 import yaml
@@ -49,9 +48,9 @@ class ConfigReader:
             logger.debug(f"Reading config file {conf_file}")
             with open(conf_file, "r") as conf:
                 return yaml.safe_load(conf)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             logger.error(f"Did not find file {conf_file}.")
-        except PermissionError as e:
+        except PermissionError:
             logger.error(f"Missing read permission for file {conf_file}.")
         except Exception as e:
             logger.error(f"Failed to read config from path {conf_file} due to error {e}.")
