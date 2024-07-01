@@ -1,0 +1,36 @@
+{
+  "result": [
+    {
+      "id": "some-id",
+      "name": "Spike in Security Events - Blocked Requests",
+      "description": "Sent within two hours of the spike in events being detected ",
+      "alert_body": "{\"field\": 123}",
+      "alert_type": "clickhouse_alert_fw_anomaly",
+      "mechanism": "some-id@upstream.opsgenie.net",
+      "mechanism_type": "email",
+      "policy_id": "policy-id",
+      "sent": "2024-05-24T03:22:45.410294Z"
+    },
+    {
+      "id": "some-id-2",
+      "name": "Spike in Security Events - Allowed Requests",
+      "description": "Sent within two hours of the spike in events being detected",
+      "alert_body": "{\"field2\":\"value\"}",
+      "alert_type": "clickhouse_alert_fw_anomaly",
+      "mechanism": "some-id@upstream.opsgenie.net",
+      "mechanism_type": "email",
+      "policy_id": "policy-id",
+      "sent": "2024-05-21T10:07:23.522451Z"
+    }
+  ],
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result_info": {
+    "page": 1,
+    "per_page": 25,
+    "count": 25,
+    "total_count": 2,
+    "total_pages": 1
+  }
+}

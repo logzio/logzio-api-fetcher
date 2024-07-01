@@ -1,6 +1,20 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 WORKDIR /app
-COPY /src ./src
+
+# python settings
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install dependencies
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set user as non root
+RUN chown nobody:nogroup /app
+USER nobody
+
+# Copy the program to /src
+COPY --chown=nobody:nogroup /src ./src
+
+# Run the program
 ENTRYPOINT ["python", "-m", "src.main"]
