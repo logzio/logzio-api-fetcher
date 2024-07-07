@@ -47,5 +47,5 @@ class TestCloudflareApi(unittest.TestCase):
         # Test sending request
         results = a.send_request()
 
-        self.assertEqual(a.url, "https://api.cloudflare.com/client/v4/accounts/abcd-efg/alerting/v3/history?since=2024-05-24T03:22:45.410294Z")
+        self.assertEqual(a.url, "https://api.cloudflare.com/client/v4/accounts/abcd-efg/alerting/v3/history?since=2024-05-24T03:22:46.410294Z")
         self.assertEqual(results, res.get("result"))
