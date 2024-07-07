@@ -10,6 +10,7 @@ By default `cloudflare` API type has built in pagination settings and sets the `
 | url                     | The request URL                                                                                                                             | Required          | -                 |
 | next_url                | If needed to update the URL in next requests based on the last response. Supports using variables (see [General API](../general/README.md)) | Optional          | -                 |
 | additional_fields       | Additional custom fields to add to the logs before sending to logzio                                                                        | Optional          | -                 |
+| days_back_fetch         | The amount of days to fetch back in the first request. Applies a filter on `since` parameter.                                               | Optional          | -                 |
 | scrape_interval         | Time interval to wait between runs (unit: `minutes`)                                                                                        | Optional          | 1 (minute)        |
 | pagination_off          | True if builtin pagination should be off, False otherwise                                                                                   | Optional          | `False`           |
 
@@ -20,8 +21,9 @@ apis:
     type: cloudflare
     cloudflare_account_id: <<CLOUDFLARE_ACCOUNT_ID>>
     cloudflare_bearer_token: <<CLOUDFLARE_BEARER_TOKEN>>
-    url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since=2024-05-21T04:06:20.522451Z
+    url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history
     next_url: https://api.cloudflare.com/client/v4/accounts/{account_id}/alerting/v3/history?since={res.result.[0].sent}
+    days_back_fetch: 7
     scrape_interval: 5
     additional_fields:
       type: cloudflare
