@@ -236,6 +236,7 @@ logzio:
 ```
 
 ### Run The Docker Container
+In the path where you saved your `config.yaml`, run:
 ```shell
 docker run --name logzio-api-fetcher \
 -v "$(pwd)":/app/src/shared \
