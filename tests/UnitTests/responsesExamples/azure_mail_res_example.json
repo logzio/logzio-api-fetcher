@@ -1,0 +1,25 @@
+{
+    "d": {
+        "results": [
+            {
+                "__metadata": {
+                    "id": "https://reports.office365.com/ecp/ReportingWebService/Reporting.svc/MessageTrace(1)",
+                    "uri": "https://reports.office365.com/ecp/ReportingWebService/Reporting.svc/MessageTrace(1)",
+                    "type": "TenantReporting.MessageTrace"
+                },
+                "Organization": "examplecorp.onmicrosoft.com",
+                "MessageId": "<3a273efc-cd65-4335-96ec-5f6934f0fb10@az.uksouth.production.microsoft.com>",
+                "Received": "2024-05-28T13:08:54Z",
+                "SenderAddress": "azure-noreply@microsoft.com",
+                "RecipientAddress": "foo.bar@example.corp",
+                "Subject": "PIM: MessageTrace API service account has the Privileged Role Administrator role",
+                "Status": "GettingStatus",
+                "ToIP": null,
+                "FromIP": "1.1.1.1",
+                "StartDate": "2024-05-28T13:08:54Z",
+                "EndDate": "2024-05-30T13:08:54Z"
+            }
+        ],
+        "@odata.nextLink": "https://reports.office365.com/ecp/ReportingWebService/Reporting.svc/MessageTrace?$skiptoken=abc123"
+    }
+}
