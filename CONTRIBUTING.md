@@ -45,19 +45,19 @@ Or if you prefer, you can [open an issue on GitHub](https://github.com/logzio/lo
 
 
 ### Code Contributions
-1. Checkout a new branch
-2. Make your changes
-3. Build the docker image locally to test your changes
-4. Push your changes and open a new PR 
+1. Checkout a new branch following the naming convention: `bugfix/<issue>` or `feature/<name>`.
+2. Make your changes.
+3. Build the docker image locally to test your changes.
+4. Push your changes and open a new PR.
 
 ### Improving The Documentation
 You can either:
 1. Reach out to Logz.io Support team using the chat icon located in the bottom-right corner of your Logz.io account.
 2. [Open an issue on GitHub](https://github.com/logzio/logzio-api-fetcher/issues/new), and our team will address it as soon as possible.
-3. Open a PR with the needed changes
-   - Checkout a new branch
-   - Make your changes
-   -  Push your changes and open a new PR 
+3. Open a PR with the needed changes.
+   - Checkout a new branch following the naming convention: `doc/<topic>`.
+   - Make your changes.
+   -  Push your changes and open a new PR.
 
 ## Attribution
 This guide is based on the **contributing-gen** ❤️ [Make your own](https://github.com/bttger/contributing-gen)!
