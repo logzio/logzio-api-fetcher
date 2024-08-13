@@ -1,6 +1,6 @@
 # Contributing to Logz.io API Fetcher
 
-First off all, thank you for taking the time to contribute! 💛
+First of all, thank you for taking the time to contribute! 💛
 
 All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them.  
 Please make sure to read the relevant section before making your contribution.
@@ -47,14 +47,14 @@ Or if you prefer, you can [open an issue on GitHub](https://github.com/logzio/lo
 ### Code Contributions
 1. Checkout a new branch
 2. Make your changes
-3. Build the docker image locally to test your chanegs
+3. Build the docker image locally to test your changes
 4. Push your changes and open a new PR 
 
 ### Improving The Documentation
 You can either:
 1. Reach out to Logz.io Support team using the chat icon located in the bottom-right corner of your Logz.io account.
 2. [Open an issue on GitHub](https://github.com/logzio/logzio-api-fetcher/issues/new), and our team will address it as soon as possible.
-3. Open a PR with the needeed changes
+3. Open a PR with the needed changes
    - Checkout a new branch
    - Make your changes
    -  Push your changes and open a new PR 
