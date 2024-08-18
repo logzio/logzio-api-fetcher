@@ -18,7 +18,7 @@ By default `1password` API type has built in pagination settings and sets the `r
 ## Example
 ```Yaml
 apis:
-  - name: 1Password test
+  - name: 1Password example
     type: 1password
     onepassword_bearer_token: <<1PASSWORD_BEARER_TOKEN>>
     url: https://events.1password.com/api/v1/auditevents
