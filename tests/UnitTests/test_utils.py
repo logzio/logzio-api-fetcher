@@ -86,6 +86,7 @@ class TestUtilsFunctions(unittest.TestCase):
         no_vars = "just a string with no vars"
         not_valid_vars = "{field}! just testing {res.obj_arr[2].f1}"
         empty_val_throw_error = "can also handle {res.none}!"
+        flattened_obj = "{\"limit\": 100, \"start_time\": \"{res.obj_arr.[1].f2}\"}"
 
         # Assert they behave as expected
         self.assertEqual(substitute_vars(valid_vars, extract_vars(valid_vars), test_dic),
@@ -96,3 +97,5 @@ class TestUtilsFunctions(unittest.TestCase):
             substitute_vars(empty_val_throw_error, extract_vars(empty_val_throw_error), test_dic)
 
         self.assertEqual(substitute_vars(no_vars, extract_vars(no_vars), test_dic), no_vars)
+        self.assertEqual(substitute_vars(flattened_obj, extract_vars(flattened_obj), test_dic),
+                         "{\"limit\": 100, \"start_time\": \"abc\"}")

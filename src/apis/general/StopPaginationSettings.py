@@ -1,6 +1,7 @@
 from enum import Enum
 import logging
 from pydantic import BaseModel, Field, model_validator
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class StopPaginationSettings(BaseModel):
     """
     field: str
     condition: StopCondition
-    value: str = Field(default=None, frozen=True)
+    value: Union[str, int, bool] = Field(default=None, frozen=True)
 
     @model_validator(mode='after')
     def _check_conditional_fields(self):
@@ -32,7 +33,7 @@ class StopPaginationSettings(BaseModel):
         if we got condition as 'contains' or 'equals' >> that we also got value
         :return: self
         """
-        if self.condition in (StopCondition.EQUALS, StopCondition.CONTAINS) and not self.value:
+        if self.condition in (StopCondition.EQUALS, StopCondition.CONTAINS) and self.value is None:
             raise ValueError(f"Used stop condition {self.condition} but missing required 'value' field.")
         return self
 

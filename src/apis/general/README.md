@@ -5,18 +5,19 @@ For structuring custom API calls use type `general` API with the parameters belo
 - [Example](#example)
 
 ## Configuration
-| Parameter Name     | Description                                                                                                                       | Required/Optional | Default                     |
-|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
-| name               | Name of the API (custom name)                                                                                                     | Optional          | the defined `url`           |
-| url                | The request URL                                                                                                                   | Required          | -                           |
-| headers            | The request Headers                                                                                                               | Optional          | `{}`                        |
-| body               | The request body                                                                                                                  | Optional          | -                           |
-| method             | The request method (`GET` or `POST`)                                                                                              | Optional          | `GET`                       |
-| pagination         | Pagination settings if needed (see [options below](#pagination-configuration-options))                                            | Optional          | -                           |
-| next_url           | If needed to update the URL in next requests based on the last response. Supports using variables ([see below](#using-variables)) | Optional          | -                           |
-| response_data_path | The path to the data inside the response                                                                                          | Optional          | response root               |
-| additional_fields  | Additional custom fields to add to the logs before sending to logzio                                                              | Optional          | Add `type` as `api-fetcher` |
-| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                                              | Optional          | 1 (minute)                  |
+| Parameter Name     | Description                                                                                                                           | Required/Optional | Default                     |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------|
+| name               | Name of the API (custom name)                                                                                                         | Optional          | the defined `url`           |
+| url                | The request URL                                                                                                                       | Required          | -                           |
+| headers            | The request Headers                                                                                                                   | Optional          | `{}`                        |
+| body               | The request body                                                                                                                      | Optional          | -                           |
+| method             | The request method (`GET` or `POST`)                                                                                                  | Optional          | `GET`                       |
+| pagination         | Pagination settings if needed (see [options below](#pagination-configuration-options))                                                | Optional          | -                           |
+| next_url           | If needed to update the URL in the next request based on the last response. Supports using variables ([see below](#using-variables))  | Optional          | -                           |
+| next_body          | If needed to update the body in the next request based on the last response. Supports using variables ([see below](#using-variables)) | Optional          | -                           |
+| response_data_path | The path to the data inside the response                                                                                              | Optional          | response root               |
+| additional_fields  | Additional custom fields to add to the logs before sending to logzio                                                                  | Optional          | Add `type` as `api-fetcher` |
+| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                                                                  | Optional          | 1 (minute)                  |
 
 ## Pagination Configuration Options
 If needed, you can configure pagination.
