@@ -3,7 +3,7 @@ import json
 import logging
 from pydantic import BaseModel, Field
 import requests
-from typing import Union
+from typing import Union, Optional
 
 from src.utils.processing_functions import extract_vars, substitute_vars
 from src.apis.general.PaginationSettings import PaginationSettings, PaginationType
@@ -30,31 +30,37 @@ class ApiFetcher(BaseModel):
     :param method: Optional, the method to use for the request (default: GET)
     :param pagination_settings: Optional, PaginationSettings object that defines how to perform pagination
     :param next_url: Optional, If needed update a param in the url according to the response as we go
+    :param next_body: Optional, If needed update a param in the body according to the response as we go
     :param response_data_path: Optional, The path to find the data within the response.
     :param additional_fields: Optional, 'key: value' pairs that should be added to the API logs.
     :param scrape_interval_minutes: the interval between scraping jobs.
     :param url_vars: Not passed to the class, array of params that is generated based on next_url.
+    :param body_vars: Not passed to the class, array of params that is generated based on next_body.
     """
     name: str = Field(default="")
     url: str
     headers: dict = Field(default={})
     body: Union[str, dict, list] = Field(default=None)
     method: ReqMethod = Field(default=ReqMethod.GET, frozen=True)
-    pagination_settings: PaginationSettings = Field(default=None, frozen=True, alias="pagination")
+    pagination_settings: Optional[PaginationSettings] = Field(default=None, frozen=True, alias="pagination")
     next_url: str = Field(default=None)
+    next_body: Union[str, dict, list] = Field(default=None)
     response_data_path: str = Field(default=None, frozen=True)
     additional_fields: dict = Field(default={})
     scrape_interval_minutes: int = Field(default=1, alias="scrape_interval", ge=1)
     url_vars: list = Field(default=[], init=False, init_var=True)
+    body_vars: list = Field(default=[], init=False, init_var=True)
 
     def __init__(self, **data):
         """
-        Makes sure to format the body and generate the url_vars based on next_url.
+        Makes sure to format the body and generate the url_vars based on next_url and body_vars based on next_body.
         :param data: the fields for creation of the class.
         """
         super().__init__(**data)
         self.body = self._format_body(self.body)
+        self.next_body = self._format_body(self.next_body)
         self.url_vars = extract_vars(self.next_url)
+        self.body_vars = extract_vars(self.next_body)
         if not self.name:
             self.name = self.url
         if not self.additional_fields.get("type"):
@@ -208,6 +214,14 @@ class ApiFetcher(BaseModel):
         self.next_url = new_next_url
         self.url_vars = extract_vars(self.next_url)
 
+    def update_next_body(self, new_next_body):
+        """
+        Supports updating the next request body format to make sure the 'self.body_vars' is updated accordingly.
+        :param new_next_body: new format for the next body. (if in future some customized APIs will need it supported)
+        """
+        self.next_body = new_next_body
+        self.body_vars = extract_vars(self.next_body)
+
     def send_request(self):
         """
         Manages the request:
@@ -236,4 +250,8 @@ class ApiFetcher(BaseModel):
             # Update the url if needed
             if self.next_url:
                 self.url = substitute_vars(self.next_url, self.url_vars, r)
+
+            # Update the body if needed
+            if self.next_body:
+                self.body = substitute_vars(self.next_body, self.body_vars, r)
         return responses
