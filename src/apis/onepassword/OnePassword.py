@@ -24,10 +24,7 @@ class OnePassword(ApiFetcher):
 
     def __init__(self, **data):
         # Initialize 1Password limit for number of events to return in a single request
-        if not data.get('onepassword_limit'):
-            limit = 100
-        else:
-            limit = data.pop('onepassword_limit')
+        limit = data.pop('onepassword_limit', 100)
 
         # Configure the request
         res_data_path = "items"
@@ -65,8 +62,11 @@ class OnePassword(ApiFetcher):
             new_body.update(start_time_field)
             self.body = json.dumps(new_body)
         except json.decoder.JSONDecodeError:
-            logger.error(f"Failed to update 'start_time' filter in the request body: {self.body}. Sending request with "
-                         f"no date filter.")
+            logger.error(f"Failed to update 'start_time' filter in the request body: {self.body}. Sending {self.name} "
+                         f"request with no date filter.")
+        except TypeError:
+            logger.error(f"Got unexpected request body parameter. Please make sure the {self.name} API request body is "
+                         f"a valid json.")
 
     def send_request(self):
         """
