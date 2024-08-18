@@ -14,7 +14,7 @@ class OnePassword(ApiFetcher):
     """
     :param onepassword_bearer_token: The cloudflare Bearer token
     :param pagination_off: True if pagination should be off, False otherwise
-    :param days_back_fetch: Amount of days to fetch back in the first request, Optional (adds a filter on 'since')
+    :param days_back_fetch: Amount of days to fetch back in the first request, Optional (adds a filter on 'start_time')
     :param onepassword_limit: 1Password limit for number of events to return in a single request (for pagination)
     """
     onepassword_bearer_token: str = Field(frozen=True)
