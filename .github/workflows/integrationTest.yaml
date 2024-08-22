@@ -25,14 +25,8 @@ jobs:
         run: |
           PYTHONPATH=. python3 ./tests/IntegrationTests/test_shipping.py &
           echo $! > script_pid.txt
-      - name: Wait 30s
-        run: sleep 30
-      - name: Kill api fetcher
-        run: |
-          kill -9 $(cat script_pid.txt)
-          rm script_pid.txt
-      - name: Wait 1m, to allow logs to get processed and indexed in logzio
-        run: sleep 60
+      - name: Wait, to allow logs to get processed and indexed in logzio
+        run: sleep 120
       - name: Check Logzio for logs
         env:
           LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
