@@ -49,11 +49,17 @@ class TestAzureApi(unittest.TestCase):
                         &grant_type=client_credentials
                         """
 
+        expected_token_body2 = """client_id=some-client
+                        &scope=https://outlook.office365.com/.default
+                        &client_secret=some-secret
+                        &grant_type=client_credentials
+                        """
+
         # Validate the token request
         self.assertEqual(ag.token_request.url, "https://login.microsoftonline.com/some-tenant/oauth2/v2.0/token")
         self.assertEqual(am.token_request.url, "https://login.microsoftonline.com/some-tenant/oauth2/v2.0/token")
         self.assertEqual(ag.token_request.body, expected_token_body)
-        self.assertEqual(am.token_request.body, expected_token_body)
+        self.assertEqual(am.token_request.body, expected_token_body2)
 
         # Validate the data request URL was updated
         self.assertIn("https://azure-graph?$filter=createdDateTime gt", ag.data_request.url)
@@ -64,7 +70,7 @@ class TestAzureApi(unittest.TestCase):
         self.assertEqual("https://azure-graph?$filter=createdDateTime gt {res.value.[0].createdDateTime}",
                          ag.data_request.next_url)
         self.assertEqual(
-            "https://azure-mail?$filter=StartDate eq datetime '{res.d.results.[0].EndDate}' and EndDate eq datetime 'NOW_DATE'",
+            "https://azure-mail?$filter=StartDate eq datetime'{res.d.results.[0].EndDate}' and EndDate eq datetime'NOW_DATE'&$format=json",
             am.data_request.next_url)
 
     def test_start_date_generator(self):
@@ -159,4 +165,4 @@ class TestAzureApi(unittest.TestCase):
 
             self.assertEqual(result, data_res_body.get("d").get("results"))
             self.assertEqual(a.data_request.url,
-                             "https://reports.office365.com/ecp/reportingwebservice/reporting.svc/MessageTrace?$filter=StartDate eq datetime '2024-05-30T13:08:54Z' and EndDate eq datetime 'NOW_DATE'")
+                             "https://reports.office365.com/ecp/reportingwebservice/reporting.svc/MessageTrace?$filter=StartDate eq datetime'2024-05-30T13:08:54Z' and EndDate eq datetime'NOW_DATE'&$format=json")
