@@ -285,6 +285,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **0.2.2**:
+  - Resolve Azure mail reports bug
 - **0.2.1**:
   - Add 1Password Support
   - Add `next_body` support to allow more customization in general settings

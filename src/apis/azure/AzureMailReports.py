@@ -28,6 +28,7 @@ class AzureMailReports(AzureApi):
                                       stop_indication=StopPaginationSettings(field="d.results",
                                                                              condition="empty")),
                                   response_data_path="d.results")
+        data["scope"] = "https://outlook.office365.com/.default"
         super().__init__(data_request=data_request, **data)
 
         # Structure the next URL format, to automatically update start date.
@@ -44,15 +45,15 @@ class AzureMailReports(AzureApi):
         https://url/from/input?$filter=StartDate eq datetime '2024-05-28T13:08:54Z' and EndDate eq datetime '2024-05-29T13:08:54Z'
         """
         self.data_request.url = (self.data_request.next_url
-                                 .replace(f"{{res.value.[0].{self.end_date_filter_key}}}", fetch_start_date)
+                                 .replace(f"{{res.d.results.[0].{self.end_date_filter_key}}}", fetch_start_date)
                                  .replace("NOW_DATE", fetch_end_date))
 
     def _initialize_next_url(self):
         """
         initializing the data request next url to be in format:
-         https://url/from/input?$filter=StartDate eq datetime '{res.d.results.[0].EndDate}' and EndDate eq datetime 'NOW_DATE'
+         https://url/from/input?$filter=StartDate eq datetime'{res.d.results.[0].EndDate}' and EndDate eq datetime'NOW_DATE'
         """
-        new_next_url = self.data_request.url + f"?$filter={self.date_filter_key} eq datetime '{{res.d.results.[0].{self.end_date_filter_key}}}' and {self.end_date_filter_key} eq datetime 'NOW_DATE'"
+        new_next_url = self.data_request.url + f"?$filter={self.date_filter_key} eq datetime'{{res.d.results.[0].{self.end_date_filter_key}}}' and {self.end_date_filter_key} eq datetime'NOW_DATE'&$format=json"
         self.data_request.update_next_url(new_next_url)
 
     @staticmethod

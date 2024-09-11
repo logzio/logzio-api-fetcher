@@ -23,10 +23,12 @@ class AzureApi(OAuthApi):
     date_filter_key: str = Field(default="createdDateTime")
 
     def __init__(self, **data):
+        scope = data.pop('scope', "https://graph.microsoft.com/.default")
+
         token_request = ApiFetcher(
             url=f"https://login.microsoftonline.com/{data.get('azure_ad_tenant_id')}/oauth2/v2.0/token",
             body=f"""client_id={data.get('azure_ad_client_id')}
-                        &scope=https://graph.microsoft.com/.default
+                        &scope={scope}
                         &client_secret={data.get('azure_ad_secret_value')}
                         &grant_type=client_credentials
                         """,
