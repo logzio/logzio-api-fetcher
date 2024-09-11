@@ -10,15 +10,16 @@ Configuration [example here](#example).
 ## Azure General
 Below fields are relevant for **all Azure API types**
 
-| Parameter Name        | Description                                                                                         | Required/Optional | Default     |
-|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|-------------|
-| name                  | Name of the API (custom name)                                                                       | Optional          | `azure api` |
-| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -           |
-| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -           |
-| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -           |
-| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -           |
-| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | 1 (day)     |
-| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)  |
+| Parameter Name        | Description                                                                                         | Required/Optional | Default                                                  |
+|-----------------------|-----------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------|
+| name                  | Name of the API (custom name)                                                                       | Optional          | `azure api`                                              |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                                                              | Required          | -                                                        |
+| azure_ad_client_id    | The Azure AD Client id                                                                              | Required          | -                                                        |
+| azure_ad_secret_value | The Azure AD Secret value                                                                           | Required          | -                                                        |
+| data_request          | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md)) | Required          | -                                                        |
+| scope                 | The specific permissions an application is requesting during a token request.                       | Optional          | Azure graph scope `https://graph.microsoft.com/.default` |
+| days_back_fetch       | The amount of days to fetch back in the first request                                               | Optional          | 1 (day)                                                  |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                | Optional          | 1 (minute)                                               |
 
 ## Azure Graph
 By default `azure_graph` API type has built in pagination settings and sets the `response_data_path` to `value` field.  
