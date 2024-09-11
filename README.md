@@ -129,17 +129,17 @@ For structuring custom OAuth calls use type `oauth` API with the parameters belo
 For Azure Graph, use type `azure_graph` with the below parameters.
 
 ## Configuration Options
-| Parameter Name                 | Description                                                          | Required/Optional | Default           |
-|--------------------------------|----------------------------------------------------------------------|-------------------|-------------------|
-| name                           | Name of the API (custom name)                                        | Optional          | `azure api`       |
-| azure_ad_tenant_id             | The Azure AD Tenant id                                               | Required          | -                 |
-| azure_ad_client_id             | The Azure AD Client id                                               | Required          | -                 |
-| azure_ad_secret_value          | The Azure AD Secret value                                            | Required          | -                 |
-| date_filter_key                | The name of key to use for the date filter in the request URL params | Optional          | `createdDateTime` |
-| data_request.url               | The request URL                                                      | Required          | -                 |
-| data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio | Optional          | -                 |
-| days_back_fetch                | The amount of days to fetch back in the first request                | Optional          | 1 (day)           |
-| scrape_interval                | Time interval to wait between runs (unit: `minutes`)                 | Optional          | 1 (minute)        |
+| Parameter Name        | Description                                                          | Required/Optional | Default           |
+|-----------------------|----------------------------------------------------------------------|-------------------|-------------------|
+| name                  | Name of the API (custom name)                                        | Optional          | `azure api`       |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                               | Required          | -                 |
+| azure_ad_client_id    | The Azure AD Client id                                               | Required          | -                 |
+| azure_ad_secret_value | The Azure AD Secret value                                            | Required          | -                 |
+| date_filter_key       | The name of key to use for the date filter in the request URL params | Optional          | `createdDateTime` |
+| data_request.url      | The request URL                                                      | Required          | -                 |
+| additional_fields     | Additional custom fields to add to the logs before sending to logzio | Optional          | -                 |
+| days_back_fetch       | The amount of days to fetch back in the first request                | Optional          | 1 (day)           |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                 | Optional          | 1 (minute)        |
 
 </details>
 
@@ -151,18 +151,18 @@ For Azure Graph, use type `azure_graph` with the below parameters.
 For Azure Mail Reports, use type `azure_mail_reports` with the below parameters.
 
 ## Configuration Options
-| Parameter Name                 | Description                                                                 | Required/Optional | Default     |
-|--------------------------------|-----------------------------------------------------------------------------|-------------------|-------------|
-| name                           | Name of the API (custom name)                                               | Optional          | `azure api` |
-| azure_ad_tenant_id             | The Azure AD Tenant id                                                      | Required          | -           |
-| azure_ad_client_id             | The Azure AD Client id                                                      | Required          | -           |
-| azure_ad_secret_value          | The Azure AD Secret value                                                   | Required          | -           |
-| start_date_filter_key          | The name of key to use for the start date filter in the request URL params. | Optional          | `startDate` |
-| end_date_filter_key            | The name of key to use for the end date filter in the request URL params.   | Optional          | `EndDate`   |
-| data_request.url               | The request URL                                                             | Required          | -           |
-| data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio        | Optional          | -           |
-| days_back_fetch                | The amount of days to fetch back in the first request                       | Optional          | 1 (day)     |
-| scrape_interval                | Time interval to wait between runs (unit: `minutes`)                        | Optional          | 1 (minute)  |
+| Parameter Name        | Description                                                                 | Required/Optional | Default     |
+|-----------------------|-----------------------------------------------------------------------------|-------------------|-------------|
+| name                  | Name of the API (custom name)                                               | Optional          | `azure api` |
+| azure_ad_tenant_id    | The Azure AD Tenant id                                                      | Required          | -           |
+| azure_ad_client_id    | The Azure AD Client id                                                      | Required          | -           |
+| azure_ad_secret_value | The Azure AD Secret value                                                   | Required          | -           |
+| start_date_filter_key | The name of key to use for the start date filter in the request URL params. | Optional          | `startDate` |
+| end_date_filter_key   | The name of key to use for the end date filter in the request URL params.   | Optional          | `EndDate`   |
+| data_request.url      | The request URL                                                             | Required          | -           |
+| additional_fields     | Additional custom fields to add to the logs before sending to logzio        | Optional          | -           |
+| days_back_fetch       | The amount of days to fetch back in the first request                       | Optional          | 1 (day)     |
+| scrape_interval       | Time interval to wait between runs (unit: `minutes`)                        | Optional          | 1 (minute)  |
 
 
 </details>
@@ -181,6 +181,7 @@ For structuring custom general Azure API calls use type `azure_general` API with
 | azure_ad_client_id    | The Azure AD Client id                                                                                      | Required          | -           |
 | azure_ad_secret_value | The Azure AD Secret value                                                                                   | Required          | -           |
 | data_request          | Nest here any detail relevant to the data request. (Options in [General API](./src/apis/general/README.md)) | Required          | -           |
+| additional_fields     | Additional custom fields to add to the logs before sending to logzio                                        | Optional          | -           |
 | days_back_fetch       | The amount of days to fetch back in the first request                                                       | Optional          | 1 (day)     |
 | scrape_interval       | Time interval to wait between runs (unit: `minutes`)                                                        | Optional          | 1 (minute)  |
 
