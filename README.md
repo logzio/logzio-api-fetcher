@@ -232,6 +232,29 @@ By default `1password` API type has built in pagination settings and sets the `r
 
 </details>
 
+<details>
+  <summary>
+    <span><a href="./src/apis/dockerhub/README.md">Dockerhub</a></span>
+  </summary>
+
+For dockerhub audit logs, use type `dockerhub` with the below parameters.
+
+## Configuration Options
+| Parameter Name     | Description                                                                               | Required/Optional | Default           |
+|--------------------|-------------------------------------------------------------------------------------------|-------------------|-------------------|
+| name               | Name of the API (custom name)                                                             | Optional          | the defined `url` |
+| dockerhub_user     | DockerHub username                                                                        | Required          | -                 |
+| dockerhub_token    | DockerHub personal access token or password                                               | Required          | -                 |
+| url                | The request URL                                                                           | Required          | -                 |
+| next_url           | URL for the next page of results (used for pagination)                                    | Optional          | -                 |
+| method             | The request method (`GET` or `POST`)                                                      | Optional          | `GET`             |
+| days_back_fetch    | The amount of days to fetch back in the first request. Adds a filter on `from` parameter. | Optional          | 1                 |
+| scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                      | Optional          | 1 (minute)        |
+| additional_fields  | Additional custom fields to add to the logs before sending to logzio                      | Optional          | -                 |
+
+
+</details>
+
 
 And your logzio output under `logzio`:
 
@@ -285,6 +308,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **0.3.0**:
+  - Add support for dockerhub audit logs
 - **0.2.2**:
   - Resolve Azure mail reports bug
 - **0.2.1**:
