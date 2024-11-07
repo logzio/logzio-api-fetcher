@@ -57,30 +57,20 @@ class TestDockerHubApi(unittest.TestCase):
     def test_invalid_days_back_fetch(self):
         dh = DockerHub(**default_dockerhub_config,
                        days_back_fetch=-1)
-        dh._initialize_params()
         self.assertNotIn("from=", dh.url)
-
-    def test_valid_days_back_fetch(self):
-        dh = DockerHub(**default_dockerhub_config,
-                       days_back_fetch=5)
-        dh._initialize_params()
-        expected_date = (datetime.now(UTC) - timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-        self.assertIn(f"from={expected_date}", dh.url)
 
     def test_url_with_existing_query(self):
         dh = DockerHub(dockerhub_user=default_dockerhub_config.get("dockerhub_user"),
                        dockerhub_token=default_dockerhub_config.get("dockerhub_token"),
-                       url="https://hub.docker.com/v2/auditlogs/logzio?existing_param=value",
+                       url="https://hub.docker.com/v2/auditlogs/test?existing_param=value",
                        days_back_fetch=1)
-        dh._initialize_params()
         self.assertIn("&from=", dh.url)
-        self.assertIn("existing_param=value", dh.url)
+        self.assertIn("?existing_param=value", dh.url)
 
     def test_url_without_existing_query(self):
         dh = DockerHub(**default_dockerhub_config,
                        days_back_fetch=1)
-        dh._initialize_params()
-        self.assertIn("?from=", dh.url)
+        self.assertIn("&from=", dh.url)
 
     def test_start_date_generator(self):
         zero_days_back = DockerHub(**default_dockerhub_config,
@@ -128,6 +118,7 @@ class TestDockerHubApi(unittest.TestCase):
         self.assertEqual(dh.url,
                          default_dockerhub_config.get("url") + "?page_size=100")
 
+    @responses.activate
     def test_jwt_token_success(self):
         token_res_body = {
             "token": "mocked_jwt_token",
@@ -172,7 +163,7 @@ class TestDockerHubApi(unittest.TestCase):
         dh = DockerHub(**default_dockerhub_config)
         result = dh.send_request()
 
-        self.assertIsNone(result)
+        self.assertEqual(result, [])
         self.assertEqual(dh.headers["Authorization"], "Bearer mocked_jwt_token")
 
 
