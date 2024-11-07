@@ -9,7 +9,11 @@ from src.apis.dockerhub.Dockerhub import DockerHub
 
 curr_path = abspath(dirname(__file__))
 
-DOCKER_API_TEST_URL = "https://hub.docker.com/v2/auditlogs/test"
+default_dockerhub_config = {
+    "dockerhub_user": "some-user",
+    "dockerhub_token": "some-token",
+    "url": "https://hub.docker.com/v2/auditlogs/test",
+}
 
 
 class TestDockerHubApi(unittest.TestCase):
@@ -20,18 +24,18 @@ class TestDockerHubApi(unittest.TestCase):
     def test_invalid_setup(self):
         invalid_configs = [
             {
-                "dockerhub_user": "some-user",
-                "dockerhub_token": "some-token",
+                "dockerhub_user": default_dockerhub_config.get("dockerhub_user"),
+                "dockerhub_token": default_dockerhub_config.get("dockerhub_token"),
                 "data_request": {
-                    "url": DOCKER_API_TEST_URL
+                    "url": default_dockerhub_config.get("url")
                 }
             },
             {
-                "dockerhub_user": "some-user",
-                "url": DOCKER_API_TEST_URL
+                "dockerhub_user": default_dockerhub_config.get("dockerhub_user"),
+                "url": default_dockerhub_config.get("url")
             },
             {
-                "dockerhub_token": "some-token",
+                "dockerhub_token": default_dockerhub_config.get("dockerhub_token"),
             },
         ]
 
@@ -40,11 +44,9 @@ class TestDockerHubApi(unittest.TestCase):
                 DockerHub(**config)
 
     def test_valid_setup(self):
-        dh = DockerHub(dockerhub_user="some-user",
-                       dockerhub_token="some-token",
-                       url=DOCKER_API_TEST_URL)
+        dh = DockerHub(**default_dockerhub_config)
 
-        self.assertIn(DOCKER_API_TEST_URL, dh.url)
+        self.assertIn(default_dockerhub_config.get("url"), dh.url)
 
         self.assertEqual(dh.headers["Content-Type"], "application/json")
 
@@ -52,21 +54,42 @@ class TestDockerHubApi(unittest.TestCase):
 
         self.assertIsNone(dh._jwt_token)
 
+    def test_invalid_days_back_fetch(self):
+        dh = DockerHub(**default_dockerhub_config,
+                       days_back_fetch=-1)
+        dh._initialize_params()
+        self.assertNotIn("from=", dh.url)
+
+    def test_valid_days_back_fetch(self):
+        dh = DockerHub(**default_dockerhub_config,
+                       days_back_fetch=5)
+        dh._initialize_params()
+        expected_date = (datetime.now(UTC) - timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        self.assertIn(f"from={expected_date}", dh.url)
+
+    def test_url_with_existing_query(self):
+        dh = DockerHub(dockerhub_user=default_dockerhub_config.get("dockerhub_user"),
+                       dockerhub_token=default_dockerhub_config.get("dockerhub_token"),
+                       url="https://hub.docker.com/v2/auditlogs/logzio?existing_param=value",
+                       days_back_fetch=1)
+        dh._initialize_params()
+        self.assertIn("&from=", dh.url)
+        self.assertIn("existing_param=value", dh.url)
+
+    def test_url_without_existing_query(self):
+        dh = DockerHub(**default_dockerhub_config,
+                       days_back_fetch=1)
+        dh._initialize_params()
+        self.assertIn("?from=", dh.url)
 
     def test_start_date_generator(self):
-        zero_days_back = DockerHub(dockerhub_user="some-user",
-                                   dockerhub_token="some-token",
-                                   url=DOCKER_API_TEST_URL,
+        zero_days_back = DockerHub(**default_dockerhub_config,
                                    days_back_fetch=0)
 
-        day_back = DockerHub(dockerhub_user="some-user",
-                             dockerhub_token="some-token",
-                             url=DOCKER_API_TEST_URL,
+        day_back = DockerHub(**default_dockerhub_config,
                              days_back_fetch=1)
 
-        five_days_back = DockerHub(dockerhub_user="some-user",
-                                   dockerhub_token="some-token",
-                                   url=DOCKER_API_TEST_URL,
+        five_days_back = DockerHub(**default_dockerhub_config,
                                    days_back_fetch=5)
 
         # Make sure the current format and needed dates are generated
@@ -94,23 +117,21 @@ class TestDockerHubApi(unittest.TestCase):
                       status=200)
 
         responses.add(responses.GET,
-                      DOCKER_API_TEST_URL,
+                      default_dockerhub_config.get("url"),
                       json=data_res_body,
                       status=200)
 
         responses.add(responses.GET,
-                      DOCKER_API_TEST_URL + "?from=2024-11-01T12:34:56.789Z&page_size=100",
+                      default_dockerhub_config.get("url") + "?from=2024-11-01T12:34:56.789Z&page_size=100",
                       json={"logs": []},
                       status=200)
 
-        dh = DockerHub(dockerhub_user="some-user",
-                       dockerhub_token="some-token",
-                       url=DOCKER_API_TEST_URL)
+        dh = DockerHub(**default_dockerhub_config)
         result = dh.send_request()
 
         self.assertEqual(result, data_res_body.get("logs"))
         self.assertEqual(dh.url,
-                         DOCKER_API_TEST_URL + "?page_size=100")
+                         default_dockerhub_config.get("url") + "?page_size=100")
 
 
 if __name__ == '__main__':
