@@ -20,7 +20,7 @@ class DockerHub(ApiFetcher):
     dockerhub_user: str = Field(frozen=True)
     dockerhub_token: str = Field(frozen=False)
     days_back_fetch: int = Field(default=-1, frozen=True)
-    refresh_token_interval: int = Field(default=5)
+    refresh_token_interval: int = Field(default=30)
     _jwt_token: str = None
     _token_expiry: datetime = None
 
