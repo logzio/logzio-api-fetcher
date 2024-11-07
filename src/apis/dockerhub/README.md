@@ -10,7 +10,7 @@ The `dockerhub` API type is used to fetch audit logs from DockerHub. It supports
 | url                | The request URL                                                                           | Required          | -                 |
 | next_url           | URL for the next page of results (used for pagination)                                    | Optional          | -                 |
 | method             | The request method (`GET` or `POST`)                                                      | Optional          | `GET`             |
-| days_back_fetch    | The amount of days to fetch back in the first request. Adds a filter on `from` parameter. | Optional          | 1                 |
+| days_back_fetch    | The amount of days to fetch back in the first request. Adds a filter on `from` parameter. | Optional          | 0                 |
 | scrape_interval    | Time interval to wait between runs (unit: `minutes`)                                      | Optional          | 1 (minute)        |
 | additional_fields  | Additional custom fields to add to the logs before sending to logzio                      | Optional          | -                 |
 
