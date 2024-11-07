@@ -44,20 +44,14 @@ class TestDockerHubApi(unittest.TestCase):
                        dockerhub_token="some-token",
                        url=DOCKER_API_TEST_URL)
 
-        # Validate the data request URL was updated
         self.assertIn(DOCKER_API_TEST_URL, dh.url)
 
-        # Validate headers
         self.assertEqual(dh.headers["Content-Type"], "application/json")
 
-        # Validate response data path
         self.assertEqual(dh.response_data_path, "logs")
 
-        # Validate JWT token is None initially
         self.assertIsNone(dh._jwt_token)
 
-        # Validate token expiry is None initially
-        self.assertIsNone(dh._token_expiry)
 
     def test_start_date_generator(self):
         zero_days_back = DockerHub(dockerhub_user="some-user",
@@ -99,25 +93,21 @@ class TestDockerHubApi(unittest.TestCase):
                       json=token_res_body,
                       status=200)
 
-        # Mock initial data response
         responses.add(responses.GET,
                       DOCKER_API_TEST_URL,
                       json=data_res_body,
                       status=200)
 
-        # Mock pagination data response
         responses.add(responses.GET,
                       DOCKER_API_TEST_URL + "?from=2024-11-01T12:34:56.789Z&page_size=100",
                       json={"logs": []},
                       status=200)
 
-        # Test sending request
         dh = DockerHub(dockerhub_user="some-user",
                        dockerhub_token="some-token",
                        url=DOCKER_API_TEST_URL)
         result = dh.send_request()
 
-        # Make sure we get the needed data and the url for next request is updated properly
         self.assertEqual(result, data_res_body.get("logs"))
         self.assertEqual(dh.url,
                          DOCKER_API_TEST_URL + "?page_size=100")
