@@ -121,17 +121,59 @@ class TestDockerHubApi(unittest.TestCase):
                       json=data_res_body,
                       status=200)
 
-        responses.add(responses.GET,
-                      default_dockerhub_config.get("url") + "?from=2024-11-01T12:34:56.789Z&page_size=100",
-                      json={"logs": []},
-                      status=200)
-
         dh = DockerHub(**default_dockerhub_config)
         result = dh.send_request()
 
         self.assertEqual(result, data_res_body.get("logs"))
         self.assertEqual(dh.url,
                          default_dockerhub_config.get("url") + "?page_size=100")
+
+    def test_jwt_token_success(self):
+        token_res_body = {
+            "token": "mocked_jwt_token",
+        }
+        responses.add(responses.POST,
+                      "https://hub.docker.com/v2/users/login",
+                      json=token_res_body,
+                      status=200)
+
+        dh = DockerHub(**default_dockerhub_config)
+        token = dh._get_jwt_token()
+
+        self.assertEqual(token, "mocked_jwt_token")
+        self.assertEqual(dh._jwt_token, "mocked_jwt_token")
+
+    @responses.activate
+    def test_jwt_token_failure(self):
+        responses.add(responses.POST,
+                      "https://hub.docker.com/v2/users/login",
+                      status=401)
+
+        dh = DockerHub(**default_dockerhub_config)
+        token = dh._get_jwt_token()
+
+        self.assertIsNone(token)
+        self.assertIsNone(dh._jwt_token)
+
+    @responses.activate
+    def test_send_request_unauthorized(self):
+        token_res_body = {
+            "token": "mocked_jwt_token",
+        }
+        responses.add(responses.POST,
+                      "https://hub.docker.com/v2/users/login",
+                      json=token_res_body,
+                      status=200)
+
+        responses.add(responses.GET,
+                      default_dockerhub_config.get("url"),
+                      status=401)
+
+        dh = DockerHub(**default_dockerhub_config)
+        result = dh.send_request()
+
+        self.assertIsNone(result)
+        self.assertEqual(dh.headers["Authorization"], "Bearer mocked_jwt_token")
 
 
 if __name__ == '__main__':
