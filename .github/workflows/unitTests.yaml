@@ -17,3 +17,6 @@ jobs:
           pip install pytest-cov
       - name: Run tests
         run: PYTHONPATH=. pytest --cov-report term-missing --cov=src tests/UnitTests/test_*.py
+
+      - name: Run e2e tests
+        run: PYTHONPATH=. pytest --cov-report term-missing --cov=src src/apis/dockerhub/test_e2e_dockerhub.py
