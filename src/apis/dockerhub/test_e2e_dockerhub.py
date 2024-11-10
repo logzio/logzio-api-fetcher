@@ -11,7 +11,6 @@ from src.main import main
 
 TEST_TYPE = "dockerhub-audit-test"
 
-
 def _search_data(query):
     """
     Send given search query to logzio and returns the result.
@@ -85,7 +84,9 @@ class TestDockerhubE2E(unittest.TestCase):
     """
 
     def test_data_in_logz(self):
-        temp_config_path = _update_config_tokens("./testdata/valid_dockerhub_config.yaml")
+        curr_path = abspath(dirname(__file__))
+        config_path = f"{curr_path}/testdata/valid_dockerhub_config.yaml"
+        temp_config_path = _update_config_tokens(config_path)
         thread = threading.Thread(target=main, kwargs={"conf_path": temp_config_path})
         thread.daemon = True
         thread.start()
