@@ -18,5 +18,10 @@ jobs:
       - name: Run tests
         run: PYTHONPATH=. pytest --cov-report term-missing --cov=src tests/UnitTests/test_*.py
 
-      - name: Run e2e tests
-        run: PYTHONPATH=. pytest --cov-report term-missing --cov=src src/apis/dockerhub/test_e2e_dockerhub.py
+      - name: Run dockerhub e2e tests
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
+          LOGZIO_SHIPPING_TOKEN: ${{ secrets.LOGZIO_SHIPPING_TOKEN }}
+          LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
+        run: PYTHONPATH=. pytest term-missing src/apis/dockerhub/test_e2e_dockerhub.py
