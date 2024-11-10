@@ -92,7 +92,7 @@ class TestDockerhubE2E(unittest.TestCase):
         thread.join(timeout=60)
         azure_logs_in_acc = _search_data(f"type:{TEST_TYPE}")
         self.assertTrue(azure_logs_in_acc)
-        self.assertTrue(all([log.get("_source").get("type") == TEST_TYPE for log in azure_logs_in_acc]))
+        self.assertTrue(all([log.get("_source").get("eventType") == "auditevents" for log in azure_logs_in_acc]))
         delete_temp_files()
 
 
