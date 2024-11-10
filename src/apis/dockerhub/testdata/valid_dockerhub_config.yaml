@@ -1,0 +1,20 @@
+apis:
+  - name: Dockerhub audit logs
+    type: dockerhub
+    dockerhub_token: token
+    dockerhub_user: user
+    url: https://hub.docker.com/v2/auditlogs/logzio
+    next_url: https://hub.docker.com/v2/auditlogs/logzio?from={res.logs.[0].timestamp}
+    method: GET
+    days_back_fetch: 7
+    scrape_interval: 10
+    additional_fields:
+      type: dockerhub-audit-test
+      eventType: auditevents
+
+logzio:
+  url: https://listener.logz.io:8071
+  token: token
+
+
+

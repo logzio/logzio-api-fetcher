@@ -1,0 +1,75 @@
+{
+    "logs": [
+        {
+            "event_id": "1234abcd-5678-efgh-9101-ijklmnopqrst",
+            "account": "mock_account",
+            "action": "repo.tag.push",
+            "name": "mock_account/mock-repo",
+            "actor": "user123 - access token \"mock-token\"",
+            "data": {
+                "access_token_id": "abcd1234-ef56-7890-abcd-1234567890ef",
+                "access_token_label": "mock-token",
+                "access_token_type": "TYPE_UNSPECIFIED",
+                "digest": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+                "tag": "latest"
+            },
+            "timestamp": "2024-11-01T12:34:56.789Z",
+            "action_description": "pushed the tag latest with the digest sha256:1234567890abc to the repository mock_account/mock-repo"
+        },
+        {
+            "event_id": "5678ijkl-9101-mnop-2345-qrstuvwx5678",
+            "account": "mock_account",
+            "action": "repo.create",
+            "name": "mock_account/mock-new-repo",
+            "actor": "user456",
+            "data": {
+                "categories": "utilities",
+                "privacy": "public"
+            },
+            "timestamp": "2024-11-02T10:11:12.345Z",
+            "action_description": "created the public repository mock_account/mock-new-repo"
+        },
+        {
+            "event_id": "9101qrst-2345-uvwx-6789-yzabcdef1234",
+            "account": "mock_account",
+            "action": "repo.tag.push",
+            "name": "mock_account/mock-repo",
+            "actor": "user123 - access token \"mock-token\"",
+            "data": {
+                "access_token_id": "efgh5678-ijkl-9012-mnop-3456789012qr",
+                "access_token_label": "mock-token",
+                "access_token_type": "TYPE_UNSPECIFIED",
+                "digest": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+                "tag": "v1.0.1"
+            },
+            "timestamp": "2024-11-03T08:23:45.678Z",
+            "action_description": "pushed the tag v1.0.1 with the digest sha256:abcdef1234567 to the repository mock_account/mock-repo"
+        },
+        {
+            "event_id": "abcd5678-efgh-9101-ijkl-3456mnopqrst",
+            "account": "mock_account",
+            "action": "repo.delete",
+            "name": "mock_account/old-repo",
+            "actor": "user789",
+            "data": {},
+            "timestamp": "2024-11-04T16:22:33.444Z",
+            "action_description": "deleted the repository mock_account/old-repo"
+        },
+        {
+            "event_id": "efgh9101-ijkl-2345-mnop-6789qrstuvwx",
+            "account": "mock_account",
+            "action": "repo.tag.push",
+            "name": "mock_account/mock-repo",
+            "actor": "user123 - access token \"mock-token\"",
+            "data": {
+                "access_token_id": "ijkl9012-mnop-3456-qrst-7890uvwxyzab",
+                "access_token_label": "mock-token",
+                "access_token_type": "TYPE_UNSPECIFIED",
+                "digest": "sha256:7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234",
+                "tag": "stable"
+            },
+            "timestamp": "2024-11-05T14:45:23.567Z",
+            "action_description": "pushed the tag stable with the digest sha256:7890abcdef123 to the repository mock_account/mock-repo"
+        }
+    ]
+}

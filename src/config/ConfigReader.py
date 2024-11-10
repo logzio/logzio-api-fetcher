@@ -11,6 +11,7 @@ from src.apis.azure.AzureMailReports import AzureMailReports
 from src.apis.cloudflare.Cloudflare import Cloudflare
 from src.apis.onepassword.OnePassword import OnePassword
 from src.output.LogzioShipper import LogzioShipper
+from src.apis.dockerhub.Dockerhub import DockerHub
 
 INPUT_API_FIELD = "apis"
 OUTPUT_LOGZIO_FIELD = "logzio"
@@ -21,7 +22,8 @@ API_TYPES_TO_CLASS_NAME_MAPPING = {
     "azure_graph": "AzureGraph",
     "azure_mail_reports": "AzureMailReports",
     "cloudflare": "Cloudflare",
-    "1password": "OnePassword"
+    "1password": "OnePassword",
+    "dockerhub": "DockerHub"
 }
 
 logger = logging.getLogger(__name__)
