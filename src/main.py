@@ -5,7 +5,6 @@ from logging.config import fileConfig
 
 from src.config.ConfigReader import ConfigReader
 from src.manager.TaskManager import TaskManager
-
 LOGGER_CONFIG_PATH = "./src/utils/logging_config.ini"
 FETCHER_CONFIG_PATH = "./src/shared/config.yaml"
 
@@ -50,14 +49,16 @@ def main(conf_path=FETCHER_CONFIG_PATH, test=False):
     """
     Get args >> Configure logger >> Read config file >> Start API fetching and shipping task based on config
     """
-    args = __get_args()
-    _setup_logger(args.level, test)
+    try:
+        logging.info("Starting Logzio API Fetcher...")
+        args = __get_args()
+        _setup_logger(args.level, test)
 
-    conf = ConfigReader(conf_path)
-
-    if conf.api_instances:
-        TaskManager(apis=conf.api_instances, logzio_shipper=conf.logzio_shipper).run()
-
+        conf = ConfigReader(conf_path)
+        if conf.api_instances:
+            TaskManager(apis=conf.api_instances, logzio_shipper=conf.logzio_shipper).run()
+    except Exception as e:
+        logging.error(f"Failed to run the Logzio API Fetcher.\nTraceback: {e}")
 
 if __name__ == '__main__':
     main()

@@ -109,6 +109,28 @@ class LogzioShipper(BaseModel):
         self.curr_bulk_size = 0
 
     @staticmethod
+    def _exception_traceback():
+        """
+        Creates a dictionary based on details from an exception traceback        :return:  dictionary
+        """
+        try:
+            import sys
+            import traceback
+            baseDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+            tb = {
+                "tbFile": f"{sys.exc_info()[2].tb_frame.f_code.co_filename}".replace(f"{baseDir}/", "", 1).replace(
+                    ".py", "", 1),
+                "tbType": f"{sys.exc_info()[0]}".replace('<', '').replace('>', '').replace('class ', '').replace("'",
+                                                                                                                 ""),
+                "tbSummary": f"{traceback.format_exc()}",
+                "tbReason": f"{sys.exc_info()[1]}",
+                "tbLine": f"{sys.exc_info()[-1].tb_lineno}"}
+            return tb
+        except AttributeError:
+            return None
+
+    @staticmethod
     def _handle_exception(exp, msg, *args):
         """
         Logs the given error message and raises the exception.
@@ -116,7 +138,9 @@ class LogzioShipper(BaseModel):
         :param msg: error message to log regarding it
         :param args: message arguments
         """
-        logger.error(msg.format(*args))
+        verboseTraceback = _get_verbose_traceback(exp)
+        errorMessage = f"{msg.format(*args)}\nTraceback:\n{verboseTraceback}" if verboseTraceback else msg.format(*args)
+        logger.error(errorMessage)
         raise exp
 
     def _handle_http_errors(self, status_code, exp):
