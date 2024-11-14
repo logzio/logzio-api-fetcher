@@ -31,13 +31,13 @@ class GoogleWorkspace(ApiFetcher):
     :param google_workspace_limit: Limit for number of events to return in a single request (for pagination)
     """
 
-    google_workspace_client_id: str = Field(frozen=True)
-    google_workspace_client_secret: str = Field(frozen=True)
+    oauth_client_id: str = Field(frozen=True)
+    oauth_client_secret: str = Field(frozen=True)
     pagination_off: bool = Field(default=False)
     days_back_fetch: int = Field(default=-1, frozen=True)
     google_workspace_limit: int = Field(default=100, ge=1, le=1000)
     method: ReqMethod = Field(default=ReqMethod.GET, frozen=True)
-    scopes: str = Field(default=DEFAULT_SCOPES, frozen=True)
+    scopes: list = Field(default=DEFAULT_SCOPES, frozen=True)
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -79,7 +79,7 @@ class GoogleWorkspace(ApiFetcher):
         auth_url = (
             f"https://accounts.google.com/o/oauth2/auth"
             f"?client_id={self.google_workspace_client_id}"
-            f"&redirect_uri={REDIRECT_URI}"
+            f"&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
             f"&scope={urllib.parse.quote(' '.join(self.scopes))}"
             f"&response_type=code"
             f"&access_type=offline"
@@ -98,6 +98,7 @@ class GoogleWorkspace(ApiFetcher):
         except IndexError:
             logger.error("Failed to extract authorization code from the response URL.")
             return None
+
         # Step 3: Exchange authorization code for access token and refresh token
         token_url = "https://oauth2.googleapis.com/token"
         payload = {
