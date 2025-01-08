@@ -17,8 +17,6 @@ class ApiE2ETest(unittest.TestCase):
     def setUp(self):
         self.test_type = f"api-fetcher-e2e-test-{self.generate_random_string()}"
         os.environ["TEST_TYPE"] = self.test_type
-        dotenv_path = join(abspath(dirname(__file__)), '.env')
-        load_dotenv(dotenv_path=dotenv_path)
         self.token_map = self.get_token_map()
         self.config_path = self.get_config_path()
         self.temp_config_path = update_config_tokens(self.config_path, self.token_map)

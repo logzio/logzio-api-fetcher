@@ -1,8 +1,5 @@
 import unittest
 from os.path import abspath, dirname
-
-from dotenv import load_dotenv
-
 from e2e_tests.api_e2e_test import ApiE2ETest
 import docker
 import requests
