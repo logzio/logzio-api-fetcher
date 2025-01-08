@@ -1,0 +1,43 @@
+import os
+import yaml
+import glob
+
+
+def update_config_tokens(file_path, token_updates):
+    """
+    Updates the tokens in the given file based on the provided token updates.
+    :param file_path: Path to the configuration file.
+    :param token_updates: Dictionary of token updates.
+    :return: Path to the temporary configuration file.
+    """
+    with open(file_path, "r") as conf:
+        content = yaml.safe_load(conf)
+
+    for key, env_var in token_updates.items():
+        value = os.getenv(env_var)
+        if value is None:
+            raise EnvironmentError(f"{env_var} environment variable is missing")
+        keys = key.split('.')
+        d = content
+        for k in keys[:-1]:
+            d = d.setdefault(k, {})
+        d[keys[-1]] = value
+
+    path, ext = file_path.rsplit(".", 1)
+    temp_test_path = f"{path}_temp.{ext}"
+
+    with open(temp_test_path, "w") as file:
+        yaml.dump(content, file)
+
+    return temp_test_path
+
+
+def delete_temp_files():
+    """
+    delete the temp config that generated for the test
+    """
+    curr_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    test_configs_path = f"{curr_path}/apis/testdata/*_temp.yaml"
+
+    for file in glob.glob(test_configs_path):
+        os.remove(file)
