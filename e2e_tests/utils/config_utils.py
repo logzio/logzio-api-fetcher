@@ -3,25 +3,43 @@ import yaml
 import glob
 
 
-def update_config_tokens(file_path, token_updates):
+def validate_config_tokens(token_map):
+    """
+    Validates that the environment variables referenced in token_map exist.
+    :param token_map: Dictionary of tokens.
+    :raises EnvironmentError: If any environment variable is missing.
+    """
+    for env_var in token_map.values():
+        if os.getenv(env_var) is None:
+            raise EnvironmentError(f"{env_var} environment variable is missing")
+
+
+def update_config_tokens(file_path, token_map):
     """
     Updates the tokens in the given file based on the provided token updates.
     :param file_path: Path to the configuration file.
-    :param token_updates: Dictionary of token updates.
+    :param token_map: Dictionary of token updates.
     :return: Path to the temporary configuration file.
     """
     with open(file_path, "r") as conf:
         content = yaml.safe_load(conf)
 
-    for key, env_var in token_updates.items():
+    for key, env_var in token_map.items():
         value = os.getenv(env_var)
         if value is None:
             raise EnvironmentError(f"{env_var} environment variable is missing")
         keys = key.split('.')
         d = content
         for k in keys[:-1]:
-            d = d.setdefault(k, {})
-        d[keys[-1]] = value
+            if k.isdigit():
+                k = int(k)
+                d = d[k]
+            else:
+                d = d.setdefault(k, {})
+        if keys[-1].isdigit():
+            d[int(keys[-1])] = value
+        else:
+            d[keys[-1]] = value
 
     path, ext = file_path.rsplit(".", 1)
     temp_test_path = f"{path}_temp.{ext}"
