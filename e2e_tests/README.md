@@ -8,9 +8,6 @@ This guide provides instructions for developers on how to add new end-to-end (E2
 Ensure the following environment variables are set:
 - `LOGZIO_API_TOKEN`: Your Logz.io API token.
 - `LOGZIO_SHIPPING_TOKEN`: Your Logz.io shipping token.
-- `AZURE_AD_TENANT_ID`: Your Azure AD tenant ID.
-- `AZURE_AD_CLIENT_ID`: Your Azure AD client ID.
-- `AZURE_AD_SECRET_VALUE`: Your Azure AD secret value.
 
 Or any other environment variables that are required for the tests to run.
 
@@ -20,7 +17,22 @@ Or any other environment variables that are required for the tests to run.
 3. **Implement Module-Specific Methods**: Override the `module_specific_setup`, `module_specific_teardown`, and other necessary methods as needed.
 4. **Add Configuration Files**: Place any necessary configuration files in the `e2e_tests/testdata/` directory.
 
-### Example
+### Utility Functions
+- `run_main_program`: Runs the main program with the specified configuration file and secrets map.
+- `search_logs`: Searches for logs in logzio based on the specified query.
+
+### Secrets Map
+The `secrets_map` is a dictionary that maps the secrets in the configuration file to the environment variables. This allows you to pass sensitive information such as tokens without hardcoding them in the configuration file.
+Example:
+```python
+secrets_map = {
+    "apis.0.dockerhub_token": "DOCKERHUB_TOKEN",
+    "apis.0.dockerhub_user": "DOCKERHUB_USER",
+    "logzio.token": "LOGZIO_SHIPPING_TOKEN",
+    "apis.0.additional_fields.type": "TEST_TYPE"
+}
+```
+### New E2E test example
 ```python
 from e2e_tests.api_e2e_test import ApiE2ETest
 import unittest
@@ -52,6 +64,3 @@ class TestNewModuleE2E(ApiE2ETest):
 if __name__ == '__main__':
     unittest.main()
 ```
-### Utility Functions
-- `run_main_program`: Runs the main program with the specified configuration file and secrets map.
-- `search_logs`: Searches for logs in logzio based on the specified query.
