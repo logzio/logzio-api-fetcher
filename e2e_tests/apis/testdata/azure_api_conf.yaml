@@ -1,0 +1,16 @@
+apis:
+  - name: azure test
+    type: azure_graph
+    azure_ad_tenant_id: <<AZURE_AD_TENANT_ID>>
+    azure_ad_client_id: <<AZURE_AD_CLIENT_ID>>
+    azure_ad_secret_value: <<AZURE_AD_SECRET_VALUE>>
+    data_request:
+      url: https://graph.microsoft.com/v1.0/auditLogs/signIns
+    additional_fields:
+      type: azure_graph_shipping_test
+    days_back_fetch: 8
+    scrape_interval: 1
+
+logzio:
+  url: https://listener.logz.io:8071
+  token: SHipPIngtoKen
