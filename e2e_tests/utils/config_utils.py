@@ -3,28 +3,28 @@ import yaml
 import glob
 
 
-def validate_config_tokens(token_map):
+def validate_config_tokens(secrets_map):
     """
     Validates that the environment variables referenced in token_map exist.
-    :param token_map: Dictionary of tokens.
+    :param secrets_map: Dictionary of tokens.
     :raises EnvironmentError: If any environment variable is missing.
     """
-    for env_var in token_map.values():
+    for env_var in secrets_map.values():
         if os.getenv(env_var) is None:
             raise EnvironmentError(f"{env_var} environment variable is missing")
 
 
-def update_config_tokens(file_path, token_map):
+def update_config_tokens(file_path, secrets_map):
     """
     Updates the tokens in the given file based on the provided token updates.
     :param file_path: Path to the configuration file.
-    :param token_map: Dictionary of token updates.
+    :param secrets_map: Dictionary of token updates.
     :return: Path to the temporary configuration file.
     """
     with open(file_path, "r") as conf:
         content = yaml.safe_load(conf)
 
-    for key, env_var in token_map.items():
+    for key, env_var in secrets_map.items():
         value = os.getenv(env_var)
         if value is None:
             raise EnvironmentError(f"{env_var} environment variable is missing")

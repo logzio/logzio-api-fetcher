@@ -1,3 +1,4 @@
+import time
 import unittest
 from os.path import abspath, dirname
 from e2e_tests.api_e2e_test import ApiE2ETest
@@ -42,6 +43,7 @@ class TestDockerhubE2E(ApiE2ETest):
         config_path = f"{curr_path}/testdata/valid_dockerhub_config.yaml"
         self.run_main_program(config_path=config_path, secrets_map=secrets_map)
         logs = self.search_logs(f"type:{self.test_type}")
+        time.sleep(120)
         self.assertTrue(logs)
         self.assertTrue(all([log.get("_source").get("eventType") == "auditevents" for log in logs]))
 
