@@ -1,4 +1,4 @@
-name: Automatic unit tests
+name: Unit tests
 on: [pull_request]
 jobs:
   tests:

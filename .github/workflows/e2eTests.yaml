@@ -1,8 +1,5 @@
-name: End-to-End Tests
-on:
-  workflow_run:
-    workflows: ["Automatic unit tests"]
-    types: [completed]
+name: E2E tests
+on: [pull_request]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest

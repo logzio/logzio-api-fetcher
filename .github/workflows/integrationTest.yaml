@@ -1,8 +1,5 @@
-name: Automatic integration e2e test
-on:
-  workflow_run:
-    workflows: ["Automatic unit tests"]
-    types: [completed]
+name: Integration test
+on: [pull_request]
 jobs:
   e2e_test:
     runs-on: ubuntu-latest
