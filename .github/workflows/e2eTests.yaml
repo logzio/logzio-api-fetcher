@@ -17,7 +17,7 @@ jobs:
       - name: Run E2E tests
         env:
           LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           LOGZIO_SHIPPING_TOKEN: ${{ secrets.LOGZIO_SHIPPING_TOKEN }}
         run: python -m unittest discover -s e2e_tests/apis -p "*.py"
