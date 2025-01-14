@@ -41,4 +41,4 @@ jobs:
           AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
           AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
           AZURE_AD_SECRET_VALUE: ${{ secrets.AZURE_AD_SECRET_VALUE }}
-        run: unittest discover -s e2e_tests/apis -p "*.py"
+        run: python -m unittest discover -s e2e_tests/apis -p "*.py"
