@@ -23,10 +23,11 @@ def was_tag_pushed_recently(image, tag, days=14):
 class TestDockerhubE2E(ApiE2ETest):
 
     def module_specific_setup(self):
+        curr_path = abspath(dirname(__file__))
         self.client = docker.from_env()
-        self.dockerfile_path = f"{self.curr_path}/testdata/test.dockerfile"
+        self.dockerfile_path = f"{curr_path}/testdata/test.dockerfile"
         if not was_tag_pushed_recently(DOCKER_IMAGE, DOCKER_TAG):
-            self.client.images.build(path=self.curr_path, dockerfile=self.dockerfile_path,
+            self.client.images.build(path=curr_path, dockerfile=self.dockerfile_path,
                                      tag=f"{DOCKER_IMAGE}:{DOCKER_TAG}")
             self.client.images.push(DOCKER_IMAGE, tag=DOCKER_TAG)
 
