@@ -30,20 +30,16 @@ class TestDockerhubE2E(ApiE2ETest):
                                      tag=f"{DOCKER_IMAGE}:{DOCKER_TAG}")
             self.client.images.push(DOCKER_IMAGE, tag=DOCKER_TAG)
 
-    def get_secrets_map(self):
-        return {
+    def test_dockerhub_audit_logs_e2e(self):
+        secrets_map = {
             "apis.0.dockerhub_token": "DOCKERHUB_TOKEN",
             "apis.0.dockerhub_user": "DOCKERHUB_USER",
             "logzio.token": "LOGZIO_SHIPPING_TOKEN",
             "apis.0.additional_fields.type": "TEST_TYPE"
         }
-
-    def get_config_path(self):
-        self.curr_path = abspath(dirname(__file__))
-        return f"{self.curr_path}/testdata/valid_dockerhub_config.yaml"
-
-    def test_dockerhub_audit_logs_e2e(self):
-        self.run_main_program()
+        curr_path = abspath(dirname(__file__))
+        config_path = f"{curr_path}/testdata/valid_dockerhub_config.yaml"
+        self.run_main_program(config_path=config_path, secrets_map=secrets_map)
         logs = self.search_logs(f"type:{self.test_type}")
         self.assertTrue(logs)
         self.assertTrue(all([log.get("_source").get("eventType") == "auditevents" for log in logs]))
