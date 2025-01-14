@@ -1,5 +1,8 @@
 name: End-to-End Tests
-on: [push]
+on:
+  workflow_run:
+    workflows: ["Automatic unit tests"]
+    types: [completed]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
@@ -15,9 +18,13 @@ jobs:
           pip install docker
           pip install requests
       - name: Run E2E tests
+        # Set required environment variables
         env:
           LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           LOGZIO_SHIPPING_TOKEN: ${{ secrets.LOGZIO_SHIPPING_TOKEN }}
+          AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+          AZURE_AD_SECRET_VALUE: ${{ secrets.AZURE_AD_SECRET_VALUE }}
         run: python -m unittest discover -s e2e_tests/apis -p "*.py"
