@@ -1,6 +1,23 @@
-name: E2E tests
+name: Tests
 on: [pull_request]
 jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install responses
+          pip install pytest
+          pip install pytest-cov
+      - name: Run tests
+        run: PYTHONPATH=. pytest --cov-report term-missing --cov=src tests/UnitTests/test_*.py
+
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
