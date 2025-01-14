@@ -33,7 +33,7 @@ class TestDockerhubE2E(ApiE2ETest):
 
     def test_dockerhub_audit_logs_e2e(self):
         secrets_map = {
-            "apis.0.dockerhub_token": "DOCKERHUB_TOKEN",
+            "apis.0.dockerhub_token": "DOCKERHUB_PASSWORD",
             "apis.0.dockerhub_user": "DOCKERHUB_USER",
             "logzio.token": "LOGZIO_SHIPPING_TOKEN",
             "apis.0.additional_fields.type": "TEST_TYPE"
