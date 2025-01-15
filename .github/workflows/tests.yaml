@@ -35,8 +35,8 @@ jobs:
         # Set required environment variables
         env:
           LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERHUB_USER: ${{ secrets.DOCKER_USER }}
           LOGZIO_SHIPPING_TOKEN: ${{ secrets.LOGZIO_SHIPPING_TOKEN }}
           AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
           AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
