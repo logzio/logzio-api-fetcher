@@ -3,10 +3,25 @@ import threading
 import random
 import string
 import unittest
+import yaml
 
 from src.main import main
 from e2e_tests.utils.config_utils import update_config_tokens, delete_temp_files, validate_config_tokens
 from e2e_tests.utils.log_utils import search_data
+
+
+def print_yaml_content(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            # Load the YAML content
+            yaml_content = yaml.safe_load(file)
+
+            # Print the YAML content
+            print(yaml.dump(yaml_content, sort_keys=False, default_flow_style=False))
+    except FileNotFoundError:
+        print(f"Error: The file {file_path} does not exist.")
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML file: {e}")
 
 
 class ApiE2ETest(unittest.TestCase):
@@ -38,8 +53,12 @@ class ApiE2ETest(unittest.TestCase):
     def set_configuration(self, config_path, secrets_map):
         self.token_map = secrets_map
         self.config_path = config_path
+        print(f"Configuration file: {self.config_path}")
+        print(f"Yaml: {print_yaml_content(self.config_path)}")
         validate_config_tokens(self.token_map)
         self.temp_config_path = update_config_tokens(self.config_path, self.token_map)
+        print(f"Temp configuration file: {self.config_path}")
+        print(f"Temp Yaml: {print_yaml_content(self.config_path)}")
 
     def run_main_program(self, config_path, secrets_map, test=False):
         """

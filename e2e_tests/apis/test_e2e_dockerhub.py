@@ -42,8 +42,8 @@ class TestDockerhubE2E(ApiE2ETest):
         curr_path = abspath(dirname(__file__))
         config_path = f"{curr_path}/testdata/valid_dockerhub_config.yaml"
         self.run_main_program(config_path=config_path, secrets_map=secrets_map)
-        logs = self.search_logs(f"type:{self.test_type}")
         time.sleep(120)
+        logs = self.search_logs(f"type:{self.test_type}")
         self.assertTrue(logs)
         self.assertTrue(all([log.get("_source").get("eventType") == "auditevents" for log in logs]))
 
