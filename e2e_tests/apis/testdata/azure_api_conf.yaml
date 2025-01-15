@@ -9,7 +9,7 @@ apis:
     additional_fields:
       type: azure_graph_shipping_test
     days_back_fetch: 8
-    scrape_interval: 1
+    scrape_interval: 10
 
 logzio:
   url: https://listener.logz.io:8071
