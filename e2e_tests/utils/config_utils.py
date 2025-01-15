@@ -26,6 +26,7 @@ def update_config_tokens(file_path, secrets_map):
 
     for key, env_var in secrets_map.items():
         value = os.getenv(env_var)
+        print(f"Updating {key} with {env_var}={value}")
         if value is None:
             raise EnvironmentError(f"{env_var} environment variable is missing")
         keys = key.split('.')
