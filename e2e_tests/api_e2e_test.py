@@ -54,9 +54,11 @@ class ApiE2ETest(unittest.TestCase):
         self.token_map = secrets_map
         self.config_path = config_path
         print(f"Configuration file: {self.config_path}")
+        print_yaml_content(self.config_path)
         validate_config_tokens(self.token_map)
         self.temp_config_path = update_config_tokens(self.config_path, self.token_map)
         print(f"Temp configuration file: {self.config_path}")
+        print_yaml_content(self.temp_config_path)
 
     def run_main_program(self, config_path, secrets_map, test=False):
         """
