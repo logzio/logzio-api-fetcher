@@ -309,6 +309,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **0.3.1**:
+  - Handle internal logger configuration in memory instead of disk
 - **0.3.0**:
   - Add support for dockerhub audit logs
 - **0.2.2**:

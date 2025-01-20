@@ -1,12 +1,13 @@
 import argparse
 import configparser
-import logging
+import os
 from logging.config import fileConfig
-
+import logging
+import sys
+from src.utils.MaskInfoFormatter import MaskInfoFormatter
 from src.config.ConfigReader import ConfigReader
 from src.manager.TaskManager import TaskManager
 
-LOGGER_CONFIG_PATH = "./src/utils/logging_config.ini"
 FETCHER_CONFIG_PATH = "./src/shared/config.yaml"
 
 
@@ -23,27 +24,26 @@ def __get_args():
 
 def _setup_logger(level, test):
     """
-    Configures the logger and it's logging level.
+    Configures the logger and its logging level in memory.
     :param level: the logger logging level
+    :param test: flag to indicate if it's a test run
     """
-    # If test, always set to debug
     if test:
         level = "DEBUG"
 
-    # Update the level in the config file
-    if level != "INFO":
-        logging_conf = configparser.RawConfigParser()
-        logging_conf.read(LOGGER_CONFIG_PATH)
+    logger = logging.getLogger()
+    logger.setLevel(level)
 
-        logging_conf['logger_root']['level'] = level
-        logging_conf['handler_stream_handler']['level'] = level
+    stream_handler = logging.StreamHandler(sys.stderr)
+    stream_handler.setLevel(level)
 
-        with open(LOGGER_CONFIG_PATH, 'w') as configfile:
-            logging_conf.write(configfile)
+    formatter = MaskInfoFormatter(fmt="%(asctime)s [%(levelname)s]: %(message)s")
+    stream_handler.setFormatter(formatter)
 
-    # Load the config to the logger
-    fileConfig(LOGGER_CONFIG_PATH, disable_existing_loggers=False)
-    logging.info(f'Starting Logzio API fetcher in {level} level.')
+    logger.handlers.clear()
+    logger.addHandler(stream_handler)
+
+    logging.info(f"Starting Logzio API fetcher in {level} level.")
 
 
 def main(conf_path=FETCHER_CONFIG_PATH, test=False):
