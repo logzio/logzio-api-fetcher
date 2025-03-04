@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python 3.12
+      - name: Setup Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.14'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -25,5 +25,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          sbom: true
+          provenance: mode=max
           platforms: linux/amd64, linux/arm/v7, linux/arm/v8, linux/arm64
           tags: logzio/logzio-api-fetcher:latest, logzio/logzio-api-fetcher:${{ github.event.release.tag_name }}
