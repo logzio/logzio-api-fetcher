@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/" # Location of Dockerfile
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "python image update:"
+
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of GitHub Actions workflows
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "pip"
+    directory: "/" # Location of requirements.txt
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "library update:"

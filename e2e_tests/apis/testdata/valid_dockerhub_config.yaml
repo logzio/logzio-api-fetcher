@@ -6,7 +6,7 @@ apis:
     url: https://hub.docker.com/v2/auditlogs/logzio
     next_url: https://hub.docker.com/v2/auditlogs/logzio?from={res.logs.[0].timestamp}
     method: GET
-    days_back_fetch: 7
+    days_back_fetch: 10
     scrape_interval: 10
     additional_fields:
       type: dockerhub-audit-test
