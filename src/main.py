@@ -56,7 +56,7 @@ def main(conf_path=FETCHER_CONFIG_PATH, test=False):
     conf = ConfigReader(conf_path)
 
     if conf.api_instances:
-        TaskManager(apis=conf.api_instances, logzio_shipper=conf.logzio_shipper).run()
+        TaskManager(apis=conf.api_instances).run()
 
 
 if __name__ == '__main__':

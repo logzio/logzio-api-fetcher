@@ -3,15 +3,16 @@ import json
 import requests
 
 
-def search_data(query):
+def search_data(query, account=""):
     """
     Send given search query to logzio and returns the result.
     :param query:
+    :param account: the account API to use, "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN2
     :return:
     """
     url = "https://api.logz.io/v1/search"
     headers = {
-        "X-API-TOKEN": os.environ["LOGZIO_API_TOKEN"],
+        "X-API-TOKEN": os.environ[f"LOGZIO_API_TOKEN{account}"],
         "CONTENT-TYPE": "application/json",
         "ACCEPT": "application/json"
     }

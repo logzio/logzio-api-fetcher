@@ -1,0 +1,6 @@
+apis:
+  - name: input1
+    type: general
+    url: https://some/url
+
+logzio: "invalid conf"
