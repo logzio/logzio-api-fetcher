@@ -238,7 +238,7 @@ class ApiFetcher(BaseModel):
             org_date_plus_second = (org_date_date + timedelta(seconds=seconds)).strftime(date_format)
             self.url = self.url.replace(org_date, org_date_plus_second)
         except IndexError:
-            logger.error(f"Failed to add 1s to the {self.name} api 'sinceTime' filter value, on url {self.url}")
+            logger.error(f"Failed to add {seconds}s to the {self.name} api filter value, on url {self.url}")
         except ValueError:
             logger.error(f"Failed to parse API {self.name} date in URL: {self.url}")
 

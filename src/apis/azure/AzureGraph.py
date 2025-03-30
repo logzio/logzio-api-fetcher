@@ -8,7 +8,7 @@ from src.apis.general.PaginationSettings import PaginationSettings
 from src.apis.general.StopPaginationSettings import StopPaginationSettings
 
 
-DATE_FROM_END_PATTERN = re.compile(r'\S+$')
+DATE_FROM_END_PATTERN = re.compile(r'(\S+)$')
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 logger = logging.getLogger(__name__)
