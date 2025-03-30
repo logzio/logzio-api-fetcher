@@ -20,6 +20,7 @@ class TestGoogleE2E(ApiE2ETest):
         curr_path = abspath(dirname(__file__))
         creds_path = f"{curr_path}/testdata/google_sa_creds.json"
         os.environ["GOOGLE_SA_CREDS"] = creds_path
+        os.environ["GOOGLE_PRIVATE_KEY"] = os.getenv("GOOGLE_PRIVATE_KEY").encode().decode("unicode_escape")
         update_json_tokens(creds_path, secrets_map)
 
     def test_google_data_in_logz(self):

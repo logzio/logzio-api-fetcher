@@ -76,7 +76,7 @@ def update_json_tokens(file_path, secrets_map):
     temp_test_path = f"{path}_temp.{ext}"
 
     with open(temp_test_path, "w") as file:
-        file.write(json.dumps(content))
+        json.dump(content, file)
 
     return temp_test_path
 

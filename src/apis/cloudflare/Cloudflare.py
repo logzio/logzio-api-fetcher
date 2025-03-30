@@ -68,6 +68,6 @@ class Cloudflare(ApiFetcher):
 
         # Add 1 second to a known date filter to avoid duplicates in the logs
         if DATE_FILTER_PARAMETER in self.url:
-            self.data_request.add_seconds_to_url_date_filter(1, DATE_FORMAT, FIND_DATE_PATTERN)
+            self.add_seconds_to_url_date_filter(1, DATE_FORMAT, FIND_DATE_PATTERN)
 
         return data

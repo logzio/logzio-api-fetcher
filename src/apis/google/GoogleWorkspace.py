@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timedelta, UTC
 
 from google.auth.credentials import TokenState
+from google.auth.exceptions import MalformedError
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from pydantic import Field, ConfigDict, model_validator
@@ -89,6 +90,8 @@ class GoogleWorkspace(OAuthApi):
                 self.data_request.headers["Authorization"] = f"Bearer {self.token}"
             except FileNotFoundError:
                 logger.error(f"Did not find file {self.google_ws_sa_file_path}.")
+            except MalformedError as e:
+                logger.error(f"Malformed Service Account credentials file: {e}.")
             except Exception as e:
                 logger.error("Failed to generate google access token for OAuth API request due to error: ", e)
 

@@ -19,6 +19,7 @@ jobs:
         run: PYTHONPATH=. pytest --cov-report term-missing --cov=src tests/UnitTests/test_*.py
 
   e2e-tests:
+    needs: unit-tests  # Run e2e test only if unit tests passed
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,4 +42,10 @@ jobs:
           AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
           AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
           AZURE_AD_SECRET_VALUE: ${{ secrets.AZURE_AD_SECRET_VALUE }}
+          GOOGLE_PRIVATE_KEY_ID: ${{ secrets.GOOGLE_PRIVATE_KEY_ID }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CERT_URL: ${{ secrets.GOOGLE_CERT_URL }}
+          GOOGLE_DELEGATED_ACCOUNT: ${{ secrets.GOOGLE_DELEGATED_ACCOUNT }}
         run: python -m unittest

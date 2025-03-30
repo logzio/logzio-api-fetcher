@@ -83,4 +83,4 @@ class TestGoogleApi(unittest.TestCase):
         gwa.creds = mock_creds
         result = gwa.send_request()
         self.assertEqual(result, data_res_body.get("items"))
-        self.assertEqual(gwa.data_request.url, "https://admin.googleapis.com/admin/reports/v1/activity/users/all/applications/user_accounts?startTime=2024-11-26T08:22:31.072Z")
+        self.assertEqual(gwa.data_request.url, "https://admin.googleapis.com/admin/reports/v1/activity/users/all/applications/user_accounts?startTime=2024-11-26T08:22:32.072000Z")
