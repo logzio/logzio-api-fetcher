@@ -4,6 +4,8 @@ import logging
 from pydantic import BaseModel, Field
 import requests
 from typing import Union, Optional
+from re import search
+from datetime import datetime, timedelta
 
 from src.utils.processing_functions import extract_vars, substitute_vars
 from src.apis.general.PaginationSettings import PaginationSettings, PaginationType
@@ -221,6 +223,24 @@ class ApiFetcher(BaseModel):
         """
         self.next_body = new_next_body
         self.body_vars = extract_vars(self.next_body)
+
+    def add_seconds_to_url_date_filter(self, seconds, date_format, date_re_pattern):
+        """
+        Replaces the date in the URL with a new date that is 'seconds' seconds later to prevent getting duplicate data.
+        This method is not called by default, to use it a subclass API should call it.
+        :param seconds: seconds to add to the date
+        :param date_format: the required format of the date in the URL
+        :param date_re_pattern: the regex pattern to find the date in the URL
+        """
+        try:
+            org_date = search(date_re_pattern, self.url).group(1)
+            org_date_date = datetime.strptime(org_date, date_format)
+            org_date_plus_second = (org_date_date + timedelta(seconds=seconds)).strftime(date_format)
+            self.url = self.url.replace(org_date, org_date_plus_second)
+        except IndexError:
+            logger.error(f"Failed to add 1s to the {self.name} api 'sinceTime' filter value, on url {self.url}")
+        except ValueError:
+            logger.error(f"Failed to parse API {self.name} date in URL: {self.url}")
 
     def send_request(self):
         """

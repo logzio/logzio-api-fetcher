@@ -9,7 +9,7 @@ from src.apis.general.StopPaginationSettings import StopPaginationSettings
 
 
 DATE_FROM_END_PATTERN = re.compile(r'\S+$')
-
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +69,6 @@ class AzureGraph(AzureApi):
         data = super().send_request()
 
         # Add 1s to the time we took from the response to avoid duplicates
-        org_date = re.search(DATE_FROM_END_PATTERN, self.data_request.url).group(0)
-        try:
-            org_date = datetime.strptime(org_date, "%Y-%m-%dT%H:%M:%SZ")
-            org_date_plus_second = (org_date + timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
-            self.data_request.url = self._replace_url_date(org_date_plus_second)
-        except ValueError:
-            logger.error(f"Failed to parse API {self.name} date in URL: {self.data_request.url}")
+        self.data_request.add_seconds_to_url_date_filter(1, DATE_FORMAT, DATE_FROM_END_PATTERN)
 
         return data

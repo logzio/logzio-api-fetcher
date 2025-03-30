@@ -12,6 +12,8 @@ from src.apis.cloudflare.Cloudflare import Cloudflare
 from src.apis.onepassword.OnePassword import OnePassword
 from src.output.LogzioShipper import LogzioShipper
 from src.apis.dockerhub.Dockerhub import DockerHub
+from src.apis.google.GoogleWorkspace import GoogleWorkspace
+from src.apis.google.GoogleWorkspaceActivity import GoogleWorkspaceActivity
 
 INPUT_API_FIELD = "apis"
 OUTPUT_LOGZIO_FIELD = "logzio"
@@ -23,7 +25,9 @@ API_TYPES_TO_CLASS_NAME_MAPPING = {
     "azure_mail_reports": "AzureMailReports",
     "cloudflare": "Cloudflare",
     "1password": "OnePassword",
-    "dockerhub": "DockerHub"
+    "dockerhub": "DockerHub",
+    "google_workspace": "GoogleWorkspace",
+    "google_activity": "GoogleWorkspaceActivity",
 }
 
 logger = logging.getLogger(__name__)

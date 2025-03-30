@@ -48,6 +48,13 @@ class OAuthApi(BaseModel):
 
         return self
 
+    def _token_expired(self):
+        """
+        Returns if the token expiration time passed.
+        :return: true if token is expired, false otherwise
+        """
+        return time() > (self.token_expire - 60)
+
     def _update_token(self):
         """
         Checks if the token expiration passed and if so, gets a new one and updates the data request 'Authorization'
@@ -55,7 +62,7 @@ class OAuthApi(BaseModel):
         """
         token_response = {}
 
-        if time() > (self.token_expire - 60):
+        if self._token_expired():
             try:
                 logger.debug("Sending request to update the access token.")
                 token_response = self.token_request.send_request()[0]

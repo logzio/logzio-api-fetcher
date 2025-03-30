@@ -10,6 +10,7 @@ from src.apis.general.StopPaginationSettings import StopPaginationSettings
 
 DATE_FILTER_PARAMETER = "since="
 FIND_DATE_PATTERN = re.compile(r'since=(\S+?)(?:&|$)')
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 logger = logging.getLogger(__name__)
 
@@ -60,21 +61,13 @@ class Cloudflare(ApiFetcher):
             self.url += f"?since={self._generate_start_fetch_date()}"
 
     def _generate_start_fetch_date(self):
-        return (datetime.now(UTC) - timedelta(days=self.days_back_fetch)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        return (datetime.now(UTC) - timedelta(days=self.days_back_fetch)).strftime(DATE_FORMAT)
 
     def send_request(self):
         data = super().send_request()
 
         # Add 1 second to a known date filter to avoid duplicates in the logs
         if DATE_FILTER_PARAMETER in self.url:
-            try:
-                org_date = re.search(FIND_DATE_PATTERN, self.url).group(1)
-                org_date_date = datetime.strptime(org_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-                org_date_plus_second = (org_date_date + timedelta(seconds=1)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-                self.url = self.url.replace(org_date, org_date_plus_second)
-            except IndexError:
-                logger.error(f"Failed to add 1s to the {self.name} api 'since' filter value, on url {self.url}")
-            except ValueError:
-                logger.error(f"Failed to parse API {self.name} date in URL: {self.url}")
+            self.data_request.add_seconds_to_url_date_filter(1, DATE_FORMAT, FIND_DATE_PATTERN)
 
         return data

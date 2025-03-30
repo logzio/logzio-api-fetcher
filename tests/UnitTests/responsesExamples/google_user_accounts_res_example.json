@@ -1,0 +1,28 @@
+{
+  "kind": "admin#reports#activities",
+  "etag": "\"etag-abcd\"",
+  "items": [
+    {
+      "kind": "admin#reports#activity",
+      "id": {
+        "time": "2024-11-26T08:22:31.072Z",
+        "uniqueQualifier": "-8355100519881361853",
+        "applicationName": "user_accounts",
+        "customerId": "C0123"
+      },
+      "etag": "\"etag-efgh\"",
+      "actor": {
+        "callerType": "USER",
+        "email": "elphaba@thropp.io",
+        "profileId": "12345"
+      },
+      "ipAddress": "100.100.0.0",
+      "events": [
+        {
+          "type": "password_change",
+          "name": "password_edit"
+        }
+      ]
+    }
+  ]
+}

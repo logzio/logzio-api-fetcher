@@ -1,3 +1,4 @@
+import json
 import os
 import yaml
 import glob
@@ -13,17 +14,13 @@ def validate_config_tokens(secrets_map):
         if os.getenv(env_var) is None:
             raise EnvironmentError(f"{env_var} environment variable is missing")
 
-
-def update_config_tokens(file_path, secrets_map):
+def _replace_key_with_env_var(secrets_map, content):
     """
-    Updates the tokens in the given file based on the provided token updates.
-    :param file_path: Path to the configuration file.
-    :param secrets_map: Dictionary of token updates.
-    :return: Path to the temporary configuration file.
+    Replaces the keys in the content with the corresponding environment variable values.
+    :param secrets_map: Dictionary of keys and corresponding environment variable.
+    :param content: The content to be updated.
+    :return: Updated content.
     """
-    with open(file_path, "r") as conf:
-        content = yaml.safe_load(conf)
-
     for key, env_var in secrets_map.items():
         value = os.getenv(env_var)
         print(f"Updating {key} with {env_var}={value}")
@@ -41,6 +38,19 @@ def update_config_tokens(file_path, secrets_map):
             d[int(keys[-1])] = value
         else:
             d[keys[-1]] = value
+    return content
+
+def update_config_tokens(file_path, secrets_map):
+    """
+    Updates the tokens in the given yaml file based on the provided token updates.
+    :param file_path: Path to the configuration file.
+    :param secrets_map: Dictionary of token updates.
+    :return: Path to the temporary configuration file.
+    """
+    with open(file_path, "r") as conf:
+        content = yaml.safe_load(conf)
+
+    content = _replace_key_with_env_var(secrets_map, content)
 
     path, ext = file_path.rsplit(".", 1)
     temp_test_path = f"{path}_temp.{ext}"
@@ -50,6 +60,25 @@ def update_config_tokens(file_path, secrets_map):
 
     return temp_test_path
 
+def update_json_tokens(file_path, secrets_map):
+    """
+    Updates the tokens in the given json file based on the provided token updates.
+    :param file_path: Path to the configuration file.
+    :param secrets_map: Dictionary of token updates.
+    :return: Path to the temporary configuration file.
+    """
+    with open(file_path, "r") as conf:
+        content = json.loads(conf.read())
+
+    content = _replace_key_with_env_var(secrets_map, content)
+
+    path, ext = file_path.rsplit(".", 1)
+    temp_test_path = f"{path}_temp.{ext}"
+
+    with open(temp_test_path, "w") as file:
+        file.write(json.dumps(content))
+
+    return temp_test_path
 
 def delete_temp_files():
     """
