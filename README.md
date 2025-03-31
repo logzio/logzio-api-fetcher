@@ -255,6 +255,49 @@ For dockerhub audit logs, use type `dockerhub` with the below parameters.
 
 
 </details>
+<details>
+  <summary>
+    <span><a href="./src/apis/google/README.md#google-workspace-activities">Google Workspace Activity</a></span>
+  </summary>
+
+For Google Workspace Activity, use type `google_activity` with the below parameters.
+
+
+## Configuration Options
+| Parameter Name              | Description                                                                                                                                                                                                                                         | Required/Optional | Default                                 |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|-----------------------------------------|
+| name                        | Name of the API (custom name)                                                                                                                                                                                                                       | Optional          | `Google Workspace`                      |
+| google_ws_sa_file_name      | The name of the service account credentials file. **Required unless** `google_ws_sa_file_path` is set.                                                                                                                                              | Required*         | `""`                                    |
+| google_ws_sa_file_path      | The path to the service account credentials file. **Required unless** `google_ws_sa_file_name` is set. Use this if mounting the file to a different path than the default.                                                                          | Optional*         | `./src/shared/<google_ws_sa_file_name>` |
+| google_ws_delegated_account | The email of the user for which the application is requesting delegated access                                                                                                                                                                      | Required          | -                                       |
+| application_name            | Specifies the [Google Workspace application](https://developers.google.com/workspace/admin/reports/reference/rest/v1/activities/list#applicationname) to fetch activity data from (e.g., `saml`, `user_accounts`, `login`, `admin`, `groups`, etc). | Required          | -                                       |
+| user_key                    | The unique ID of the user to fetch activity data for                                                                                                                                                                                                | Optional          | `all`                                   |
+| additional_fields           | Additional custom fields to add to the logs before sending to logzio                                                                                                                                                                                | Optional          | -                                       |
+| days_back_fetch             | The amount of days to fetch back in the first request                                                                                                                                                                                               | Optional          | 1 (day)                                 |
+| scrape_interval             | Time interval to wait between runs (unit: `minutes`)                                                                                                                                                                                                | Optional          | 1 (minute)                              |
+
+
+</details>
+<details>
+  <summary>
+    <span><a href="./src/apis/google/README.md#google-workspace-general">Google Workspace General API</a></span>
+  </summary>
+
+For structuring custom general Google Workspace API calls use type `google_workspace` API with the parameters below.
+
+| Parameter Name              | Description                                                                                                                                                                | Required/Optional | Default                                                            |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|--------------------------------------------------------------------|
+| name                        | Name of the API (custom name)                                                                                                                                              | Optional          | `Google Workspace`                                                 |
+| google_ws_sa_file_name      | The name of the service account credentials file. **Required unless** `google_ws_sa_file_path` is set.                                                                     | Required*         | `""`                                                               |
+| google_ws_sa_file_path      | The path to the service account credentials file. **Required unless** `google_ws_sa_file_name` is set. Use this if mounting the file to a different path than the default. | Optional*         | `./src/shared/<google_ws_sa_file_name>`                            |
+| google_ws_delegated_account | The email of the user for which the application is requesting delegated access                                                                                             | Required          | -                                                                  |
+| scopes                      | The OAuth 2.0 scopes that you might need to request to access Google APIs                                                                                                  | Optional          | `["https://www.googleapis.com/auth/admin.reports.audit.readonly"]` |
+| data_request                | Nest here any detail relevant to the data request. (Options in [General API](../general/README.md))                                                                        | Required          | -                                                                  |
+| additional_fields           | Additional custom fields to add to the logs before sending to logzio                                                                                                       | Optional          | -                                                                  |
+| days_back_fetch             | The amount of days to fetch back in the first request                                                                                                                      | Optional          | 1 (day)                                                            |
+| scrape_interval             | Time interval to wait between runs (unit: `minutes`)                                                                                                                       | Optional          | 1 (minute)                                                         |
+
+</details>
 
 
 And your logzio output under `logzio`:
@@ -312,6 +355,11 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **2.0.0**:
+  - Add Google Workspace Support
+  - Add option to configure multiple Logz.io outputs.
+  - Bug fix for Cloudflare `next_url` to be optional.
+  - **Note:** No breaking changes, major version bump is made to align with semantic versioning in future releases.
 - **0.3.1**:
   - Handle internal logger configuration in memory instead of disk
 - **0.3.0**:
