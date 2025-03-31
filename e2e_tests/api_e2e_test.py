@@ -75,17 +75,18 @@ class ApiE2ETest(unittest.TestCase):
         thread.start()
         thread.join(timeout=60)
 
-    def search_logs(self, query):
+    def search_logs(self, query, acc=""):
         """
         Search logs in logzio based on the provided query.
 
         Args:
             query (str): The query string to search for in the logs.
+            acc (str): The account API to use, default "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN_2.
 
         Returns:
             list: A list of log entries that match the query.
         """
-        return search_data(query)
+        return search_data(query, acc)
 
     def module_specific_setup(self):
         """

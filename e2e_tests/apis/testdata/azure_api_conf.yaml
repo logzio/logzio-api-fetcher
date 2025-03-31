@@ -12,5 +12,10 @@ apis:
     scrape_interval: 10
 
 logzio:
-  url: https://listener.logz.io:8071
-  token: SHipPIngtoKen
+  - url: https://listener.logz.io:8071
+    token: SHipPIngtoKen
+    inputs: [ azure test ]
+  - url: https://listener.logz.io:8071
+    token: SHipPIngtoKen2
+    inputs:
+      - azure test

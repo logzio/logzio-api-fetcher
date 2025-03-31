@@ -1,0 +1,19 @@
+apis:
+  - name: input1
+    type: general
+    url: https://some/url
+  - name: input2
+    type: cloudflare
+    cloudflare_account_id: c10u5f1ar3acc0un7i6
+    cloudflare_bearer_token: b3ar3r-t0k3n
+    url: https://api.cloudflare.com/rand/url
+    scrape_interval: 5
+
+logzio:
+  - url: https://listener.logz.io:8071
+    token: SHipPIngtoKen1
+    inputs: [input1, input2]
+  - url: https://listener.logz.io:8071
+    token: SHipPIngtoKen2
+    inputs:
+      - input1

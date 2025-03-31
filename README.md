@@ -307,6 +307,9 @@ And your logzio output under `logzio`:
 | url            | The logzio Listener address | Optional          | `https://listener.logz.io:8071` |
 | token          | The logzio shipping token   | Required          | -                               |
 
+> [!NOTE]
+> To configure multiple outputs, please see [multiple outputs example](./src/output/README.md#multiple-outputs)
+
 #### Example
 ```Yaml
 apis:
