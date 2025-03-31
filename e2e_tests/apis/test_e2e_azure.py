@@ -22,7 +22,7 @@ class TestAzureE2E(ApiE2ETest):
             "apis.0.azure_ad_client_id": "AZURE_AD_CLIENT_ID",
             "apis.0.azure_ad_secret_value": "AZURE_AD_SECRET_VALUE",
             "logzio.0.token": "LOGZIO_SHIPPING_TOKEN",
-            "logzio.1.token": "LOGZIO_SHIPPING_TOKEN2",
+            "logzio.1.token": "LOGZIO_SHIPPING_TOKEN_2",
             "apis.0.additional_fields.type": "TEST_TYPE"
         }
         curr_path = abspath(dirname(__file__))

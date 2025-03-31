@@ -35,11 +35,11 @@ jobs:
         # Set required environment variables
         env:
           LOGZIO_API_TOKEN: ${{ secrets.LOGZIO_API_TOKEN }}
-          LOGZIO_API_TOKEN2: ${{ secrets.LOGZIO_API_TOKEN2 }}
+          LOGZIO_API_TOKEN_2: ${{ secrets.LOGZIO_API_TOKEN_2 }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           DOCKERHUB_USER: ${{ secrets.DOCKER_USERNAME }}
           LOGZIO_SHIPPING_TOKEN: ${{ secrets.LOGZIO_SHIPPING_TOKEN }}
-          LOGZIO_SHIPPING_TOKEN2: ${{ secrets.LOGZIO_SHIPPING_TOKEN2 }}
+          LOGZIO_SHIPPING_TOKEN_2: ${{ secrets.LOGZIO_SHIPPING_TOKEN_2 }}
           AZURE_AD_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
           AZURE_AD_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
           AZURE_AD_SECRET_VALUE: ${{ secrets.AZURE_AD_SECRET_VALUE }}

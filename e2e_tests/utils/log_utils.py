@@ -7,12 +7,16 @@ def search_data(query, account=""):
     """
     Send given search query to logzio and returns the result.
     :param query:
-    :param account: the account API to use, "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN2
+    :param account: the account API to use, "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN_2
     :return:
     """
     url = "https://api.logz.io/v1/search"
+    account_env = {
+        "": "LOGZIO_API_TOKEN",
+        "2": "LOGZIO_API_TOKEN_2"
+    }
     headers = {
-        "X-API-TOKEN": os.environ[f"LOGZIO_API_TOKEN{account}"],
+        "X-API-TOKEN": os.environ[account_env.get(account)],
         "CONTENT-TYPE": "application/json",
         "ACCEPT": "application/json"
     }

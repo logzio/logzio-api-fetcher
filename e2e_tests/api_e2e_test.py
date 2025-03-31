@@ -81,7 +81,7 @@ class ApiE2ETest(unittest.TestCase):
 
         Args:
             query (str): The query string to search for in the logs.
-            acc (str): The account API to use, default "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN2.
+            acc (str): The account API to use, default "" for LOGZIO_API_TOKEN, "2" for LOGZIO_API_TOKEN_2.
 
         Returns:
             list: A list of log entries that match the query.
