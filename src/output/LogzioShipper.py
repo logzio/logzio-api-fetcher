@@ -34,6 +34,7 @@ class LogzioShipper(BaseModel):
     """
     listener: str = Field(default="https://listener.logz.io:8071", alias="url")
     token: str = Field(frozen=True)
+    inputs: list = Field(default=[], frozen=True)
     curr_logs: list = Field(default=[], init=False, init_var=True)
     curr_bulk_size: int = Field(default=0, init=False, init_var=True)
 

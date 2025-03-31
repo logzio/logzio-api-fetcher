@@ -48,7 +48,8 @@ class Cloudflare(ApiFetcher):
 
         # Update the cloudflare account id in both the url and next url
         self.url = self.url.replace("{account_id}", self.cloudflare_account_id)
-        self.next_url = self.next_url.replace("{account_id}", self.cloudflare_account_id)
+        if self.next_url:
+            self.next_url = self.next_url.replace("{account_id}", self.cloudflare_account_id)
 
         if self.days_back_fetch > 0:
             self._initialize_url_date()

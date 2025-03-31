@@ -13,11 +13,9 @@ class TaskManager:
     """
     Class to run scheduled task that collects data from given APIs and sends them with the given logzio_shipper.
     :param apis: List of ApiFetcher instances to fetch data from
-    :param logzio_shipper: LogzioShipper instance to send data to
     """
-    def __init__(self, apis=[], logzio_shipper=None):
+    def __init__(self, apis=[]):
         self.apis = apis
-        self.logzio_shipper = logzio_shipper
         self.threads = []
         self.event = threading.Event()
 
@@ -31,14 +29,14 @@ class TaskManager:
         :param api: The API class instance
         """
         logger.info(f"Starting task for api {api.name}.")
-        data_exists = False
 
         try:
-            for log in api.send_request():
-                data_exists = True
-                self.logzio_shipper.add_log_to_send(log, api.additional_fields)
-            if data_exists:
-                self.logzio_shipper.send_to_logzio()
+            logs = api.send_request()
+            if logs:
+                for logzio_shipper in api.outputs:
+                    for log in logs:
+                        logzio_shipper.add_log_to_send(log, api.additional_fields)
+                    logzio_shipper.send_to_logzio()
 
         except requests.exceptions.InvalidURL as e:
             logger.error(f"Failed to send data to Logz.io... Invalid url: {e}")

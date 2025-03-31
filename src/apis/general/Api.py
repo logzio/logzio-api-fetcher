@@ -36,6 +36,7 @@ class ApiFetcher(BaseModel):
     :param scrape_interval_minutes: the interval between scraping jobs.
     :param url_vars: Not passed to the class, array of params that is generated based on next_url.
     :param body_vars: Not passed to the class, array of params that is generated based on next_body.
+    :param outputs: Not passed to the class, array of outputs to export the returned data to.
     """
     name: str = Field(default="")
     url: str
@@ -50,6 +51,7 @@ class ApiFetcher(BaseModel):
     scrape_interval_minutes: int = Field(default=1, alias="scrape_interval", ge=1)
     url_vars: list = Field(default=[], init=False, init_var=True)
     body_vars: list = Field(default=[], init=False, init_var=True)
+    outputs: list = Field(default=[], init=False, init_var=True)
 
     def __init__(self, **data):
         """
