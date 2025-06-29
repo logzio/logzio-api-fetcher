@@ -6,13 +6,14 @@ from src.apis.general.Api import ApiFetcher, ReqMethod
 
 
 class CiscoXdr(OAuthApi):
+    ciscio_token_url = "https://visibility.amp.cisco.com/iroh/oauth2/token"
     cisco_client_id: str = Field(frozen=True)
     client_password: str = Field(frozen=True)
 
     def __init__(self, **data):
         credentials = f"{data.get('cisco_client_id')}:{data.get('client_password')}"
         token_request = ApiFetcher(
-            url=f"https://visibility.amp.cisco.com/iroh/oauth2/token",
+            url=self.ciscio_token_url,
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
@@ -27,7 +28,6 @@ class CiscoXdr(OAuthApi):
             "Accept": "application/json"
         }
         
-        # Merge custom headers with default headers
         if 'headers' in data_request_config:
             default_headers.update(data_request_config['headers'])
         
