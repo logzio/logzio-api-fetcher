@@ -355,6 +355,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **2.0.1**:
+  - Suppoort for cisco xdr
 - **2.0.0**:
   - Add Google Workspace Support
   - Add option to configure multiple Logz.io outputs.
