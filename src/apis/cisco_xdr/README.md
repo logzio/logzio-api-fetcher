@@ -46,8 +46,3 @@ apis:
 ## Authentication
 
 This module uses OAuth 2.0 client credentials flow with Basic Authentication. The credentials are automatically encoded and sent in the Authorization header to the `/iroh/oauth2/token` endpoint.
-
-
-## Output
-
-All logs include any custom fields specified in `additional_fields` and `data_request.additional_fields`. 
