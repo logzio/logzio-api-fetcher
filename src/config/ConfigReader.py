@@ -14,6 +14,7 @@ from src.output.LogzioShipper import LogzioShipper
 from src.apis.dockerhub.Dockerhub import DockerHub
 from src.apis.google.GoogleWorkspace import GoogleWorkspace
 from src.apis.google.GoogleWorkspaceActivity import GoogleWorkspaceActivity
+from src.apis.cisco_xdr.CiscoXDR import CiscoXdr
 
 INPUT_API_FIELD = "apis"
 OUTPUT_LOGZIO_FIELD = "logzio"
@@ -28,6 +29,7 @@ API_TYPES_TO_CLASS_NAME_MAPPING = {
     "dockerhub": "DockerHub",
     "google_workspace": "GoogleWorkspace",
     "google_activity": "GoogleWorkspaceActivity",
+    "cisco_xdr": "CiscoXdr",
 }
 
 logger = logging.getLogger(__name__)
