@@ -17,8 +17,7 @@ apis:
       url: https://visibility.amp.cisco.com/iroh/iroh-event/event/search
       method: POST
       body:
-        start_time: "<TIME>"    
-        end_time: "<TIME>"
+        query: <xdr_query>
         limit: 1000
       response_data_path: data 
     additional_fields:
