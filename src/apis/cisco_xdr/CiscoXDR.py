@@ -4,16 +4,16 @@ from pydantic import Field
 from src.apis.oauth.OAuth import OAuthApi
 from src.apis.general.Api import ApiFetcher, ReqMethod
 
+CISCO_TOKEN_URL = "https://visibility.amp.cisco.com/iroh/oauth2/token"
 
 class CiscoXdr(OAuthApi):
-    ciscio_token_url = "https://visibility.amp.cisco.com/iroh/oauth2/token"
     cisco_client_id: str = Field(frozen=True)
     client_password: str = Field(frozen=True)
 
     def __init__(self, **data):
         credentials = f"{data.get('cisco_client_id')}:{data.get('client_password')}"
         token_request = ApiFetcher(
-            url=self.ciscio_token_url,
+            url=CISCO_TOKEN_URL,
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Accept": "application/json",
