@@ -40,7 +40,7 @@ apis:
 | data_request.pagination | Pagination settings if needed | Optional | - |
 | data_request.next_url | If needed to update the URL in next requests based on the last response | Optional | - |
 | data_request.response_data_path | The path to the data inside the response | Optional | response root |
-| data_request.additional_fields | Additional custom fields to add to the logs before sending to logzio | Optional | - |
+| additional_fields | Additional custom fields to add to the logs before sending to logzio | Optional | - |
 | scrape_interval | Time interval to wait between runs (unit: `minutes`) | Optional | 1 (minute) |
 
 ## Authentication
