@@ -3,10 +3,10 @@ apis:
     type: google_activity
     google_ws_sa_file_path: ./google_sa_creds_temp.json
     google_ws_delegated_account: user@example.com
-    application_name: login
+    application_name: admin
     additional_fields:
       type: google_activity_shipping_test
-    days_back_fetch: 7
+    days_back_fetch: 30
     scrape_interval: 5
 
 logzio:
