@@ -212,6 +212,26 @@ By default `cloudflare` API type:
 </details>
 <details>
   <summary>
+    <span><a href="./src/apis/cloudflare_logs/README.md">Cloudflare Logs Received</a></span>
+  </summary>
+
+For Cloudflare [Logs Received](https://developers.cloudflare.com/api/resources/logs/subresources/received/methods/get/) endpoint (`/zones/{zone_id}/logs/received`), use type `cloudflare_logs`.
+This type dynamically manages `start` and `end` time windows, handles NDJSON responses, and automatically splits requests into 1-hour windows.
+
+## Configuration Options
+| Parameter Name          | Description                                                                               | Required/Optional | Default           |
+|-------------------------|-------------------------------------------------------------------------------------------|-------------------|-------------------|
+| name                    | Name of the API (custom name)                                                             | Optional          | the defined `url` |
+| cloudflare_account_id   | The Cloudflare Account ID                                                                 | Required          | -                 |
+| cloudflare_bearer_token | The Cloudflare Bearer token                                                               | Required          | -                 |
+| url                     | The request URL (do not include `start`/`end` params, they are managed automatically)     | Required          | -                 |
+| days_back_fetch         | The amount of days to fetch back in the first request (max: 7)                            | Optional          | 1 (day)           |
+| additional_fields       | Additional custom fields to add to the logs before sending to logzio                      | Optional          | -                 |
+| scrape_interval         | Time interval to wait between runs (unit: `minutes`)                                      | Optional          | 1 (minute)        |
+
+</details>
+<details>
+  <summary>
     <span><a href="./src/apis/onepassword/README.md">1Password</a></span>
   </summary>
 
@@ -355,6 +375,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **2.1.0**:
+  - Add `cloudflare_logs` type to support Cloudflare Logs Received endpoint (`/zones/{zone_id}/logs/received`) with dynamic `start`/`end` time window management and NDJSON response parsing.
 - **2.0.1**:
   - Suppoort for cisco xdr
 - **2.0.0**:
