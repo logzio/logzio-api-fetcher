@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, timezone
 import logging
 from pydantic import Field
 import re
@@ -62,7 +62,7 @@ class Cloudflare(ApiFetcher):
             self.url += f"?since={self._generate_start_fetch_date()}"
 
     def _generate_start_fetch_date(self):
-        return (datetime.now(UTC) - timedelta(days=self.days_back_fetch)).strftime(DATE_FORMAT)
+        return (datetime.now(timezone.utc) - timedelta(days=self.days_back_fetch)).strftime(DATE_FORMAT)
 
     def send_request(self):
         data = super().send_request()
