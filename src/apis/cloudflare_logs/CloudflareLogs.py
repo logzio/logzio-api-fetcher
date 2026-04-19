@@ -3,7 +3,6 @@ import json
 import logging
 from pydantic import Field
 from typing import Optional
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 from src.apis.general.Api import ApiFetcher
 
@@ -29,7 +28,6 @@ class CloudflareLogs(ApiFetcher):
     days_back_fetch: int = Field(default=1, frozen=True, ge=1, le=7)
 
     next_start_time: Optional[datetime] = Field(default=None, init=False, init_var=True)
-    base_url: str = Field(default="", init=False, init_var=True)
 
     def __init__(self, **data):
         headers = {
@@ -40,30 +38,15 @@ class CloudflareLogs(ApiFetcher):
         super().__init__(headers=headers, **data)
 
         self.url = self.url.replace("{account_id}", self.cloudflare_account_id)
-
-        self.base_url = self._strip_time_params(self.url)
-
         self.next_start_time = datetime.now(timezone.utc) - timedelta(days=self.days_back_fetch)
 
     @staticmethod
-    def _strip_time_params(url):
-        """Remove start and end query parameters from the URL to get the base URL."""
-        parsed = urlparse(url)
-        params = parse_qs(parsed.query, keep_blank_values=True)
-        params.pop("start", None)
-        params.pop("end", None)
-        clean_query = urlencode(params, doseq=True)
-        return urlunparse(parsed._replace(query=clean_query))
-
-    def _build_url(self, start, end):
+    def _build_url(base_url, start, end):
         """Build the full URL with start and end parameters."""
-        separator = "&" if "?" in self.base_url and self.base_url.split("?")[1] else "?"
-        # If base_url ends with '?' or has no query string, use '?'
-        if "?" not in self.base_url:
-            separator = "?"
+        separator = "&" if "?" in base_url else "?"
         start_str = start.strftime(DATE_FORMAT)
         end_str = end.strftime(DATE_FORMAT)
-        return f"{self.base_url}{separator}start={start_str}&end={end_str}"
+        return f"{base_url}{separator}start={start_str}&end={end_str}"
 
     @staticmethod
     def _parse_ndjson(text):
@@ -93,12 +76,13 @@ class CloudflareLogs(ApiFetcher):
                          f"end limit: {end_limit.strftime(DATE_FORMAT)}")
             return all_responses
 
+        original_url = self.url
         start = self.next_start_time
 
         while start < end_limit:
             end = min(start + MAX_WINDOW, end_limit)
 
-            self.url = self._build_url(start, end)
+            self.url = self._build_url(original_url, start, end)
             logger.debug(f"Fetching {self.name} logs window: {start.strftime(DATE_FORMAT)} -> {end.strftime(DATE_FORMAT)}")
 
             response = self._make_call()
@@ -120,5 +104,6 @@ class CloudflareLogs(ApiFetcher):
             all_responses.extend(logs)
             start = end
 
+        self.url = original_url
         self.next_start_time = start
         return all_responses

@@ -92,15 +92,6 @@ class TestCloudflareLogsApi(unittest.TestCase):
         """The logs/received endpoint should never get a 'since' parameter."""
         a = self._create_instance()
         self.assertNotIn("since=", a.url)
-        self.assertNotIn("since=", a.base_url)
-
-    def test_strips_start_end_from_user_url(self):
-        """If the user provides start/end in URL, they should be stripped for the base URL."""
-        a = self._create_instance(
-            url=f"{self.BASE_URL}?start=2026-02-23T10:00:00Z&end=2026-02-23T10:01:00Z"
-        )
-        self.assertNotIn("start=", a.base_url)
-        self.assertNotIn("end=", a.base_url)
 
     def test_auth_header(self):
         a = self._create_instance()
@@ -122,21 +113,20 @@ class TestCloudflareLogsApi(unittest.TestCase):
         self.assertEqual(len(logs), 2)
 
     def test_build_url(self):
-        a = self._create_instance()
         start = datetime(2026, 2, 23, 10, 0, 0, tzinfo=timezone.utc)
         end = datetime(2026, 2, 23, 11, 0, 0, tzinfo=timezone.utc)
-        url = a._build_url(start, end)
+        url = CloudflareLogs._build_url(self.BASE_URL, start, end)
         self.assertIn("start=2026-02-23T10:00:00Z", url)
         self.assertIn("end=2026-02-23T11:00:00Z", url)
         self.assertTrue(url.startswith(self.BASE_URL))
 
     def test_build_url_with_existing_params(self):
         """If base URL has other params (e.g., fields=), start/end should be appended with &."""
-        a = self._create_instance(url=f"{self.BASE_URL}?fields=ClientIP,RayID")
+        base_url = f"{self.BASE_URL}?fields=ClientIP,RayID"
         start = datetime(2026, 2, 23, 10, 0, 0, tzinfo=timezone.utc)
         end = datetime(2026, 2, 23, 11, 0, 0, tzinfo=timezone.utc)
-        url = a._build_url(start, end)
-        self.assertIn("fields=ClientIP%2CRayID", url)
+        url = CloudflareLogs._build_url(base_url, start, end)
+        self.assertIn("fields=ClientIP,RayID", url)
         self.assertIn("&start=2026-02-23T10:00:00Z", url)
         self.assertIn("&end=2026-02-23T11:00:00Z", url)
 
