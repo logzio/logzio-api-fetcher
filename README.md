@@ -375,6 +375,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **2.1.1**:
+  - Bug fix for `cloudflare_logs` API type: URLs with additional query parameters (e.g., `fields=`) were being corrupted.
 - **2.1.0**:
   - Add `cloudflare_logs` type to support Cloudflare Logs Received endpoint (`/zones/{zone_id}/logs/received`) with dynamic `start`/`end` time window management and NDJSON response parsing.
 - **2.0.1**:
