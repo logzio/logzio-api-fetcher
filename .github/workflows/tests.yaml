@@ -4,7 +4,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
@@ -22,7 +22,7 @@ jobs:
     needs: unit-tests  # Run e2e test only if unit tests passed
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
         with:
