@@ -65,6 +65,7 @@ class TaskManager:
             logger.debug(f"Starting thread to collect logs from {api.name}")
             thread = threading.Thread(target=self._run_api_task, args=(api,))
             thread.start()
+            thread.join()
 
             # Enforce new task to run every scrape_interval
             if self.event.wait(timeout=api.scrape_interval_minutes * 60):

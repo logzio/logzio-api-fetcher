@@ -375,6 +375,8 @@ docker stop -t 30 logzio-api-fetcher
 ```
 
 ## Changelog:
+- **2.1.2**:
+  - Bug fix: Prevent concurrent task execution when a previous task is still running, which could cause duplicate data and corrupted URLs for long-running APIs.
 - **2.1.1**:
   - Bug fix for `cloudflare_logs` API type: URLs with additional query parameters (e.g., `fields=`) were being corrupted.
 - **2.1.0**:
